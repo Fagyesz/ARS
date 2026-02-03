@@ -19,26 +19,38 @@ export function ProductItem({
 }) {
   const variantUrl = useVariantUrl(product.handle);
   const image = product.featuredImage;
+  const isAvailable = 'availableForSale' in product ? product.availableForSale : true;
+
   return (
     <Link
-      className="product-item"
+      className="product-card"
       key={product.id}
       prefetch="intent"
       to={variantUrl}
     >
-      {image && (
-        <Image
-          alt={image.altText || product.title}
-          aspectRatio="1/1"
-          data={image}
-          loading={loading}
-          sizes="(min-width: 45em) 400px, 100vw"
-        />
-      )}
-      <h4>{product.title}</h4>
-      <small>
-        <Money data={product.priceRange.minVariantPrice} />
-      </small>
+      <div className="product-card-image">
+        {image && (
+          <Image
+            alt={image.altText || product.title}
+            aspectRatio="1/1"
+            data={image}
+            loading={loading}
+            sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
+          />
+        )}
+        {!isAvailable && (
+          <span className="product-card-badge sold-out">Elfogyott</span>
+        )}
+      </div>
+      <div className="product-card-info">
+        {'vendor' in product && product.vendor && (
+          <span className="product-card-artist">{product.vendor}</span>
+        )}
+        <h3 className="product-card-title">{product.title}</h3>
+        <div className="product-card-price">
+          <Money data={product.priceRange.minVariantPrice} />
+        </div>
+      </div>
     </Link>
   );
 }
