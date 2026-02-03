@@ -1,4 +1,4 @@
-import {Link, useNavigate} from 'react-router';
+import {useNavigate} from 'react-router';
 import {type MappedProductOptions} from '@shopify/hydrogen';
 import type {
   Maybe,
@@ -7,6 +7,14 @@ import type {
 import {AddToCartButton} from './AddToCartButton';
 import {useAside} from './Aside';
 import type {ProductFragment} from 'storefrontapi.generated';
+
+// Hungarian translations for common option names
+const OPTION_TRANSLATIONS: Record<string, string> = {
+  Size: 'Méret',
+  Color: 'Szín',
+  Style: 'Stílus',
+  Material: 'Anyag',
+};
 
 export function ProductForm({
   productOptions,
@@ -17,16 +25,19 @@ export function ProductForm({
 }) {
   const navigate = useNavigate();
   const {open} = useAside();
+
   return (
     <div className="product-form">
       {productOptions.map((option) => {
         // If there is only a single value in the option values, don't display the option
         if (option.optionValues.length === 1) return null;
 
+        const optionLabel = OPTION_TRANSLATIONS[option.name] || option.name;
+
         return (
-          <div className="product-options" key={option.name}>
-            <h5>{option.name}</h5>
-            <div className="product-options-grid">
+          <div className="product-option-group" key={option.name}>
+            <span className="size-selector-label">{optionLabel}</span>
+            <div className="size-selector">
               {option.optionValues.map((value) => {
                 const {
                   name,
@@ -39,65 +50,58 @@ export function ProductForm({
                   swatch,
                 } = value;
 
+                // Check if this is a color swatch
+                const hasSwatchStyle = swatch?.color || swatch?.image?.previewImage?.url;
+
                 if (isDifferentProduct) {
-                  // SEO
-                  // When the variant is a combined listing child product
-                  // that leads to a different url, we need to render it
-                  // as an anchor tag
                   return (
-                    <Link
-                      className="product-options-item"
+                    <a
+                      className={`size-option ${hasSwatchStyle ? 'swatch' : ''}`}
                       key={option.name + name}
-                      prefetch="intent"
-                      preventScrollReset
-                      replace
-                      to={`/products/${handle}?${variantUriQuery}`}
-                      style={{
-                        border: selected
-                          ? '1px solid black'
-                          : '1px solid transparent',
-                        opacity: available ? 1 : 0.3,
-                      }}
+                      href={`/products/${handle}?${variantUriQuery}`}
+                      data-selected={selected}
+                      data-available={available}
+                      style={hasSwatchStyle ? {
+                        backgroundColor: swatch?.color || 'transparent',
+                        backgroundImage: swatch?.image?.previewImage?.url
+                          ? `url(${swatch.image.previewImage.url})`
+                          : undefined,
+                      } : undefined}
                     >
-                      <ProductOptionSwatch swatch={swatch} name={name} />
-                    </Link>
+                      {!hasSwatchStyle && name}
+                    </a>
                   );
                 } else {
-                  // SEO
-                  // When the variant is an update to the search param,
-                  // render it as a button with javascript navigating to
-                  // the variant so that SEO bots do not index these as
-                  // duplicated links
                   return (
                     <button
                       type="button"
-                      className={`product-options-item${
-                        exists && !selected ? ' link' : ''
-                      }`}
+                      className={`size-option ${hasSwatchStyle ? 'swatch' : ''}`}
                       key={option.name + name}
-                      style={{
-                        border: selected
-                          ? '1px solid black'
-                          : '1px solid transparent',
-                        opacity: available ? 1 : 0.3,
-                      }}
-                      disabled={!exists}
+                      data-selected={selected}
+                      data-available={available}
+                      disabled={!exists || !available}
                       onClick={() => {
-                        if (!selected) {
+                        if (!selected && exists) {
                           void navigate(`?${variantUriQuery}`, {
                             replace: true,
                             preventScrollReset: true,
                           });
                         }
                       }}
+                      style={hasSwatchStyle ? {
+                        backgroundColor: swatch?.color || 'transparent',
+                        backgroundImage: swatch?.image?.previewImage?.url
+                          ? `url(${swatch.image.previewImage.url})`
+                          : undefined,
+                      } : undefined}
+                      title={!available ? 'Nincs készleten' : name}
                     >
-                      <ProductOptionSwatch swatch={swatch} name={name} />
+                      {!hasSwatchStyle && name}
                     </button>
                   );
                 }
               })}
             </div>
-            <br />
           </div>
         );
       })}
@@ -118,33 +122,8 @@ export function ProductForm({
             : []
         }
       >
-        {selectedVariant?.availableForSale ? 'Add to cart' : 'Sold out'}
+        {selectedVariant?.availableForSale ? 'Kosárba' : 'Elfogyott'}
       </AddToCartButton>
-    </div>
-  );
-}
-
-function ProductOptionSwatch({
-  swatch,
-  name,
-}: {
-  swatch?: Maybe<ProductOptionValueSwatch> | undefined;
-  name: string;
-}) {
-  const image = swatch?.image?.previewImage?.url;
-  const color = swatch?.color;
-
-  if (!image && !color) return name;
-
-  return (
-    <div
-      aria-label={name}
-      className="product-option-label-swatch"
-      style={{
-        backgroundColor: color || 'transparent',
-      }}
-    >
-      {!!image && <img src={image} alt={name} />}
     </div>
   );
 }

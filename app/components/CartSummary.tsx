@@ -15,19 +15,21 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
 
   return (
     <div aria-labelledby="cart-summary" className={className}>
-      <h4>Totals</h4>
-      <dl className="cart-subtotal">
-        <dt>Subtotal</dt>
-        <dd>
-          {cart?.cost?.subtotalAmount?.amount ? (
-            <Money data={cart?.cost?.subtotalAmount} />
-          ) : (
-            '-'
-          )}
-        </dd>
-      </dl>
-      <CartDiscounts discountCodes={cart?.discountCodes} />
-      <CartGiftCard giftCardCodes={cart?.appliedGiftCards} />
+      <div className="cart-summary-content">
+        <dl className="cart-subtotal">
+          <dt>Részösszeg</dt>
+          <dd>
+            {cart?.cost?.subtotalAmount?.amount ? (
+              <Money data={cart?.cost?.subtotalAmount} />
+            ) : (
+              '-'
+            )}
+          </dd>
+        </dl>
+        <p className="cart-shipping-note">Szállítási költség a pénztárnál kerül kiszámításra</p>
+        <CartDiscounts discountCodes={cart?.discountCodes} />
+        <CartGiftCard giftCardCodes={cart?.appliedGiftCards} />
+      </div>
       <CartCheckoutActions checkoutUrl={cart?.checkoutUrl} />
     </div>
   );
@@ -37,12 +39,9 @@ function CartCheckoutActions({checkoutUrl}: {checkoutUrl?: string}) {
   if (!checkoutUrl) return null;
 
   return (
-    <div>
-      <a href={checkoutUrl} target="_self">
-        <p>Continue to Checkout &rarr;</p>
-      </a>
-      <br />
-    </div>
+    <a href={checkoutUrl} target="_self" className="cart-checkout-btn">
+      Tovább a fizetéshez
+    </a>
   );
 }
 
@@ -57,38 +56,44 @@ function CartDiscounts({
       ?.map(({code}) => code) || [];
 
   return (
-    <div>
-      {/* Have existing discount, display it with a remove option */}
-      <dl hidden={!codes.length}>
-        <div>
-          <dt>Discount(s)</dt>
-          <UpdateDiscountForm>
-            <div className="cart-discount">
-              <code>{codes?.join(', ')}</code>
-              &nbsp;
-              <button type="submit" aria-label="Remove discount">
-                Remove
-              </button>
-            </div>
-          </UpdateDiscountForm>
-        </div>
-      </dl>
+    <div className="cart-discounts">
+      {codes.length > 0 && (
+        <dl className="cart-discount-applied">
+          <dt>Kedvezmény</dt>
+          <dd>
+            <UpdateDiscountForm>
+              <div className="cart-discount-code">
+                <code>{codes?.join(', ')}</code>
+                <button type="submit" aria-label="Kedvezmény eltávolítása">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              </div>
+            </UpdateDiscountForm>
+          </dd>
+        </dl>
+      )}
 
-      {/* Show an input to apply a discount */}
       <UpdateDiscountForm discountCodes={codes}>
-        <div>
-          <label htmlFor="discount-code-input" className="sr-only">
-            Discount code
-          </label>
+        <div className="cart-discount-form">
           <input
             id="discount-code-input"
             type="text"
             name="discountCode"
-            placeholder="Discount code"
+            placeholder="Kuponkód"
           />
-          &nbsp;
-          <button type="submit" aria-label="Apply discount code">
-            Apply
+          <button type="submit" aria-label="Kuponkód alkalmazása">
+            Alkalmaz
           </button>
         </div>
       </UpdateDiscountForm>
@@ -131,35 +136,47 @@ function CartGiftCard({
   }, [giftCardAddFetcher.data]);
 
   return (
-    <div>
+    <div className="cart-gift-cards">
       {giftCardCodes && giftCardCodes.length > 0 && (
-        <dl>
-          <dt>Applied Gift Card(s)</dt>
+        <dl className="cart-gift-card-applied">
+          <dt>Ajándékkártya</dt>
           {giftCardCodes.map((giftCard) => (
-            <RemoveGiftCardForm key={giftCard.id} giftCardId={giftCard.id}>
-              <div className="cart-discount">
-                <code>***{giftCard.lastCharacters}</code>
-                &nbsp;
-                <Money data={giftCard.amountUsed} />
-                &nbsp;
-                <button type="submit">Remove</button>
-              </div>
-            </RemoveGiftCardForm>
+            <dd key={giftCard.id}>
+              <RemoveGiftCardForm giftCardId={giftCard.id}>
+                <div className="cart-discount-code">
+                  <code>***{giftCard.lastCharacters}</code>
+                  <span>-<Money data={giftCard.amountUsed} /></span>
+                  <button type="submit" aria-label="Eltávolítás">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                  </button>
+                </div>
+              </RemoveGiftCardForm>
+            </dd>
           ))}
         </dl>
       )}
 
       <AddGiftCardForm fetcherKey="gift-card-add">
-        <div>
+        <div className="cart-discount-form">
           <input
             type="text"
             name="giftCardCode"
-            placeholder="Gift card code"
+            placeholder="Ajándékkártya kód"
             ref={giftCardCodeInput}
           />
-          &nbsp;
           <button type="submit" disabled={giftCardAddFetcher.state !== 'idle'}>
-            Apply
+            Alkalmaz
           </button>
         </div>
       </AddGiftCardForm>
