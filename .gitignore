@@ -1,0 +1,12 @@
+node_modules
+/.DS_Store
+.claude/
+.cursor/
+/.cache
+/build
+/dist
+/public/build
+/.mf
+.env
+.shopify
+.react-router

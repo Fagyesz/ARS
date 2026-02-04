@@ -1,0 +1,120 @@
+Handle,Title,Body (HTML),Vendor,Product Category,Type,Tags,Published,Option1 Name,Option1 Value,Option2 Name,Option2 Value,Variant SKU,Variant Grams,Variant Inventory Tracker,Variant Inventory Qty,Variant Inventory Policy,Variant Fulfillment Service,Variant Price,Variant Compare At Price,Variant Requires Shipping,Variant Taxable,Variant Barcode,Image Src,Image Position,Image Alt Text,Gift Card,SEO Title,SEO Description,Status
+baseline-t-shirt,Baseline T-shirt,"<p>Ars Mosoris alap póló - egyszerű, letisztult design.</p>",Ars Mosoris,Apparel & Accessories > Clothing > Shirts & Tops > T-Shirts,Póló,"polo, brand, alapdarab",true,Méret,S,,,ARS-BAS-S,200,shopify,50,deny,manual,5000,,true,true,,https://ars-mosoris.merchstore.hu/storage/products/01JYCGSJZTD5TTCHDQG06BVMMV.png,1,Baseline T-shirt,false,Baseline T-shirt | Ars Mosoris,Ars Mosoris alap póló - egyszerű letisztult design,active
+baseline-t-shirt,,,,,,,,,M,,,ARS-BAS-M,200,shopify,50,deny,manual,5000,,true,true,,,,,,,
+baseline-t-shirt,,,,,,,,,L,,,ARS-BAS-L,200,shopify,50,deny,manual,5000,,true,true,,,,,,,
+baseline-t-shirt,,,,,,,,,XL,,,ARS-BAS-XL,200,shopify,40,deny,manual,5000,,true,true,,,,,,,
+baseline-t-shirt,,,,,,,,,XXL,,,ARS-BAS-XXL,200,shopify,30,deny,manual,5000,,true,true,,,,,,,
+visions-t-shirt,Visions T-shirt,"<p>Ars Mosoris Visions póló - különleges grafikai design.</p>",Ars Mosoris,Apparel & Accessories > Clothing > Shirts & Tops > T-Shirts,Póló,"polo, brand, visions",true,Méret,S,,,ARS-VIS-S,200,shopify,50,deny,manual,5500,,true,true,,https://ars-mosoris.merchstore.hu/storage/products/01JY6CZH5KCTK1DPHS35JNR5SY.png,1,Visions T-shirt,false,Visions T-shirt | Ars Mosoris,Ars Mosoris Visions póló - különleges grafikai design,active
+visions-t-shirt,,,,,,,,,M,,,ARS-VIS-M,200,shopify,50,deny,manual,5500,,true,true,,,,,,,
+visions-t-shirt,,,,,,,,,L,,,ARS-VIS-L,200,shopify,50,deny,manual,5500,,true,true,,,,,,,
+visions-t-shirt,,,,,,,,,XL,,,ARS-VIS-XL,200,shopify,40,deny,manual,5500,,true,true,,,,,,,
+visions-t-shirt,,,,,,,,,XXL,,,ARS-VIS-XXL,200,shopify,30,deny,manual,5500,,true,true,,,,,,,
+noi-test-alkotas,Női test alkotás,"<p>Ancsa egyedi művészi alkotása pólón. Eredeti grafika a művész keze által.</p>",Ancsa,Apparel & Accessories > Clothing > Shirts & Tops > T-Shirts,Póló,"polo, ancsa, muveszi, alkotas",true,Méret,S,,,ARS-ANC-NT-S,200,shopify,30,deny,manual,9500,,true,true,,https://ars-mosoris.merchstore.hu/storage/products/01JY75TN7WMW0V6C5031ZGV0Q6.png,1,Női test alkotás - Ancsa,false,Női test alkotás | Ancsa | Ars Mosoris,Ancsa egyedi művészi alkotása pólón,active
+noi-test-alkotas,,,,,,,,,M,,,ARS-ANC-NT-M,200,shopify,30,deny,manual,9500,,true,true,,,,,,,
+noi-test-alkotas,,,,,,,,,L,,,ARS-ANC-NT-L,200,shopify,30,deny,manual,9500,,true,true,,,,,,,
+noi-test-alkotas,,,,,,,,,XL,,,ARS-ANC-NT-XL,200,shopify,25,deny,manual,9500,,true,true,,,,,,,
+noi-test-alkotas,,,,,,,,,XXL,,,ARS-ANC-NT-XXL,200,shopify,20,deny,manual,9500,,true,true,,,,,,,
+bogar-alkotas,Bogár alkotás,"<p>Ancsa bogár témájú művészi alkotása. Részletes grafika természeti motívumokkal.</p>",Ancsa,Apparel & Accessories > Clothing > Shirts & Tops > T-Shirts,Póló,"polo, ancsa, bogar, termeszet",true,Méret,S,,,ARS-ANC-BOG-S,200,shopify,30,deny,manual,9500,,true,true,,https://ars-mosoris.merchstore.hu/storage/products/01JY75NM0E2GQR9AEX7TNDYKYH.png,1,Bogár alkotás - Ancsa,false,Bogár alkotás | Ancsa | Ars Mosoris,Ancsa bogár témájú művészi alkotása,active
+bogar-alkotas,,,,,,,,,M,,,ARS-ANC-BOG-M,200,shopify,30,deny,manual,9500,,true,true,,,,,,,
+bogar-alkotas,,,,,,,,,L,,,ARS-ANC-BOG-L,200,shopify,30,deny,manual,9500,,true,true,,,,,,,
+bogar-alkotas,,,,,,,,,XL,,,ARS-ANC-BOG-XL,200,shopify,25,deny,manual,9500,,true,true,,,,,,,
+bogar-alkotas,,,,,,,,,XXL,,,ARS-ANC-BOG-XXL,200,shopify,20,deny,manual,9500,,true,true,,,,,,,
+napvilag-holdvilag-alkotas,Napvilág Holdvilág alkotás,"<p>Ancsa művészi dualitás alkotása - a fény és árnyék játéka.</p>",Ancsa,Apparel & Accessories > Clothing > Shirts & Tops > T-Shirts,Póló,"polo, ancsa, nap, hold",true,Méret,S,,,ARS-ANC-NH-S,200,shopify,30,deny,manual,9500,,true,true,,https://ars-mosoris.merchstore.hu/storage/products/01JY760VYQSMNB98ETPBGBVB64.png,1,Napvilág Holdvilág alkotás - Ancsa,false,Napvilág Holdvilág alkotás | Ancsa | Ars Mosoris,Ancsa művészi dualitás alkotása,active
+napvilag-holdvilag-alkotas,,,,,,,,,M,,,ARS-ANC-NH-M,200,shopify,30,deny,manual,9500,,true,true,,,,,,,
+napvilag-holdvilag-alkotas,,,,,,,,,L,,,ARS-ANC-NH-L,200,shopify,30,deny,manual,9500,,true,true,,,,,,,
+napvilag-holdvilag-alkotas,,,,,,,,,XL,,,ARS-ANC-NH-XL,200,shopify,25,deny,manual,9500,,true,true,,,,,,,
+napvilag-holdvilag-alkotas,,,,,,,,,XXL,,,ARS-ANC-NH-XXL,200,shopify,20,deny,manual,9500,,true,true,,,,,,,
+tinta-alkotas,Tinta alkotás,"<p>Ancsa tintával készült művészi alkotása - expresszív vonalak és formák.</p>",Ancsa,Apparel & Accessories > Clothing > Shirts & Tops > T-Shirts,Póló,"polo, ancsa, tinta, grafika",true,Méret,S,,,ARS-ANC-TIN-S,200,shopify,30,deny,manual,9500,,true,true,,https://ars-mosoris.merchstore.hu/storage/products/01JY7666PWF1QXSNZW0E6GKXTW.png,1,Tinta alkotás - Ancsa,false,Tinta alkotás | Ancsa | Ars Mosoris,Ancsa tintával készült művészi alkotása,active
+tinta-alkotas,,,,,,,,,M,,,ARS-ANC-TIN-M,200,shopify,30,deny,manual,9500,,true,true,,,,,,,
+tinta-alkotas,,,,,,,,,L,,,ARS-ANC-TIN-L,200,shopify,30,deny,manual,9500,,true,true,,,,,,,
+tinta-alkotas,,,,,,,,,XL,,,ARS-ANC-TIN-XL,200,shopify,25,deny,manual,9500,,true,true,,,,,,,
+tinta-alkotas,,,,,,,,,XXL,,,ARS-ANC-TIN-XXL,200,shopify,20,deny,manual,9500,,true,true,,,,,,,
+maszk-alkotas,Maszk alkotás,"<p>Ancsa maszk témájú alkotása - identitás és rejtőzés.</p>",Ancsa,Apparel & Accessories > Clothing > Shirts & Tops > T-Shirts,Póló,"polo, ancsa, maszk, identitas",true,Méret,S,,,ARS-ANC-MSK-S,200,shopify,30,deny,manual,9500,,true,true,,https://ars-mosoris.merchstore.hu/storage/products/01JY76BQ2ZE7HES7HYFM1RQG38.png,1,Maszk alkotás - Ancsa,false,Maszk alkotás | Ancsa | Ars Mosoris,Ancsa maszk témájú alkotása,active
+maszk-alkotas,,,,,,,,,M,,,ARS-ANC-MSK-M,200,shopify,30,deny,manual,9500,,true,true,,,,,,,
+maszk-alkotas,,,,,,,,,L,,,ARS-ANC-MSK-L,200,shopify,30,deny,manual,9500,,true,true,,,,,,,
+maszk-alkotas,,,,,,,,,XL,,,ARS-ANC-MSK-XL,200,shopify,25,deny,manual,9500,,true,true,,,,,,,
+maszk-alkotas,,,,,,,,,XXL,,,ARS-ANC-MSK-XXL,200,shopify,20,deny,manual,9500,,true,true,,,,,,,
+bacsi-alkotas,Bácsi alkotás,"<p>Zorka karakteres portré alkotása - mély emberi ábrázolás.</p>",Zorka,Apparel & Accessories > Clothing > Shirts & Tops > T-Shirts,Póló,"polo, zorka, portre, karakter",true,Méret,S,,,ARS-ZOR-BAC-S,200,shopify,30,deny,manual,9500,,true,true,,https://ars-mosoris.merchstore.hu/storage/products/01JY76GTACYM826WJ9V0N7JT11.png,1,Bácsi alkotás - Zorka,false,Bácsi alkotás | Zorka | Ars Mosoris,Zorka karakteres portré alkotása,active
+bacsi-alkotas,,,,,,,,,M,,,ARS-ZOR-BAC-M,200,shopify,30,deny,manual,9500,,true,true,,,,,,,
+bacsi-alkotas,,,,,,,,,L,,,ARS-ZOR-BAC-L,200,shopify,30,deny,manual,9500,,true,true,,,,,,,
+bacsi-alkotas,,,,,,,,,XL,,,ARS-ZOR-BAC-XL,200,shopify,25,deny,manual,9500,,true,true,,,,,,,
+bacsi-alkotas,,,,,,,,,XXL,,,ARS-ZOR-BAC-XXL,200,shopify,20,deny,manual,9500,,true,true,,,,,,,
+tus-alkotas,Tus alkotás,"<p>Zorka tussal készült művészi alkotása - erőteljes vonalvezetés.</p>",Zorka,Apparel & Accessories > Clothing > Shirts & Tops > T-Shirts,Póló,"polo, zorka, tus, grafika",true,Méret,S,,,ARS-ZOR-TUS-S,200,shopify,30,deny,manual,9500,,true,true,,https://ars-mosoris.merchstore.hu/storage/products/01JY76YRQR28MN82NJDFPCY98Q.png,1,Tus alkotás - Zorka,false,Tus alkotás | Zorka | Ars Mosoris,Zorka tussal készült művészi alkotása,active
+tus-alkotas,,,,,,,,,M,,,ARS-ZOR-TUS-M,200,shopify,30,deny,manual,9500,,true,true,,,,,,,
+tus-alkotas,,,,,,,,,L,,,ARS-ZOR-TUS-L,200,shopify,30,deny,manual,9500,,true,true,,,,,,,
+tus-alkotas,,,,,,,,,XL,,,ARS-ZOR-TUS-XL,200,shopify,25,deny,manual,9500,,true,true,,,,,,,
+tus-alkotas,,,,,,,,,XXL,,,ARS-ZOR-TUS-XXL,200,shopify,20,deny,manual,9500,,true,true,,,,,,,
+festett-alkotas,Festett alkotás,"<p>Zorka festett technikájú alkotása - vibráló színek és formák.</p>",Zorka,Apparel & Accessories > Clothing > Shirts & Tops > T-Shirts,Póló,"polo, zorka, festett, szines",true,Méret,S,,,ARS-ZOR-FES-S,200,shopify,30,deny,manual,9500,,true,true,,https://ars-mosoris.merchstore.hu/storage/products/01JY77MDSG6BYKXE554514F6F2.png,1,Festett alkotás - Zorka,false,Festett alkotás | Zorka | Ars Mosoris,Zorka festett technikájú alkotása,active
+festett-alkotas,,,,,,,,,M,,,ARS-ZOR-FES-M,200,shopify,30,deny,manual,9500,,true,true,,,,,,,
+festett-alkotas,,,,,,,,,L,,,ARS-ZOR-FES-L,200,shopify,30,deny,manual,9500,,true,true,,,,,,,
+festett-alkotas,,,,,,,,,XL,,,ARS-ZOR-FES-XL,200,shopify,25,deny,manual,9500,,true,true,,,,,,,
+festett-alkotas,,,,,,,,,XXL,,,ARS-ZOR-FES-XXL,200,shopify,20,deny,manual,9500,,true,true,,,,,,,
+spiral-alkotas,Spirál alkotás,"<p>Zorka spirál motívumú alkotása - végtelen körforgás.</p>",Zorka,Apparel & Accessories > Clothing > Shirts & Tops > T-Shirts,Póló,"polo, zorka, spiral, geometrikus",true,Méret,S,,,ARS-ZOR-SPI-S,200,shopify,30,deny,manual,9500,,true,true,,https://ars-mosoris.merchstore.hu/storage/products/01JY789MA6N0GTH8685Y5CM2C4.png,1,Spirál alkotás - Zorka,false,Spirál alkotás | Zorka | Ars Mosoris,Zorka spirál motívumú alkotása,active
+spiral-alkotas,,,,,,,,,M,,,ARS-ZOR-SPI-M,200,shopify,30,deny,manual,9500,,true,true,,,,,,,
+spiral-alkotas,,,,,,,,,L,,,ARS-ZOR-SPI-L,200,shopify,30,deny,manual,9500,,true,true,,,,,,,
+spiral-alkotas,,,,,,,,,XL,,,ARS-ZOR-SPI-XL,200,shopify,25,deny,manual,9500,,true,true,,,,,,,
+spiral-alkotas,,,,,,,,,XXL,,,ARS-ZOR-SPI-XXL,200,shopify,20,deny,manual,9500,,true,true,,,,,,,
+citrom-vaszontaska,Citrom vászontáska,"<p>Zorka citrom motívumos vászontáskája - friss és vidám design.</p>",Zorka,Apparel & Accessories > Handbags Wallets & Cases > Tote Bags,Táska,"taska, vaszon, zorka, citrom",true,Méret,One Size,,,ARS-ZOR-CIT,150,shopify,100,deny,manual,4900,,true,true,,https://ars-mosoris.merchstore.hu/storage/products/01JY78P1F55SYVZEY0DZ1JD8YS.png,1,Citrom vászontáska - Zorka,false,Citrom vászontáska | Zorka | Ars Mosoris,Zorka citrom motívumos vászontáskája,active
+ciano-alkotas,Ciano alkotás,"<p>Zsolt cián színvilágú művészi alkotása - modern és vibráló.</p>",Zsolt,Apparel & Accessories > Clothing > Shirts & Tops > T-Shirts,Póló,"polo, zsolt, cian, modern",true,Méret,S,,,ARS-ZSO-CIA-S,200,shopify,30,deny,manual,8990,,true,true,,https://ars-mosoris.merchstore.hu/storage/products/01JY797F18D2HN78HSE91RHW93.png,1,Ciano alkotás - Zsolt,false,Ciano alkotás | Zsolt | Ars Mosoris,Zsolt cián színvilágú művészi alkotása,active
+ciano-alkotas,,,,,,,,,M,,,ARS-ZSO-CIA-M,200,shopify,30,deny,manual,8990,,true,true,,,,,,,
+ciano-alkotas,,,,,,,,,L,,,ARS-ZSO-CIA-L,200,shopify,30,deny,manual,8990,,true,true,,,,,,,
+ciano-alkotas,,,,,,,,,XL,,,ARS-ZSO-CIA-XL,200,shopify,25,deny,manual,8990,,true,true,,,,,,,
+ciano-alkotas,,,,,,,,,XXL,,,ARS-ZSO-CIA-XXL,200,shopify,20,deny,manual,8990,,true,true,,,,,,,
+star-alkotas,Star alkotás,"<p>Zsolt csillag témájú alkotása - kozmikus inspiráció.</p>",Zsolt,Apparel & Accessories > Clothing > Shirts & Tops > T-Shirts,Póló,"polo, zsolt, csillag, kozmikus",true,Méret,S,,,ARS-ZSO-STA-S,200,shopify,30,deny,manual,8990,,true,true,,https://ars-mosoris.merchstore.hu/storage/products/01JY7B768C21494YYNGSJC12ZD.png,1,Star alkotás - Zsolt,false,Star alkotás | Zsolt | Ars Mosoris,Zsolt csillag témájú alkotása,active
+star-alkotas,,,,,,,,,M,,,ARS-ZSO-STA-M,200,shopify,30,deny,manual,8990,,true,true,,,,,,,
+star-alkotas,,,,,,,,,L,,,ARS-ZSO-STA-L,200,shopify,30,deny,manual,8990,,true,true,,,,,,,
+star-alkotas,,,,,,,,,XL,,,ARS-ZSO-STA-XL,200,shopify,25,deny,manual,8990,,true,true,,,,,,,
+star-alkotas,,,,,,,,,XXL,,,ARS-ZSO-STA-XXL,200,shopify,20,deny,manual,8990,,true,true,,,,,,,
+backturner-alkotas,Backturner alkotás,"<p>Zsolt Backturner alkotása - dinamikus perspektíva.</p>",Zsolt,Apparel & Accessories > Clothing > Shirts & Tops > T-Shirts,Póló,"polo, zsolt, dinamikus, absztrakt",true,Méret,S,,,ARS-ZSO-BAC-S,200,shopify,30,deny,manual,9500,,true,true,,https://ars-mosoris.merchstore.hu/storage/products/01JY7AEVQNGHHM1JE42GVYH6C7.png,1,Backturner alkotás - Zsolt,false,Backturner alkotás | Zsolt | Ars Mosoris,Zsolt Backturner alkotása,active
+backturner-alkotas,,,,,,,,,M,,,ARS-ZSO-BAC-M,200,shopify,30,deny,manual,9500,,true,true,,,,,,,
+backturner-alkotas,,,,,,,,,L,,,ARS-ZSO-BAC-L,200,shopify,30,deny,manual,9500,,true,true,,,,,,,
+backturner-alkotas,,,,,,,,,XL,,,ARS-ZSO-BAC-XL,200,shopify,25,deny,manual,9500,,true,true,,,,,,,
+backturner-alkotas,,,,,,,,,XXL,,,ARS-ZSO-BAC-XXL,200,shopify,20,deny,manual,9500,,true,true,,,,,,,
+unravel-alkotas,Unravel alkotás,"<p>Zsolt Unravel alkotása - kibomló formák és struktúrák.</p>",Zsolt,Apparel & Accessories > Clothing > Shirts & Tops > T-Shirts,Póló,"polo, zsolt, unravel, absztrakt",true,Méret,S,,,ARS-ZSO-UNR-S,200,shopify,30,deny,manual,8990,,true,true,,https://ars-mosoris.merchstore.hu/storage/products/01JY7ARBYDE6BA83K0HJDTA8P4.png,1,Unravel alkotás - Zsolt,false,Unravel alkotás | Zsolt | Ars Mosoris,Zsolt Unravel alkotása,active
+unravel-alkotas,,,,,,,,,M,,,ARS-ZSO-UNR-M,200,shopify,30,deny,manual,8990,,true,true,,,,,,,
+unravel-alkotas,,,,,,,,,L,,,ARS-ZSO-UNR-L,200,shopify,30,deny,manual,8990,,true,true,,,,,,,
+unravel-alkotas,,,,,,,,,XL,,,ARS-ZSO-UNR-XL,200,shopify,25,deny,manual,8990,,true,true,,,,,,,
+unravel-alkotas,,,,,,,,,XXL,,,ARS-ZSO-UNR-XXL,200,shopify,20,deny,manual,8990,,true,true,,,,,,,
+illusion-alkotas,Illusion alkotás,"<p>Zsolt illúzió alkotása - látszat és valóság határán.</p>",Zsolt,Apparel & Accessories > Clothing > Shirts & Tops > T-Shirts,Póló,"polo, zsolt, illuzio, optikai",true,Méret,S,,,ARS-ZSO-ILL-S,200,shopify,30,deny,manual,8990,,true,true,,https://ars-mosoris.merchstore.hu/storage/products/01JY7C2WZT0KBJ10RG4WT99FQS.png,1,Illusion alkotás - Zsolt,false,Illusion alkotás | Zsolt | Ars Mosoris,Zsolt illúzió alkotása,active
+illusion-alkotas,,,,,,,,,M,,,ARS-ZSO-ILL-M,200,shopify,30,deny,manual,8990,,true,true,,,,,,,
+illusion-alkotas,,,,,,,,,L,,,ARS-ZSO-ILL-L,200,shopify,30,deny,manual,8990,,true,true,,,,,,,
+illusion-alkotas,,,,,,,,,XL,,,ARS-ZSO-ILL-XL,200,shopify,25,deny,manual,8990,,true,true,,,,,,,
+illusion-alkotas,,,,,,,,,XXL,,,ARS-ZSO-ILL-XXL,200,shopify,20,deny,manual,8990,,true,true,,,,,,,
+dongo-alkotas,Dongó alkotás,"<p>Dóri dongó motívumú alkotása - részletgazdag természeti grafika.</p>",Dóri,Apparel & Accessories > Clothing > Shirts & Tops > T-Shirts,Póló,"polo, dori, dongo, termeszet",true,Méret,S,,,ARS-DOR-DON-S,200,shopify,30,deny,manual,9500,,true,true,,https://ars-mosoris.merchstore.hu/storage/products/01JY7EDTQV0V99GJAZ82P2FB85.png,1,Dongó alkotás - Dóri,false,Dongó alkotás | Dóri | Ars Mosoris,Dóri dongó motívumú alkotása,active
+dongo-alkotas,,,,,,,,,M,,,ARS-DOR-DON-M,200,shopify,30,deny,manual,9500,,true,true,,,,,,,
+dongo-alkotas,,,,,,,,,L,,,ARS-DOR-DON-L,200,shopify,30,deny,manual,9500,,true,true,,,,,,,
+dongo-alkotas,,,,,,,,,XL,,,ARS-DOR-DON-XL,200,shopify,25,deny,manual,9500,,true,true,,,,,,,
+dongo-alkotas,,,,,,,,,XXL,,,ARS-DOR-DON-XXL,200,shopify,20,deny,manual,9500,,true,true,,,,,,,
+goliatbogar-alkotas,Góliátbogár alkotás,"<p>Dóri góliátbogár témájú alkotása - lenyűgöző rovar portré.</p>",Dóri,Apparel & Accessories > Clothing > Shirts & Tops > T-Shirts,Póló,"polo, dori, bogar, termeszet",true,Méret,S,,,ARS-DOR-GOL-S,200,shopify,30,deny,manual,9500,,true,true,,https://ars-mosoris.merchstore.hu/storage/products/01JY7EN70MKQFCH7WJZW4R44PJ.png,1,Góliátbogár alkotás - Dóri,false,Góliátbogár alkotás | Dóri | Ars Mosoris,Dóri góliátbogár témájú alkotása,active
+goliatbogar-alkotas,,,,,,,,,M,,,ARS-DOR-GOL-M,200,shopify,30,deny,manual,9500,,true,true,,,,,,,
+goliatbogar-alkotas,,,,,,,,,L,,,ARS-DOR-GOL-L,200,shopify,30,deny,manual,9500,,true,true,,,,,,,
+goliatbogar-alkotas,,,,,,,,,XL,,,ARS-DOR-GOL-XL,200,shopify,25,deny,manual,9500,,true,true,,,,,,,
+goliatbogar-alkotas,,,,,,,,,XXL,,,ARS-DOR-GOL-XXL,200,shopify,20,deny,manual,9500,,true,true,,,,,,,
+cserebogar-alkotas,Cserebogár alkotás,"<p>Dóri cserebogár témájú alkotása - nosztalgikus rovar grafika.</p>",Dóri,Apparel & Accessories > Clothing > Shirts & Tops > T-Shirts,Póló,"polo, dori, bogar, termeszet",true,Méret,S,,,ARS-DOR-CSE-S,200,shopify,30,deny,manual,9500,,true,true,,https://ars-mosoris.merchstore.hu/storage/products/01JY7EY0S46S0EYDA75E3MTZE0.png,1,Cserebogár alkotás - Dóri,false,Cserebogár alkotás | Dóri | Ars Mosoris,Dóri cserebogár témájú alkotása,active
+cserebogar-alkotas,,,,,,,,,M,,,ARS-DOR-CSE-M,200,shopify,30,deny,manual,9500,,true,true,,,,,,,
+cserebogar-alkotas,,,,,,,,,L,,,ARS-DOR-CSE-L,200,shopify,30,deny,manual,9500,,true,true,,,,,,,
+cserebogar-alkotas,,,,,,,,,XL,,,ARS-DOR-CSE-XL,200,shopify,25,deny,manual,9500,,true,true,,,,,,,
+cserebogar-alkotas,,,,,,,,,XXL,,,ARS-DOR-CSE-XXL,200,shopify,20,deny,manual,9500,,true,true,,,,,,,
+the-tower-vaszontaska,The Tower vászontáska,"<p>Dóri Tower tarot ihletésű vászontáskája - misztikus design.</p>",Dóri,Apparel & Accessories > Handbags Wallets & Cases > Tote Bags,Táska,"taska, vaszon, dori, tarot",true,Méret,One Size,,,ARS-DOR-TOW,150,shopify,100,deny,manual,4900,,true,true,,https://ars-mosoris.merchstore.hu/storage/products/01JY7E7YEC5BAX3YCPEMXJQVET.png,1,The Tower vászontáska - Dóri,false,The Tower vászontáska | Dóri | Ars Mosoris,Dóri Tower tarot ihletésű vászontáskája,active
+the-lovers-vaszontaska,The Lovers vászontáska,"<p>Dóri Lovers tarot ihletésű vászontáskája - romantikus design.</p>",Dóri,Apparel & Accessories > Handbags Wallets & Cases > Tote Bags,Táska,"taska, vaszon, dori, tarot",true,Méret,One Size,,,ARS-DOR-LOV,150,shopify,100,deny,manual,4900,,true,true,,https://ars-mosoris.merchstore.hu/storage/products/01JY7EATRBKR2BKCQ06QKDAXZR.png,1,The Lovers vászontáska - Dóri,false,The Lovers vászontáska | Dóri | Ars Mosoris,Dóri Lovers tarot ihletésű vászontáskája,active
+szen-alkotas,Szén alkotás,"<p>Emese szénnel készült művészi alkotása - nyers és expresszív.</p>",Emese,Apparel & Accessories > Clothing > Shirts & Tops > T-Shirts,Póló,"polo, emese, szen, grafika",true,Méret,S,,,ARS-EME-SZE-S,200,shopify,30,deny,manual,9500,,true,true,,https://ars-mosoris.merchstore.hu/storage/products/01JY7CRV4M4HF11D3TBXTHJ45R.png,1,Szén alkotás - Emese,false,Szén alkotás | Emese | Ars Mosoris,Emese szénnel készült művészi alkotása,active
+szen-alkotas,,,,,,,,,M,,,ARS-EME-SZE-M,200,shopify,30,deny,manual,9500,,true,true,,,,,,,
+szen-alkotas,,,,,,,,,L,,,ARS-EME-SZE-L,200,shopify,30,deny,manual,9500,,true,true,,,,,,,
+szen-alkotas,,,,,,,,,XL,,,ARS-EME-SZE-XL,200,shopify,25,deny,manual,9500,,true,true,,,,,,,
+szen-alkotas,,,,,,,,,XXL,,,ARS-EME-SZE-XXL,200,shopify,20,deny,manual,9500,,true,true,,,,,,,
+lito-alkotas,Litó alkotás,"<p>Emese litográfia technikájú alkotása - klasszikus nyomtatási műfaj.</p>",Emese,Apparel & Accessories > Clothing > Shirts & Tops > T-Shirts,Póló,"polo, emese, lito, grafika",true,Méret,S,,,ARS-EME-LIT-S,200,shopify,30,deny,manual,9500,,true,true,,https://ars-mosoris.merchstore.hu/storage/products/01JY7D4NMA9T43HACVKKBTDWE1.png,1,Litó alkotás - Emese,false,Litó alkotás | Emese | Ars Mosoris,Emese litográfia technikájú alkotása,active
+lito-alkotas,,,,,,,,,M,,,ARS-EME-LIT-M,200,shopify,30,deny,manual,9500,,true,true,,,,,,,
+lito-alkotas,,,,,,,,,L,,,ARS-EME-LIT-L,200,shopify,30,deny,manual,9500,,true,true,,,,,,,
+lito-alkotas,,,,,,,,,XL,,,ARS-EME-LIT-XL,200,shopify,25,deny,manual,9500,,true,true,,,,,,,
+lito-alkotas,,,,,,,,,XXL,,,ARS-EME-LIT-XXL,200,shopify,20,deny,manual,9500,,true,true,,,,,,,
+lino-alkotas,Linó alkotás,"<p>Emese linómetszet technikájú alkotása - egyedi nyomatok.</p>",Emese,Apparel & Accessories > Clothing > Shirts & Tops > T-Shirts,Póló,"polo, emese, lino, nyomat",true,Méret,S,,,ARS-EME-LIN-S,200,shopify,30,deny,manual,9500,,true,true,,https://ars-mosoris.merchstore.hu/storage/products/01JY7DGG9WDY7CZSZGWG0PFHFX.png,1,Linó alkotás - Emese,false,Linó alkotás | Emese | Ars Mosoris,Emese linómetszet technikájú alkotása,active
+lino-alkotas,,,,,,,,,M,,,ARS-EME-LIN-M,200,shopify,30,deny,manual,9500,,true,true,,,,,,,
+lino-alkotas,,,,,,,,,L,,,ARS-EME-LIN-L,200,shopify,30,deny,manual,9500,,true,true,,,,,,,
+lino-alkotas,,,,,,,,,XL,,,ARS-EME-LIN-XL,200,shopify,25,deny,manual,9500,,true,true,,,,,,,
+lino-alkotas,,,,,,,,,XXL,,,ARS-EME-LIN-XXL,200,shopify,20,deny,manual,9500,,true,true,,,,,,,
+capali-vaszontaska,Cápali vászontáska,"<p>Emese cápa motívumos vászontáskája - játékos tengeri design.</p>",Emese,Apparel & Accessories > Handbags Wallets & Cases > Tote Bags,Táska,"taska, vaszon, emese, capa",true,Méret,One Size,,,ARS-EME-CAP,150,shopify,100,deny,manual,4900,,true,true,,https://ars-mosoris.merchstore.hu/storage/products/01JY7DZRW627CDQ2FAFQW1ACJW.png,1,Cápali vászontáska - Emese,false,Cápali vászontáska | Emese | Ars Mosoris,Emese cápa motívumos vászontáskája,active
+hal-polo,Hal póló,"<p>Gábor hal motívumú művészi pólója - víz alatti világ.</p>",Gábor,Apparel & Accessories > Clothing > Shirts & Tops > T-Shirts,Póló,"polo, gabor, hal, termeszet",true,Méret,S,,,ARS-GAB-HAL-S,200,shopify,30,deny,manual,9500,,true,true,,https://ars-mosoris.merchstore.hu/storage/products/01JTGBPFM2V7P6N4CNKVNEKX79.jpg,1,Hal póló - Gábor,false,Hal póló | Gábor | Ars Mosoris,Gábor hal motívumú művészi pólója,active
+hal-polo,,,,,,,,,M,,,ARS-GAB-HAL-M,200,shopify,30,deny,manual,9500,,true,true,,,,,,,
+hal-polo,,,,,,,,,L,,,ARS-GAB-HAL-L,200,shopify,30,deny,manual,9500,,true,true,,,,,,,
+hal-polo,,,,,,,,,XL,,,ARS-GAB-HAL-XL,200,shopify,25,deny,manual,9500,,true,true,,,,,,,
+hal-polo,,,,,,,,,XXL,,,ARS-GAB-HAL-XXL,200,shopify,20,deny,manual,9500,,true,true,,,,,,,
