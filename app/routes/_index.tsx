@@ -1,4 +1,4 @@
-import {Await, useLoaderData, Link} from 'react-router';
+import {Await, useLoaderData, useActionData, useNavigation, Link, Form} from 'react-router';
 import type {Route} from './+types/_index';
 import {Suspense} from 'react';
 import {Image, Money} from '@shopify/hydrogen';
@@ -31,6 +31,35 @@ function loadDeferredData({context}: Route.LoaderArgs) {
   return {
     recommendedProducts,
   };
+}
+
+export async function action({request, context}: Route.ActionArgs) {
+  const formData = await request.formData();
+  const email = formData.get('email') as string;
+
+  const {customerCreate} = await context.storefront.query(
+    NEWSLETTER_SUBSCRIBE_MUTATION,
+    {
+      variables: {
+        input: {
+          email,
+          password: crypto.randomUUID(),
+          acceptsMarketing: true,
+        },
+      },
+    },
+  );
+
+  if (customerCreate.customerErrors.length > 0) {
+    // "already been taken" means the customer exists — treat as success
+    const alreadyExists = customerCreate.customerErrors.some(
+      (err: {message: string}) =>
+        err.message.toLowerCase().includes('already been taken'),
+    );
+    return {success: alreadyExists};
+  }
+
+  return {success: true};
 }
 
 export default function Homepage() {
@@ -226,6 +255,21 @@ function ArtistsPreview() {
 }
 
 function NewsletterSection() {
+  const actionData = useActionData<typeof action>();
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state === 'submitting';
+
+  if (actionData?.success) {
+    return (
+      <section className="newsletter">
+        <h2 className="newsletter-title">Köszönjük!</h2>
+        <p className="newsletter-subtitle">
+          Feliratkoztál a hírlevelünkre. Hamarosan értesíted lesz az akciókról!
+        </p>
+      </section>
+    );
+  }
+
   return (
     <section className="newsletter">
       <h2 className="newsletter-title">Nyerj havonta ingyenes ruhát!</h2>
@@ -233,7 +277,7 @@ function NewsletterSection() {
         Iratkozz fel hírlevelünkre és vegyél részt havi sorsolásunkon + exkluzív
         akciók, új termékek
       </p>
-      <form className="newsletter-form" action="/api/newsletter" method="POST">
+      <Form method="post" className="newsletter-form">
         <input
           type="email"
           name="email"
@@ -241,10 +285,13 @@ function NewsletterSection() {
           className="newsletter-input"
           required
         />
-        <button type="submit" className="newsletter-btn">
-          Feliratkozás
+        <button type="submit" className="newsletter-btn" disabled={isSubmitting}>
+          {isSubmitting ? 'Feldolgozás...' : 'Feliratkozás'}
         </button>
-      </form>
+      </Form>
+      {actionData && !actionData.success && (
+        <p className="newsletter-error">Valami hiba történt. Próbáld újra!</p>
+      )}
     </section>
   );
 }
@@ -275,6 +322,21 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
     products(first: 8, sortKey: UPDATED_AT, reverse: true) {
       nodes {
         ...RecommendedProduct
+      }
+    }
+  }
+` as const;
+
+const NEWSLETTER_SUBSCRIBE_MUTATION = `#graphql
+  mutation NewsletterSubscribe($input: CustomerCreateInput!) {
+    customerCreate(input: $input) {
+      customer {
+        id
+        email
+      }
+      customerErrors {
+        field
+        message
       }
     }
   }

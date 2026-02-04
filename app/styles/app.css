@@ -2397,6 +2397,12 @@ aside .cart-empty {
   background-color: var(--color-primary-hover);
 }
 
+.newsletter-error {
+  margin-top: 0.75rem;
+  color: #fc0004;
+  font-size: 0.875rem;
+}
+
 /* ============================================
    Collections Grid
    ============================================ */
