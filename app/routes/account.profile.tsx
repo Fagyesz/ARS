@@ -16,7 +16,7 @@ export type ActionResponse = {
 };
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: 'Profile'}];
+  return [{title: 'Profil | Ars Mosoris'}];
 };
 
 export async function loader({context}: Route.LoaderArgs) {
@@ -84,49 +84,60 @@ export default function AccountProfile() {
   const {state} = useNavigation();
   const action = useActionData<ActionResponse>();
   const customer = action?.customer ?? account?.customer;
+  const saved = action?.customer && !action?.error;
 
   return (
     <div className="account-profile">
-      <h2>My profile</h2>
-      <br />
-      <Form method="PUT">
-        <legend>Personal information</legend>
+      <h2>Profilom</h2>
+
+      {saved && (
+        <div className="account-success">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          A profilod sikeresen frissítve!
+        </div>
+      )}
+
+      {action?.error && (
+        <div className="account-error">{action.error}</div>
+      )}
+
+      <Form method="PUT" className="account-form">
+        <legend>Személyes adatok</legend>
         <fieldset>
-          <label htmlFor="firstName">First name</label>
-          <input
-            id="firstName"
-            name="firstName"
-            type="text"
-            autoComplete="given-name"
-            placeholder="First name"
-            aria-label="First name"
-            defaultValue={customer.firstName ?? ''}
-            minLength={2}
-          />
-          <label htmlFor="lastName">Last name</label>
-          <input
-            id="lastName"
-            name="lastName"
-            type="text"
-            autoComplete="family-name"
-            placeholder="Last name"
-            aria-label="Last name"
-            defaultValue={customer.lastName ?? ''}
-            minLength={2}
-          />
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="firstName">Keresztnév</label>
+              <input
+                id="firstName"
+                name="firstName"
+                type="text"
+                autoComplete="given-name"
+                placeholder="Keresztnév"
+                aria-label="Keresztnév"
+                defaultValue={customer.firstName ?? ''}
+                minLength={2}
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="lastName">Vezetéknév</label>
+              <input
+                id="lastName"
+                name="lastName"
+                type="text"
+                autoComplete="family-name"
+                placeholder="Vezetéknév"
+                aria-label="Vezetéknév"
+                defaultValue={customer.lastName ?? ''}
+                minLength={2}
+              />
+            </div>
+          </div>
         </fieldset>
-        {action?.error ? (
-          <p>
-            <mark>
-              <small>{action.error}</small>
-            </mark>
-          </p>
-        ) : (
-          <br />
-        )}
-        <button type="submit" disabled={state !== 'idle'}>
-          {state !== 'idle' ? 'Updating' : 'Update'}
-        </button>
+        <div className="form-actions">
+          <button type="submit" className="btn btn-primary" disabled={state !== 'idle'}>
+            {state !== 'idle' ? 'Mentés...' : 'Mentés'}
+          </button>
+        </div>
       </Form>
     </div>
   );

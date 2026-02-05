@@ -28,7 +28,7 @@ export type ActionResponse = {
 };
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: 'Addresses'}];
+  return [{title: 'Címek | Ars Mosoris'}];
 };
 
 export async function loader({context}: Route.LoaderArgs) {
@@ -262,24 +262,21 @@ export default function Addresses() {
 
   return (
     <div className="account-addresses">
-      <h2>Addresses</h2>
-      <br />
-      {!addresses.nodes.length ? (
-        <p>You have no addresses saved.</p>
-      ) : (
-        <div>
-          <div>
-            <legend>Create address</legend>
-            <NewAddressForm />
-          </div>
-          <br />
-          <hr />
-          <br />
+      <h2>Címeim</h2>
+
+      <div className="address-form-container">
+        <p className="address-section-title">Új cím hozzáadása</p>
+        <NewAddressForm />
+      </div>
+
+      {addresses.nodes.length > 0 && (
+        <>
+          <p className="address-section-title">Mentett címek</p>
           <ExistingAddresses
             addresses={addresses}
             defaultAddress={defaultAddress}
           />
-        </div>
+        </>
       )}
     </div>
   );
@@ -307,13 +304,14 @@ function NewAddressForm() {
       defaultAddress={null}
     >
       {({stateForMethod}) => (
-        <div>
+        <div className="form-actions">
           <button
+            className="btn btn-primary"
             disabled={stateForMethod('POST') !== 'idle'}
             formMethod="POST"
             type="submit"
           >
-            {stateForMethod('POST') !== 'idle' ? 'Creating' : 'Create'}
+            {stateForMethod('POST') !== 'idle' ? 'Mentés...' : 'Új cím hozzáadása'}
           </button>
         </div>
       )}
@@ -326,34 +324,42 @@ function ExistingAddresses({
   defaultAddress,
 }: Pick<CustomerFragment, 'addresses' | 'defaultAddress'>) {
   return (
-    <div>
-      <legend>Existing addresses</legend>
+    <div className="addresses-grid">
       {addresses.nodes.map((address) => (
-        <AddressForm
+        <div
           key={address.id}
-          addressId={address.id}
-          address={address}
-          defaultAddress={defaultAddress}
+          className={`address-card${defaultAddress?.id === address.id ? ' is-default' : ''}`}
         >
-          {({stateForMethod}) => (
-            <div>
-              <button
-                disabled={stateForMethod('PUT') !== 'idle'}
-                formMethod="PUT"
-                type="submit"
-              >
-                {stateForMethod('PUT') !== 'idle' ? 'Saving' : 'Save'}
-              </button>
-              <button
-                disabled={stateForMethod('DELETE') !== 'idle'}
-                formMethod="DELETE"
-                type="submit"
-              >
-                {stateForMethod('DELETE') !== 'idle' ? 'Deleting' : 'Delete'}
-              </button>
-            </div>
+          {defaultAddress?.id === address.id && (
+            <span className="address-card-badge">Alapértelmezett</span>
           )}
-        </AddressForm>
+          <AddressForm
+            addressId={address.id}
+            address={address}
+            defaultAddress={defaultAddress}
+          >
+            {({stateForMethod}) => (
+              <div className="form-actions">
+                <button
+                  className="btn btn-primary"
+                  disabled={stateForMethod('PUT') !== 'idle'}
+                  formMethod="PUT"
+                  type="submit"
+                >
+                  {stateForMethod('PUT') !== 'idle' ? 'Mentés...' : 'Mentés'}
+                </button>
+                <button
+                  className="btn btn-outline"
+                  disabled={stateForMethod('DELETE') !== 'idle'}
+                  formMethod="DELETE"
+                  type="submit"
+                >
+                  {stateForMethod('DELETE') !== 'idle' ? 'Törlés...' : 'Törlés'}
+                </button>
+              </div>
+            )}
+          </AddressForm>
+        </div>
       ))}
     </div>
   );
@@ -377,136 +383,166 @@ export function AddressForm({
   const error = action?.error?.[addressId];
   const isDefaultAddress = defaultAddress?.id === addressId;
   return (
-    <Form id={addressId}>
+    <Form id={addressId} className="account-form">
       <fieldset>
         <input type="hidden" name="addressId" defaultValue={addressId} />
-        <label htmlFor="firstName">First name*</label>
-        <input
-          aria-label="First name"
-          autoComplete="given-name"
-          defaultValue={address?.firstName ?? ''}
-          id="firstName"
-          name="firstName"
-          placeholder="First name"
-          required
-          type="text"
-        />
-        <label htmlFor="lastName">Last name*</label>
-        <input
-          aria-label="Last name"
-          autoComplete="family-name"
-          defaultValue={address?.lastName ?? ''}
-          id="lastName"
-          name="lastName"
-          placeholder="Last name"
-          required
-          type="text"
-        />
-        <label htmlFor="company">Company</label>
-        <input
-          aria-label="Company"
-          autoComplete="organization"
-          defaultValue={address?.company ?? ''}
-          id="company"
-          name="company"
-          placeholder="Company"
-          type="text"
-        />
-        <label htmlFor="address1">Address line*</label>
-        <input
-          aria-label="Address line 1"
-          autoComplete="address-line1"
-          defaultValue={address?.address1 ?? ''}
-          id="address1"
-          name="address1"
-          placeholder="Address line 1*"
-          required
-          type="text"
-        />
-        <label htmlFor="address2">Address line 2</label>
-        <input
-          aria-label="Address line 2"
-          autoComplete="address-line2"
-          defaultValue={address?.address2 ?? ''}
-          id="address2"
-          name="address2"
-          placeholder="Address line 2"
-          type="text"
-        />
-        <label htmlFor="city">City*</label>
-        <input
-          aria-label="City"
-          autoComplete="address-level2"
-          defaultValue={address?.city ?? ''}
-          id="city"
-          name="city"
-          placeholder="City"
-          required
-          type="text"
-        />
-        <label htmlFor="zoneCode">State / Province*</label>
-        <input
-          aria-label="State/Province"
-          autoComplete="address-level1"
-          defaultValue={address?.zoneCode ?? ''}
-          id="zoneCode"
-          name="zoneCode"
-          placeholder="State / Province"
-          required
-          type="text"
-        />
-        <label htmlFor="zip">Zip / Postal Code*</label>
-        <input
-          aria-label="Zip"
-          autoComplete="postal-code"
-          defaultValue={address?.zip ?? ''}
-          id="zip"
-          name="zip"
-          placeholder="Zip / Postal Code"
-          required
-          type="text"
-        />
-        <label htmlFor="territoryCode">Country Code*</label>
-        <input
-          aria-label="territoryCode"
-          autoComplete="country"
-          defaultValue={address?.territoryCode ?? ''}
-          id="territoryCode"
-          name="territoryCode"
-          placeholder="Country"
-          required
-          type="text"
-          maxLength={2}
-        />
-        <label htmlFor="phoneNumber">Phone</label>
-        <input
-          aria-label="Phone Number"
-          autoComplete="tel"
-          defaultValue={address?.phoneNumber ?? ''}
-          id="phoneNumber"
-          name="phoneNumber"
-          placeholder="+16135551111"
-          pattern="^\+?[1-9]\d{3,14}$"
-          type="tel"
-        />
-        <div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="firstName">Keresztnév *</label>
+            <input
+              aria-label="Keresztnév"
+              autoComplete="given-name"
+              defaultValue={address?.firstName ?? ''}
+              id="firstName"
+              name="firstName"
+              placeholder="Keresztnév"
+              required
+              type="text"
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="lastName">Vezetéknév *</label>
+            <input
+              aria-label="Vezetéknév"
+              autoComplete="family-name"
+              defaultValue={address?.lastName ?? ''}
+              id="lastName"
+              name="lastName"
+              placeholder="Vezetéknév"
+              required
+              type="text"
+            />
+          </div>
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="company">Cég</label>
+            <input
+              aria-label="Cégnév"
+              autoComplete="organization"
+              defaultValue={address?.company ?? ''}
+              id="company"
+              name="company"
+              placeholder="Cégnév (opcionális)"
+              type="text"
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="phoneNumber">Telefonszám</label>
+            <input
+              aria-label="Telefonszám"
+              autoComplete="tel"
+              defaultValue={address?.phoneNumber ?? ''}
+              id="phoneNumber"
+              name="phoneNumber"
+              placeholder="+36123456789"
+              pattern="^\+?[1-9]\d{3,14}$"
+              type="tel"
+            />
+          </div>
+        </div>
+
+        <div className="form-group" style={{marginBottom: '1rem'}}>
+          <label htmlFor="address1">Utca, házszám *</label>
+          <input
+            aria-label="Utca, házszám"
+            autoComplete="address-line1"
+            defaultValue={address?.address1 ?? ''}
+            id="address1"
+            name="address1"
+            placeholder="pl. Andrássy utca 1"
+            required
+            type="text"
+          />
+        </div>
+
+        <div className="form-group" style={{marginBottom: '1rem'}}>
+          <label htmlFor="address2">Emelet, ajtó</label>
+          <input
+            aria-label="Emelet, ajtó"
+            autoComplete="address-line2"
+            defaultValue={address?.address2 ?? ''}
+            id="address2"
+            name="address2"
+            placeholder="Emelet, ajtó (opcionális)"
+            type="text"
+          />
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="zip">Irányítószám *</label>
+            <input
+              aria-label="Irányítószám"
+              autoComplete="postal-code"
+              defaultValue={address?.zip ?? ''}
+              id="zip"
+              name="zip"
+              placeholder="pl. 1061"
+              required
+              type="text"
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="city">Város *</label>
+            <input
+              aria-label="Város"
+              autoComplete="address-level2"
+              defaultValue={address?.city ?? ''}
+              id="city"
+              name="city"
+              placeholder="pl. Budapest"
+              required
+              type="text"
+            />
+          </div>
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="zoneCode">Megye</label>
+            <input
+              aria-label="Megye"
+              autoComplete="address-level1"
+              defaultValue={address?.zoneCode ?? ''}
+              id="zoneCode"
+              name="zoneCode"
+              placeholder="Megye (opcionális)"
+              type="text"
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="territoryCode">Országkód *</label>
+            <input
+              aria-label="Országkód"
+              autoComplete="country"
+              defaultValue={address?.territoryCode ?? ''}
+              id="territoryCode"
+              name="territoryCode"
+              placeholder="HU"
+              required
+              type="text"
+              maxLength={2}
+            />
+          </div>
+        </div>
+
+        <div className="checkbox-row">
           <input
             defaultChecked={isDefaultAddress}
             id="defaultAddress"
             name="defaultAddress"
             type="checkbox"
           />
-          <label htmlFor="defaultAddress">Set as default address</label>
+          <label htmlFor="defaultAddress">Alapértelmezett cím</label>
         </div>
-        {error ? (
-          <p>
-            <mark>
-              <small>{error}</small>
-            </mark>
-          </p>
-        ) : (
-          <br />
+
+        {error && (
+          <div className="account-error">{error}</div>
         )}
+
         {children({
           stateForMethod: (method) => (formMethod === method ? state : 'idle'),
         })}

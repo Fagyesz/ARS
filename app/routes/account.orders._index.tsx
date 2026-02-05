@@ -30,7 +30,7 @@ type OrdersLoaderData = {
 };
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: 'Orders'}];
+  return [{title: 'Rendelések | Ars Mosoris'}];
 };
 
 export async function loader({request, context}: Route.LoaderArgs) {
@@ -58,12 +58,22 @@ export async function loader({request, context}: Route.LoaderArgs) {
   return {customer: data.customer, filters};
 }
 
+const STATUS_LABELS: Record<string, string> = {
+  PAID: 'Fizetve',
+  PENDING: 'Függőben',
+  REFUNDED: 'Visszatérítve',
+  PARTIALLY_REFUNDED: 'Részben visszatérítve',
+  FULFILLED: 'Teljesítve',
+  UNFULFILLED: 'Feldolgozás alatt',
+  PARTIALLY_FULFILLED: 'Részben teljesítve',
+};
+
 export default function Orders() {
   const {customer, filters} = useLoaderData<OrdersLoaderData>();
   const {orders} = customer;
 
   return (
-    <div className="orders">
+    <div className="account-orders">
       <OrderSearchForm currentFilters={filters} />
       <OrdersTable orders={orders} filters={filters} />
     </div>
@@ -80,7 +90,7 @@ function OrdersTable({
   const hasFilters = !!(filters.name || filters.confirmationNumber);
 
   return (
-    <div className="acccount-orders" aria-live="polite">
+    <div className="orders-list" aria-live="polite">
       {orders?.nodes.length ? (
         <PaginatedResourceSection connection={orders}>
           {({node: order}) => <OrderItem key={order.id} order={order} />}
@@ -94,22 +104,20 @@ function OrdersTable({
 
 function EmptyOrders({hasFilters = false}: {hasFilters?: boolean}) {
   return (
-    <div>
+    <div className="orders-empty">
       {hasFilters ? (
         <>
-          <p>No orders found matching your search.</p>
-          <br />
-          <p>
-            <Link to="/account/orders">Clear filters →</Link>
-          </p>
+          <p>Nem találtunk a keresésnek megfelelő rendelést.</p>
+          <Link to="/account/orders" className="btn btn-outline">
+            Szűrők törlése
+          </Link>
         </>
       ) : (
         <>
-          <p>You haven&apos;t placed any orders yet.</p>
-          <br />
-          <p>
-            <Link to="/collections">Start Shopping →</Link>
-          </p>
+          <p>Még nincs rendelésed.</p>
+          <Link to="/collections/all" className="btn btn-primary">
+            Kezdj el vásárolni
+          </Link>
         </>
       )}
     </div>
@@ -153,44 +161,45 @@ function OrderSearchForm({
       ref={formRef}
       onSubmit={handleSubmit}
       className="order-search-form"
-      aria-label="Search orders"
+      aria-label="Rendelések keresése"
     >
       <fieldset className="order-search-fieldset">
-        <legend className="order-search-legend">Filter Orders</legend>
+        <legend className="order-search-legend">Rendelések szűrése</legend>
 
         <div className="order-search-inputs">
           <input
             type="search"
             name={ORDER_FILTER_FIELDS.NAME}
-            placeholder="Order #"
-            aria-label="Order number"
+            placeholder="Rendelésszám"
+            aria-label="Rendelésszám"
             defaultValue={currentFilters.name || ''}
             className="order-search-input"
           />
           <input
             type="search"
             name={ORDER_FILTER_FIELDS.CONFIRMATION_NUMBER}
-            placeholder="Confirmation #"
-            aria-label="Confirmation number"
+            placeholder="Megerősítési szám"
+            aria-label="Megerősítési szám"
             defaultValue={currentFilters.confirmationNumber || ''}
             className="order-search-input"
           />
         </div>
 
         <div className="order-search-buttons">
-          <button type="submit" disabled={isSearching}>
-            {isSearching ? 'Searching' : 'Search'}
+          <button type="submit" className="btn btn-primary" disabled={isSearching}>
+            {isSearching ? 'Keresés...' : 'Keresés'}
           </button>
           {hasFilters && (
             <button
               type="button"
+              className="btn btn-outline"
               disabled={isSearching}
               onClick={() => {
                 setSearchParams(new URLSearchParams());
                 formRef.current?.reset();
               }}
             >
-              Clear
+              Törlés
             </button>
           )}
         </div>
@@ -201,22 +210,43 @@ function OrderSearchForm({
 
 function OrderItem({order}: {order: OrderItemFragment}) {
   const fulfillmentStatus = flattenConnection(order.fulfillments)[0]?.status;
+
   return (
-    <>
-      <fieldset>
-        <Link to={`/account/orders/${btoa(order.id)}`}>
-          <strong>#{order.number}</strong>
+    <div className="order-card">
+      <div>
+        <div className="order-card-header">
+          <Link to={`/account/orders/${btoa(order.id)}`} className="order-card-number">
+            #{order.number}
+          </Link>
+          <span className="order-card-date">
+            {new Date(order.processedAt).toLocaleDateString('hu-HU', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })}
+          </span>
+        </div>
+        <div className="order-card-statuses">
+          {order.financialStatus && (
+            <span className={`order-status-badge ${order.financialStatus.toLowerCase()}`}>
+              {STATUS_LABELS[order.financialStatus] ?? order.financialStatus}
+            </span>
+          )}
+          {fulfillmentStatus && (
+            <span className={`order-status-badge ${fulfillmentStatus.toLowerCase()}`}>
+              {STATUS_LABELS[fulfillmentStatus] ?? fulfillmentStatus}
+            </span>
+          )}
+        </div>
+      </div>
+      <div className="order-card-right">
+        <div className="order-card-price">
+          <Money data={order.totalPrice} />
+        </div>
+        <Link to={`/account/orders/${btoa(order.id)}`} className="order-card-link">
+          Részletek →
         </Link>
-        <p>{new Date(order.processedAt).toDateString()}</p>
-        {order.confirmationNumber && (
-          <p>Confirmation: {order.confirmationNumber}</p>
-        )}
-        <p>{order.financialStatus}</p>
-        {fulfillmentStatus && <p>{fulfillmentStatus}</p>}
-        <Money data={order.totalPrice} />
-        <Link to={`/account/orders/${btoa(order.id)}`}>View Order →</Link>
-      </fieldset>
-      <br />
-    </>
+      </div>
+    </div>
   );
 }

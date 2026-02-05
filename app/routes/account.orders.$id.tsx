@@ -8,7 +8,7 @@ import type {
 import {CUSTOMER_ORDER_QUERY} from '~/graphql/customer-account/CustomerOrderQuery';
 
 export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `Order ${data?.order?.name}`}];
+  return [{title: `Rendelés ${data?.order?.name} | Ars Mosoris`}];
 };
 
 export async function loader({params, context}: Route.LoaderArgs) {
@@ -73,6 +73,13 @@ export async function loader({params, context}: Route.LoaderArgs) {
   };
 }
 
+const FULFILLMENT_LABELS: Record<string, string> = {
+  FULFILLED: 'Teljesítve',
+  UNFULFILLED: 'Feldolgozás alatt',
+  PARTIALLY_FULFILLED: 'Részben teljesítve',
+  'N/A': 'Nincs adat',
+};
+
 export default function OrderRoute() {
   const {
     order,
@@ -81,132 +88,133 @@ export default function OrderRoute() {
     discountPercentage,
     fulfillmentStatus,
   } = useLoaderData<typeof loader>();
+
   return (
     <div className="account-order">
-      <h2>Order {order.name}</h2>
-      <p>Placed on {new Date(order.processedAt!).toDateString()}</p>
-      {order.confirmationNumber && (
-        <p>Confirmation: {order.confirmationNumber}</p>
-      )}
-      <br />
-      <div>
-        <table>
-          <thead>
-            <tr>
-              <th scope="col">Product</th>
-              <th scope="col">Price</th>
-              <th scope="col">Quantity</th>
-              <th scope="col">Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            {lineItems.map((lineItem, lineItemIndex) => (
-              // eslint-disable-next-line react/no-array-index-key
-              <OrderLineRow key={lineItemIndex} lineItem={lineItem} />
-            ))}
-          </tbody>
-          <tfoot>
-            {((discountValue && discountValue.amount) ||
-              discountPercentage) && (
-              <tr>
-                <th scope="row" colSpan={3}>
-                  <p>Discounts</p>
-                </th>
-                <th scope="row">
-                  <p>Discounts</p>
-                </th>
-                <td>
-                  {discountPercentage ? (
-                    <span>-{discountPercentage}% OFF</span>
-                  ) : (
-                    discountValue && <Money data={discountValue!} />
-                  )}
-                </td>
-              </tr>
-            )}
+      <div className="order-detail-header">
+        <h2>Rendelés {order.name}</h2>
+        <div className="order-detail-meta">
+          <span>
+            {new Date(order.processedAt!).toLocaleDateString('hu-HU', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })}
+          </span>
+          {order.confirmationNumber && (
+            <span>Megerősítés: {order.confirmationNumber}</span>
+          )}
+        </div>
+      </div>
+
+      <table className="order-detail-table">
+        <thead>
+          <tr>
+            <th scope="col">Termék</th>
+            <th scope="col">Ár</th>
+            <th scope="col">Db</th>
+            <th scope="col">Összesen</th>
+          </tr>
+        </thead>
+        <tbody>
+          {lineItems.map((lineItem, lineItemIndex) => (
+            // eslint-disable-next-line react/no-array-index-key
+            <OrderLineRow key={lineItemIndex} lineItem={lineItem} />
+          ))}
+        </tbody>
+        <tfoot>
+          {((discountValue && discountValue.amount) ||
+            discountPercentage) && (
             <tr>
               <th scope="row" colSpan={3}>
-                <p>Subtotal</p>
-              </th>
-              <th scope="row">
-                <p>Subtotal</p>
+                Kedvezmény
               </th>
               <td>
-                <Money data={order.subtotal!} />
+                {discountPercentage ? (
+                  <span>-{discountPercentage}%</span>
+                ) : (
+                  discountValue && <Money data={discountValue!} />
+                )}
               </td>
             </tr>
-            <tr>
-              <th scope="row" colSpan={3}>
-                Tax
-              </th>
-              <th scope="row">
-                <p>Tax</p>
-              </th>
-              <td>
-                <Money data={order.totalTax!} />
-              </td>
-            </tr>
-            <tr>
-              <th scope="row" colSpan={3}>
-                Total
-              </th>
-              <th scope="row">
-                <p>Total</p>
-              </th>
-              <td>
-                <Money data={order.totalPrice!} />
-              </td>
-            </tr>
-          </tfoot>
-        </table>
-        <div>
-          <h3>Shipping Address</h3>
+          )}
+          <tr>
+            <th scope="row" colSpan={3}>
+              Részösszeg
+            </th>
+            <td>
+              <Money data={order.subtotal!} />
+            </td>
+          </tr>
+          <tr>
+            <th scope="row" colSpan={3}>
+              ÁFA
+            </th>
+            <td>
+              <Money data={order.totalTax!} />
+            </td>
+          </tr>
+          <tr>
+            <th scope="row" colSpan={3}>
+              Végösszeg
+            </th>
+            <td>
+              <Money data={order.totalPrice!} />
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <div className="order-detail-summary">
+        <div className="order-detail-section">
+          <h3>Szállítási cím</h3>
           {order?.shippingAddress ? (
             <address>
               <p>{order.shippingAddress.name}</p>
-              {order.shippingAddress.formatted ? (
+              {order.shippingAddress.formatted && (
                 <p>{order.shippingAddress.formatted}</p>
-              ) : (
-                ''
               )}
-              {order.shippingAddress.formattedArea ? (
+              {order.shippingAddress.formattedArea && (
                 <p>{order.shippingAddress.formattedArea}</p>
-              ) : (
-                ''
               )}
             </address>
           ) : (
-            <p>No shipping address defined</p>
+            <p>Nincs megadva szállítási cím</p>
           )}
-          <h3>Status</h3>
-          <div>
-            <p>{fulfillmentStatus}</p>
-          </div>
+        </div>
+        <div className="order-detail-section">
+          <h3>Állapot</h3>
+          <p>{FULFILLMENT_LABELS[fulfillmentStatus] ?? fulfillmentStatus}</p>
         </div>
       </div>
-      <br />
-      <p>
-        <a target="_blank" href={order.statusPageUrl} rel="noreferrer">
-          View Order Status →
-        </a>
-      </p>
+
+      <a
+        className="order-status-link"
+        target="_blank"
+        href={order.statusPageUrl}
+        rel="noreferrer"
+      >
+        Rendelés állapota megtekintése →
+      </a>
     </div>
   );
 }
 
 function OrderLineRow({lineItem}: {lineItem: OrderLineItemFullFragment}) {
   return (
-    <tr key={lineItem.id}>
+    <tr>
       <td>
-        <div>
+        <div className="order-line-product">
           {lineItem?.image && (
-            <div>
-              <Image data={lineItem.image} width={96} height={96} />
+            <div className="order-line-image">
+              <Image data={lineItem.image} width={60} height={60} />
             </div>
           )}
           <div>
-            <p>{lineItem.title}</p>
-            <small>{lineItem.variantTitle}</small>
+            <p className="order-line-title">{lineItem.title}</p>
+            {lineItem.variantTitle && (
+              <p className="order-line-variant">{lineItem.variantTitle}</p>
+            )}
           </div>
         </div>
       </td>

@@ -41,8 +41,10 @@ export async function action({request, context}: Route.ActionArgs) {
     const storeDomain = context.env.PUBLIC_STORE_DOMAIN;
     const token = context.env.PUBLIC_STOREFRONT_API_TOKEN;
 
+    // Use customerEmailMarketingSubscribe for newsletter-only subscription
+    // No account/password needed — just adds them to marketing list
     const response = await fetch(
-      `https://${storeDomain}/api/2025-01/graphql.json`,
+      `https://${storeDomain}/api/unstable/graphql.json`,
       {
         method: 'POST',
         headers: {
@@ -51,19 +53,17 @@ export async function action({request, context}: Route.ActionArgs) {
         },
         body: JSON.stringify({
           query: NEWSLETTER_SUBSCRIBE_MUTATION,
-          variables: {
-            input: {
-              email,
-              password: crypto.randomUUID(),
-              acceptsMarketing: true,
-            },
-          },
+          variables: {email},
         }),
       },
     );
 
     const json = (await response.json()) as {
-      data?: {customerCreate?: {userErrors: {message: string}[]}};
+      data?: {
+        customerEmailMarketingSubscribe?: {
+          customerUserErrors: {message: string; code?: string}[];
+        };
+      };
       errors?: {message: string}[];
     };
 
@@ -71,13 +71,47 @@ export async function action({request, context}: Route.ActionArgs) {
       return {success: false};
     }
 
-    const errors = json.data?.customerCreate?.userErrors ?? [];
+    const errors =
+      json.data?.customerEmailMarketingSubscribe?.customerUserErrors ?? [];
     if (errors.length > 0) {
-      // "already been taken" means customer exists — treat as success
-      const alreadyExists = errors.some((err) =>
-        err.message.toLowerCase().includes('already been taken'),
+      // ALREADY_SUBSCRIBED or ALREADY_A_CUSTOMER = treat as success
+      const alreadyExists = errors.some(
+        (err) =>
+          err.code === 'ALREADY_SUBSCRIBED' ||
+          err.code === 'ALREADY_A_CUSTOMER' ||
+          err.message.toLowerCase().includes('already'),
       );
       return {success: alreadyExists};
+    }
+
+    // Send confirmation email via Resend
+    const resendKey = context.env.RESEND_API_KEY;
+    if (resendKey) {
+      const origin = new URL(request.url).origin;
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${resendKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: 'Ars Mosoris <arsmosoris@vincze.app>',
+          to: [email],
+          subject: 'Feliratkozás megerősítve – Ars Mosoris',
+          text: [
+            'Szia!',
+            '',
+            'Sikeres feliratkozás a hírlevelünkre! Hamarosan értesíted lesz az akciókról és az új termékekről.',
+            '',
+            `Ha szeretnéd megtekinteni a termékeinket: ${origin}`,
+            '',
+            'Üdvözlet,',
+            'Ars Mosoris',
+          ].join('\n'),
+        }),
+      }).catch(() => {
+        // Non-fatal: subscription already succeeded
+      });
     }
 
     return {success: true};
@@ -352,15 +386,12 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
 ` as const;
 
 const NEWSLETTER_SUBSCRIBE_MUTATION = `#graphql
-  mutation NewsletterSubscribe($input: CustomerCreateInput!) {
-    customerCreate(input: $input) {
-      customer {
-        id
-        email
-      }
-      userErrors {
+  mutation NewsletterSubscribe($email: String!) {
+    customerEmailMarketingSubscribe(email: $email) {
+      customerUserErrors {
         field
         message
+        code
       }
     }
   }
