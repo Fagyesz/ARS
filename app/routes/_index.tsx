@@ -37,29 +37,53 @@ export async function action({request, context}: Route.ActionArgs) {
   const formData = await request.formData();
   const email = formData.get('email') as string;
 
-  const {customerCreate} = await context.storefront.query(
-    NEWSLETTER_SUBSCRIBE_MUTATION,
-    {
-      variables: {
-        input: {
-          email,
-          password: crypto.randomUUID(),
-          acceptsMarketing: true,
+  try {
+    const storeDomain = context.env.PUBLIC_STORE_DOMAIN;
+    const token = context.env.PUBLIC_STOREFRONT_API_TOKEN;
+
+    const response = await fetch(
+      `https://${storeDomain}/api/2025-01/graphql.json`,
+      {
+        method: 'POST',
+        headers: {
+          'X-Shopify-Storefront-Access-Token': token,
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+          query: NEWSLETTER_SUBSCRIBE_MUTATION,
+          variables: {
+            input: {
+              email,
+              password: crypto.randomUUID(),
+              acceptsMarketing: true,
+            },
+          },
+        }),
       },
-    },
-  );
-
-  if (customerCreate.customerErrors.length > 0) {
-    // "already been taken" means the customer exists — treat as success
-    const alreadyExists = customerCreate.customerErrors.some(
-      (err: {message: string}) =>
-        err.message.toLowerCase().includes('already been taken'),
     );
-    return {success: alreadyExists};
-  }
 
-  return {success: true};
+    const json = (await response.json()) as {
+      data?: {customerCreate?: {userErrors: {message: string}[]}};
+      errors?: {message: string}[];
+    };
+
+    if (json.errors?.length) {
+      return {success: false};
+    }
+
+    const errors = json.data?.customerCreate?.userErrors ?? [];
+    if (errors.length > 0) {
+      // "already been taken" means customer exists — treat as success
+      const alreadyExists = errors.some((err) =>
+        err.message.toLowerCase().includes('already been taken'),
+      );
+      return {success: alreadyExists};
+    }
+
+    return {success: true};
+  } catch {
+    return {success: false};
+  }
 }
 
 export default function Homepage() {
@@ -334,7 +358,7 @@ const NEWSLETTER_SUBSCRIBE_MUTATION = `#graphql
         id
         email
       }
-      customerErrors {
+      userErrors {
         field
         message
       }
