@@ -22,6 +22,21 @@ interface PageLayoutProps {
   isLoggedIn: Promise<boolean>;
   publicStoreDomain: string;
   children?: React.ReactNode;
+  env?: {
+    contactEmail: string;
+    storeName: string;
+    storeAddress: string;
+    storeCity: string;
+    storePostalCode: string;
+    storeCountry: string;
+    storeMapLat: string;
+    storeMapLng: string;
+    storeHours: string;
+    instagramUrl: string;
+    facebookUrl: string;
+    tiktokUrl: string;
+    youtubeUrl: string;
+  };
 }
 
 export function PageLayout({
@@ -31,6 +46,7 @@ export function PageLayout({
   header,
   isLoggedIn,
   publicStoreDomain,
+  env,
 }: PageLayoutProps) {
   return (
     <Aside.Provider>
@@ -50,6 +66,7 @@ export function PageLayout({
         footer={footer}
         header={header}
         publicStoreDomain={publicStoreDomain}
+        env={env}
       />
     </Aside.Provider>
   );

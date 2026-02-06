@@ -7,13 +7,37 @@ interface FooterProps {
   footer: Promise<FooterQuery | null>;
   header: HeaderQuery;
   publicStoreDomain: string;
+  env?: {
+    contactEmail: string;
+    storeName: string;
+    storeAddress: string;
+    storeCity: string;
+    storePostalCode: string;
+    storeCountry: string;
+    storeMapLat: string;
+    storeMapLng: string;
+    storeHours: string;
+    instagramUrl: string;
+    facebookUrl: string;
+    tiktokUrl: string;
+    youtubeUrl: string;
+  };
 }
 
 export function Footer({
   footer: footerPromise,
   header,
   publicStoreDomain,
+  env,
 }: FooterProps) {
+  // Use env variables with fallbacks to config constants
+  const contactEmail = env?.contactEmail || EMAIL;
+  const socialLinks = {
+    instagram: env?.instagramUrl || SOCIAL_LINKS.instagram,
+    facebook: env?.facebookUrl || SOCIAL_LINKS.facebook,
+    tiktok: env?.tiktokUrl || SOCIAL_LINKS.tiktok,
+    youtube: env?.youtubeUrl || SOCIAL_LINKS.youtube,
+  };
   return (
     <Suspense>
       <Await resolve={footerPromise}>
@@ -30,7 +54,7 @@ export function Footer({
                   </p>
                   <div className="footer-social">
                     <a
-                      href={SOCIAL_LINKS.instagram}
+                      href={socialLinks.instagram}
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label="Instagram"
@@ -38,7 +62,7 @@ export function Footer({
                       <InstagramIcon />
                     </a>
                     <a
-                      href={SOCIAL_LINKS.facebook}
+                      href={socialLinks.facebook}
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label="Facebook"
@@ -46,7 +70,7 @@ export function Footer({
                       <FacebookIcon />
                     </a>
                     <a
-                      href={SOCIAL_LINKS.tiktok}
+                      href={socialLinks.tiktok}
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label="TikTok"
@@ -54,7 +78,7 @@ export function Footer({
                       <TikTokIcon />
                     </a>
                     <a
-                      href={SOCIAL_LINKS.youtube}
+                      href={socialLinks.youtube}
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label="YouTube"
@@ -105,7 +129,7 @@ export function Footer({
               <div className="footer-bottom">
                 <p>&copy; {new Date().getFullYear()} Ars Mosoris. Minden jog fenntartva.</p>
                 <p>
-                  <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
+                  <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
                   {' · '}
                   Budapest, Magyarország
                 </p>

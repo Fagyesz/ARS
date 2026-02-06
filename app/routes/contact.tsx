@@ -1,7 +1,24 @@
 import {useState} from 'react';
-import {Form, useActionData, useNavigation} from 'react-router';
+import {Form, useActionData, useNavigation, useLoaderData} from 'react-router';
 import type {Route} from './+types/contact';
 import {EMAIL, SOCIAL_LINKS} from '~/lib/config';
+
+export async function loader({context}: Route.LoaderArgs) {
+  const {env} = context;
+  return {
+    contactEmail: env.CONTACT_EMAIL,
+    storeAddress: env.STORE_ADDRESS,
+    storeCity: env.STORE_CITY,
+    storePostalCode: env.STORE_POSTAL_CODE,
+    storeCountry: env.STORE_COUNTRY,
+    storeMapLat: env.STORE_MAP_LAT,
+    storeMapLng: env.STORE_MAP_LNG,
+    storeHours: JSON.parse(env.STORE_HOURS),
+    instagramUrl: env.INSTAGRAM_URL,
+    facebookUrl: env.FACEBOOK_URL,
+    tiktokUrl: env.TIKTOK_URL,
+  };
+}
 
 const SUBJECT_LABELS: Record<string, string> = {
   general: 'Általános kérdés',
@@ -29,6 +46,8 @@ export async function action({request, context}: Route.ActionArgs) {
   const message = formData.get('message') as string;
 
   const apiKey = context.env.RESEND_API_KEY;
+  const fromEmail = context.env.FROM_EMAIL;
+  const contactEmail = context.env.CONTACT_EMAIL;
 
   if (!apiKey) {
     return {success: false, error: 'Email service not configured.'};
@@ -42,8 +61,8 @@ export async function action({request, context}: Route.ActionArgs) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'Ars Mosoris <arsmosoris@vincze.app>',
-        to: [EMAIL],
+        from: fromEmail,
+        to: [contactEmail],
         replyTo: email,
         subject: `[Kontaktlap] ${SUBJECT_LABELS[subject] || subject} – ${name}`,
         text: `Új üzenet a kontaktlapról\n\nNév: ${name}\nE-mail: ${email}\nTárgy: ${SUBJECT_LABELS[subject] || subject}\n\n${message}`,
@@ -61,6 +80,7 @@ export async function action({request, context}: Route.ActionArgs) {
 }
 
 export default function Contact() {
+  const loaderData = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === 'submitting';
@@ -71,8 +91,23 @@ export default function Contact() {
     setSubmitted(true);
   }
 
+  // Use env variables with fallbacks
+  const contactEmail = loaderData?.contactEmail || EMAIL;
+  const storeAddress = loaderData?.storeAddress || 'Kiss Ernő u. 4';
+  const storeCity = loaderData?.storeCity || 'Budapest';
+  const storePostalCode = loaderData?.storePostalCode || '1046';
+  const storeCountry = loaderData?.storeCountry || 'Magyarország';
+  const storeMapLat = loaderData?.storeMapLat || '47.555';
+  const storeMapLng = loaderData?.storeMapLng || '19.085';
+  const storeHours = loaderData?.storeHours || {weekday: '10:00 – 16:00', saturday: '10:00 – 14:00', sunday: 'Zárva'};
+  const socialLinks = {
+    instagram: loaderData?.instagramUrl || SOCIAL_LINKS.instagram,
+    facebook: loaderData?.facebookUrl || SOCIAL_LINKS.facebook,
+    tiktok: loaderData?.tiktokUrl || SOCIAL_LINKS.tiktok,
+  };
+
   const today = new Date().getDay();
-  const todayHours = today === 0 ? 'Zárva' : today === 6 ? '10:00 – 14:00' : '10:00 – 16:00';
+  const todayHours = today === 0 ? storeHours.sunday : today === 6 ? storeHours.saturday : storeHours.weekday;
   const isOpen = todayHours !== 'Zárva';
 
   return (
@@ -108,7 +143,7 @@ export default function Contact() {
                   </div>
                   <div className="contact-info-content">
                     <h3>E-mail</h3>
-                    <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
+                    <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
                   </div>
                 </div>
 
@@ -121,7 +156,7 @@ export default function Contact() {
                   </div>
                   <div className="contact-info-content">
                     <h3>Helyszín</h3>
-                    <p>Budapest, Kiss Ernő u. 4, 1046</p>
+                    <p>{storeCity}, {storeAddress}, {storePostalCode}</p>
                   </div>
                 </div>
 
@@ -135,7 +170,7 @@ export default function Contact() {
                   </div>
                   <div className="contact-info-content">
                     <h3>Instagram</h3>
-                    <a href={SOCIAL_LINKS.instagram} target="_blank" rel="noopener noreferrer">
+                    <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer">
                       @ars.mosoris
                     </a>
                   </div>
@@ -146,19 +181,19 @@ export default function Contact() {
               <div className="contact-socials">
                 <h3>Kövess minket</h3>
                 <div className="contact-social-links">
-                  <a href={SOCIAL_LINKS.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                  <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
                       <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
                       <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
                     </svg>
                   </a>
-                  <a href={SOCIAL_LINKS.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                  <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
                     </svg>
                   </a>
-                  <a href={SOCIAL_LINKS.tiktok} target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+                  <a href={socialLinks.tiktok} target="_blank" rel="noopener noreferrer" aria-label="TikTok">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
                     </svg>
@@ -258,8 +293,8 @@ export default function Contact() {
             <p className="store-description">
               Nyitvatartási időben az Ars Mosoris csapatának tagjai személyesen tudnak segíteni neked az artistic clothing és a contemporary fashion világában!
             </p>
-            <p className="store-address">Budapest, Kiss Ernő u. 4, 1046 Magyarország</p>
-            <p className="store-email"><a href={`mailto:${EMAIL}`}>{EMAIL}</a></p>
+            <p className="store-address">{storeCity}, {storeAddress}, {storePostalCode} {storeCountry}</p>
+            <p className="store-email"><a href={`mailto:${contactEmail}`}>{contactEmail}</a></p>
 
             <div className="store-hours">
               <h3 className="store-hours-heading">NYITVATARTÁS</h3>
@@ -273,9 +308,9 @@ export default function Contact() {
               </button>
               {hoursOpen && (
                 <div className="store-hours-list">
-                  <div className="store-hours-row"><span>Hétfő – Péntek</span><span>10:00 – 16:00</span></div>
-                  <div className="store-hours-row"><span>Szombat</span><span>10:00 – 14:00</span></div>
-                  <div className="store-hours-row store-hours-closed"><span>Vasárnap</span><span>Zárva</span></div>
+                  <div className="store-hours-row"><span>Hétfő – Péntek</span><span>{storeHours.weekday}</span></div>
+                  <div className="store-hours-row"><span>Szombat</span><span>{storeHours.saturday}</span></div>
+                  <div className="store-hours-row store-hours-closed"><span>Vasárnap</span><span>{storeHours.sunday}</span></div>
                 </div>
               )}
               <p className="store-hours-note">A webshop non-stop működik!</p>
@@ -288,7 +323,7 @@ export default function Contact() {
 
           <div className="store-map">
             <iframe
-              src="https://www.openstreetmap.org/export/embed.html?bbox=19.075%2C47.550%2C19.095%2C47.560&layer=mapnik&marker=47.555%2C19.085"
+              src={`https://www.openstreetmap.org/export/embed.html?bbox=${parseFloat(storeMapLng) - 0.01}%2C${parseFloat(storeMapLat) - 0.005}%2C${parseFloat(storeMapLng) + 0.01}%2C${parseFloat(storeMapLat) + 0.005}&layer=mapnik&marker=${storeMapLat}%2C${storeMapLng}`}
               width="100%"
               height="550"
               style={{border: 0}}

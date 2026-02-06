@@ -40,11 +40,12 @@ export async function action({request, context}: Route.ActionArgs) {
   try {
     const storeDomain = context.env.PUBLIC_STORE_DOMAIN;
     const token = context.env.PUBLIC_STOREFRONT_API_TOKEN;
+    const apiVersion = context.env.STOREFRONT_API_VERSION || 'unstable';
 
     // Use customerEmailMarketingSubscribe for newsletter-only subscription
     // No account/password needed — just adds them to marketing list
     const response = await fetch(
-      `https://${storeDomain}/api/unstable/graphql.json`,
+      `https://${storeDomain}/api/${apiVersion}/graphql.json`,
       {
         method: 'POST',
         headers: {
@@ -95,7 +96,7 @@ export async function action({request, context}: Route.ActionArgs) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: 'Ars Mosoris <arsmosoris@vincze.app>',
+          from: context.env.FROM_EMAIL,
           to: [email],
           subject: 'Feliratkozás megerősítve – Ars Mosoris',
           text: [

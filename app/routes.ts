@@ -1,9 +1,13 @@
 import {flatRoutes} from '@react-router/fs-routes';
-import {type RouteConfig} from '@react-router/dev/routes';
+import {type RouteConfig, route} from '@react-router/dev/routes';
 import {hydrogenRoutes} from '@shopify/hydrogen';
 
 export default hydrogenRoutes([
   ...(await flatRoutes()),
-  // Manual route definitions can be added to this array, in addition to or instead of using the `flatRoutes` file-based routing convention.
-  // See https://reactrouter.com/api/framework-conventions/routes.ts#routests
+  // Shopify's password-reset email links to /en/account/reset/… — alias to our reset route
+  route(
+    '/en/account/reset/:id/:token',
+    './routes/account_.reset.$id.$token.tsx',
+    {id: 'en-account-reset'},
+  ),
 ]) satisfies RouteConfig;
