@@ -57,6 +57,13 @@ function AccountMenu() {
   return (
     <nav className="account-nav" role="navigation">
       <NavLink
+        to="/account"
+        end
+        className={({isActive}) => (isActive ? 'active' : '')}
+      >
+        Áttekintés
+      </NavLink>
+      <NavLink
         to="/account/orders"
         className={({isActive}) => (isActive ? 'active' : '')}
       >
