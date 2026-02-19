@@ -1,69 +1,58 @@
-import {useLoaderData, Link} from 'react-router';
+import {Link} from 'react-router';
 import type {Route} from './+types/policies._index';
-import type {PoliciesQuery, PolicyItemFragment} from 'storefrontapi.generated';
 
-export async function loader({context}: Route.LoaderArgs) {
-  const data: PoliciesQuery = await context.storefront.query(POLICIES_QUERY);
-  
-  const shopPolicies = data.shop;
-  const policies: PolicyItemFragment[] = [
-    shopPolicies?.privacyPolicy,
-    shopPolicies?.shippingPolicy,
-    shopPolicies?.termsOfService,
-    shopPolicies?.refundPolicy,
-    shopPolicies?.subscriptionPolicy,
-  ].filter((policy): policy is PolicyItemFragment => policy != null);
+export const meta: Route.MetaFunction = () => {
+  return [{title: 'Jogi feltételek | Ars Mosoris'}];
+};
 
-  if (!policies.length) {
-    throw new Response('No policies found', {status: 404});
-  }
-
-  return {policies};
-}
+const POLICIES = [
+  {
+    handle: 'shipping-policy',
+    title: 'Szállítási feltételek',
+    description: 'Szállítási módok, idők és díjak.',
+  },
+  {
+    handle: 'refund-policy',
+    title: 'Visszaküldési feltételek',
+    description: '14 napos elállási jog és visszaküldési folyamat.',
+  },
+  {
+    handle: 'privacy-policy',
+    title: 'Adatvédelmi tájékoztató',
+    description: 'Hogyan kezeljük személyes adataidat (GDPR).',
+  },
+  {
+    handle: 'terms-of-service',
+    title: 'Általános Szerződési Feltételek',
+    description: 'Vásárlás, fizetés, jogok és kötelezettségek.',
+  },
+];
 
 export default function Policies() {
-  const {policies} = useLoaderData<typeof loader>();
-
   return (
-    <div className="policies">
-      <h1>Policies</h1>
-      <div>
-        {policies.map((policy) => (
-          <fieldset key={policy.id}>
-            <Link to={`/policies/${policy.handle}`}>{policy.title}</Link>
-          </fieldset>
-        ))}
+    <div className="policy-page">
+      <div className="container">
+        <div className="policy-header">
+          <p className="policy-tag">Ars Mosoris</p>
+          <h1>Jogi feltételek</h1>
+          <p className="policy-meta">
+            Webshopunk átlátható és fogyasztóbarát feltételek mellett működik.
+          </p>
+        </div>
+
+        <div className="policy-body">
+          {POLICIES.map((policy) => (
+            <Link
+              key={policy.handle}
+              to={`/policies/${policy.handle}`}
+              className="policy-index-card"
+            >
+              <strong>{policy.title} →</strong>
+              <p>{policy.description}</p>
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   );
 }
-
-const POLICIES_QUERY = `#graphql
-  fragment PolicyItem on ShopPolicy {
-    id
-    title
-    handle
-  }
-  query Policies ($country: CountryCode, $language: LanguageCode)
-    @inContext(country: $country, language: $language) {
-    shop {
-      privacyPolicy {
-        ...PolicyItem
-      }
-      shippingPolicy {
-        ...PolicyItem
-      }
-      termsOfService {
-        ...PolicyItem
-      }
-      refundPolicy {
-        ...PolicyItem
-      }
-      subscriptionPolicy {
-        id
-        title
-        handle
-      }
-    }
-  }
-` as const;

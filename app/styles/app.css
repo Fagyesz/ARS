@@ -3235,3 +3235,191 @@ button.reset {
 .login-card .account-error {
   margin-bottom: 1rem;
 }
+
+/* ============================================================
+   POLICY PAGES
+   ============================================================ */
+
+.policy-page {
+  padding: 5rem 0 6rem;
+}
+
+.policy-page .container {
+  max-width: 800px;
+}
+
+.policy-breadcrumb {
+  margin-bottom: 2rem;
+}
+
+.policy-breadcrumb a {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: color 0.2s;
+}
+
+.policy-breadcrumb a:hover {
+  color: var(--color-primary);
+}
+
+.policy-header {
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.policy-tag {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.policy-header h1 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+}
+
+.policy-meta {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.policy-body {
+  line-height: 1.8;
+  color: var(--color-text);
+}
+
+.policy-body h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.policy-body h2:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+.policy-body p {
+  margin-bottom: 1rem;
+}
+
+.policy-body ul,
+.policy-body ol {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+}
+
+.policy-body li {
+  margin-bottom: 0.5rem;
+}
+
+.policy-body strong {
+  font-weight: 600;
+  color: var(--color-heading);
+}
+
+.policy-body a {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.policy-contact-box {
+  margin-top: 3rem;
+  padding: 2rem;
+  background: var(--color-bg-subtle, #f9f9f9);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+}
+
+.policy-contact-box h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.policy-contact-box p {
+  font-size: 0.9375rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.policy-contact-box a {
+  color: var(--color-primary);
+}
+
+/* Shopify-rendered policy body */
+.shopify-policy-body h1,
+.shopify-policy-body h2,
+.shopify-policy-body h3 {
+  font-weight: 700;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.shopify-policy-body p {
+  margin-bottom: 1rem;
+  line-height: 1.8;
+}
+
+.shopify-policy-body ul,
+.shopify-policy-body ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.shopify-policy-body li {
+  margin-bottom: 0.5rem;
+}
+
+.policy-index-card {
+  display: block;
+  padding: 1.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  text-decoration: none;
+  color: var(--color-text);
+  margin-bottom: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.policy-index-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.policy-index-card strong {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-heading);
+}
+
+.policy-index-card p {
+  margin: 0.25rem 0 0;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 768px) {
+  .policy-page {
+    padding: 3rem 0 4rem;
+  }
+
+  .policy-header h1 {
+    font-size: 1.75rem;
+  }
+}

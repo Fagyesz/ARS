@@ -11,7 +11,7 @@ type SelectedPolicies = keyof Pick<
 >;
 
 export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `Hydrogen | ${data?.policy.title ?? ''}`}];
+  return [{title: `${data?.policy.title ?? 'Feltételek'} | Ars Mosoris`}];
 };
 
 export async function loader({params, context}: Route.LoaderArgs) {
@@ -48,15 +48,21 @@ export default function Policy() {
   const {policy} = useLoaderData<typeof loader>();
 
   return (
-    <div className="policy">
-      <br />
-      <br />
-      <div>
-        <Link to="/policies">← Back to Policies</Link>
+    <div className="policy-page">
+      <div className="container">
+        <div className="policy-breadcrumb">
+          <Link to="/">← Vissza a főoldalra</Link>
+        </div>
+
+        <div className="policy-header">
+          <p className="policy-tag">Jogi feltételek</p>
+          <h1>{policy.title}</h1>
+        </div>
+
+        <div className="policy-body shopify-policy-body">
+          <div dangerouslySetInnerHTML={{__html: policy.body}} />
+        </div>
       </div>
-      <br />
-      <h1>{policy.title}</h1>
-      <div dangerouslySetInnerHTML={{__html: policy.body}} />
     </div>
   );
 }
