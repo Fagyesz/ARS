@@ -22,7 +22,7 @@ export async function loader(args: Route.LoaderArgs) {
 
 function loadDeferredData({context}: Route.LoaderArgs) {
   const recommendedProducts = context.storefront
-    .query(RECOMMENDED_PRODUCTS_QUERY)
+    .query(RECOMMENDED_PRODUCTS_QUERY, {cache: context.storefront.CacheLong()})
     .catch((error: Error) => {
       console.error(error);
       return null;

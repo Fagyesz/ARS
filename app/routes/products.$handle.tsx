@@ -42,6 +42,7 @@ export async function loader(args: Route.LoaderArgs) {
   const [{product}] = await Promise.all([
     storefront.query(PRODUCT_QUERY, {
       variables: {handle, selectedOptions: getSelectedProductOptions(request)},
+      cache: storefront.CacheShort(),
     }),
   ]);
 
@@ -56,6 +57,7 @@ export async function loader(args: Route.LoaderArgs) {
     ? storefront
         .query(RELATED_PRODUCTS_QUERY, {
           variables: {vendor: product.vendor},
+          cache: storefront.CacheLong(),
         })
         .then((result) =>
           result?.products.nodes.filter(
