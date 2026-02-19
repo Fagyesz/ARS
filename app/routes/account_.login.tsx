@@ -1,3 +1,4 @@
+import {useLoaderData} from 'react-router';
 import type {Route} from './+types/account_.login';
 
 export async function loader({request, context}: Route.LoaderArgs) {
@@ -17,18 +18,22 @@ export async function loader({request, context}: Route.LoaderArgs) {
     });
   }
 
-  // Otherwise render the custom login page
-  return {};
+  // Forward return_to into the trigger URL so Hydrogen's login() picks it up
+  const returnTo = url.searchParams.get('return_to') ?? '/account';
+  return {returnTo};
 }
 
 export default function LoginPage() {
+  const {returnTo} = useLoaderData<typeof loader>();
+  const triggerUrl = `/account/login?trigger=1&return_to=${encodeURIComponent(returnTo)}`;
+
   return (
     <div className="login-page">
       <div className="login-card">
         <h1 className="login-brand">Ars Mosoris</h1>
         <h2 className="login-heading">Bejelentkezés</h2>
         <p className="login-sub">Lépj be a fiókodba</p>
-        <a href="/account/login?trigger=1" className="btn btn-primary login-btn">
+        <a href={triggerUrl} className="btn btn-primary login-btn">
           Bejelentkezés
         </a>
         <p className="login-note">

@@ -65,7 +65,7 @@ export const meta: Route.MetaFunction = () => {
 
 export async function loader({context}: Route.LoaderArgs) {
   const {customerAccount} = context;
-  context.customerAccount.handleAuthStatus();
+  await context.customerAccount.handleAuthStatus();
 
   const {data, errors} = await customerAccount.query(DASHBOARD_ORDERS_QUERY, {
     variables: {language: customerAccount.i18n.language},
