@@ -16,7 +16,6 @@ interface FooterProps {
     storeCountry: string;
     storeMapLat: string;
     storeMapLng: string;
-    storeHours: string;
     instagramUrl: string;
     facebookUrl: string;
     tiktokUrl: string;

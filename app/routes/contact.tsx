@@ -13,7 +13,11 @@ export async function loader({context}: Route.LoaderArgs) {
     storeCountry: env.STORE_COUNTRY,
     storeMapLat: env.STORE_MAP_LAT,
     storeMapLng: env.STORE_MAP_LNG,
-    storeHours: JSON.parse(env.STORE_HOURS),
+    storeHours: {
+      weekday: env.STORE_HOURS_WEEKDAY,
+      saturday: env.STORE_HOURS_SATURDAY,
+      sunday: env.STORE_HOURS_SUNDAY,
+    },
     instagramUrl: env.INSTAGRAM_URL,
     facebookUrl: env.FACEBOOK_URL,
     tiktokUrl: env.TIKTOK_URL,

@@ -99,7 +99,6 @@ export async function loader(args: Route.LoaderArgs) {
       storeCountry: env.STORE_COUNTRY,
       storeMapLat: env.STORE_MAP_LAT,
       storeMapLng: env.STORE_MAP_LNG,
-      storeHours: env.STORE_HOURS,
       instagramUrl: env.INSTAGRAM_URL,
       facebookUrl: env.FACEBOOK_URL,
       tiktokUrl: env.TIKTOK_URL,

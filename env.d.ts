@@ -18,7 +18,9 @@ declare global {
     STORE_COUNTRY: string;
     STORE_MAP_LAT: string;
     STORE_MAP_LNG: string;
-    STORE_HOURS: string;
+    STORE_HOURS_WEEKDAY: string;
+    STORE_HOURS_SATURDAY: string;
+    STORE_HOURS_SUNDAY: string;
     INSTAGRAM_URL: string;
     FACEBOOK_URL: string;
     TIKTOK_URL: string;
