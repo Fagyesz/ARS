@@ -20,7 +20,31 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
           <dt>Részösszeg</dt>
           <dd>
             {cart?.cost?.subtotalAmount?.amount ? (
-              <Money data={cart?.cost?.subtotalAmount} />
+              (() => {
+                const lines = (cart as any).lines?.nodes ?? [];
+                const totalDiscount = lines.reduce((sum: number, line: any) =>
+                  sum + (line.discountAllocations ?? []).reduce((s: number, a: any) =>
+                    s + parseFloat(a.discountedAmount.amount), 0), 0);
+
+                if (totalDiscount <= 0) {
+                  return <Money data={cart.cost.subtotalAmount} />;
+                }
+
+                const currency = cart.cost.subtotalAmount.currencyCode;
+                const discountedAmount = parseFloat(cart.cost.subtotalAmount.amount);
+                const originalAmount = discountedAmount + totalDiscount;
+
+                return (
+                  <div className="cart-subtotal-with-discount">
+                    <s className="cart-subtotal-original">
+                      <Money data={{amount: String(originalAmount), currencyCode: currency}} />
+                    </s>
+                    <span className="cart-subtotal-discounted">
+                      <Money data={cart.cost.subtotalAmount} />
+                    </span>
+                  </div>
+                );
+              })()
             ) : (
               '-'
             )}

@@ -748,6 +748,25 @@ aside main {
   font-weight: 600;
 }
 
+.product-price-on-sale {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+}
+
+.product-price-on-sale > span {
+  color: var(--color-ars-red);
+  font-weight: 700;
+}
+
+.product-price-on-sale > s {
+  font-size: 0.8em;
+  font-weight: 400;
+  color: var(--color-text-muted);
+  text-decoration: line-through;
+}
+
 .product-description {
   color: var(--color-text-muted);
   line-height: 1.8;
@@ -1108,9 +1127,35 @@ aside .cart-empty {
 .cart-subtotal {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: 0.5rem;
   font-weight: 600;
   font-size: 1rem;
+}
+
+.cart-subtotal-with-discount {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.cart-subtotal-original {
+  font-size: 0.8em;
+  font-weight: 400;
+  color: var(--color-text-muted);
+  text-decoration: line-through;
+}
+
+.cart-subtotal-discounted {
+  color: var(--color-ars-red);
+  font-weight: 700;
+}
+
+.cart-subtotal-savings {
+  font-size: 0.75em;
+  font-weight: 500;
+  color: #16a34a;
 }
 
 .cart-shipping-note {

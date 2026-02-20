@@ -86,7 +86,22 @@ export function CartLineItem({
         <div className="cart-line-actions">
           <CartLineQuantity line={line} />
           <div className="cart-line-price">
-            <ProductPrice price={line?.cost?.totalAmount} />
+            <ProductPrice
+              price={line?.cost?.totalAmount}
+              compareAtPrice={(() => {
+                const totalDiscount = (line.discountAllocations ?? []).reduce(
+                  (sum, a) => sum + parseFloat(a.discountedAmount.amount),
+                  0,
+                );
+                if (totalDiscount <= 0 || !line.cost?.totalAmount) return undefined;
+                return {
+                  amount: String(
+                    parseFloat(line.cost.totalAmount.amount) + totalDiscount,
+                  ),
+                  currencyCode: line.cost.totalAmount.currencyCode,
+                };
+              })()}
+            />
           </div>
         </div>
       </div>
