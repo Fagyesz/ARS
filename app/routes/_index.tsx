@@ -37,65 +37,19 @@ export async function action({request, context}: Route.ActionArgs) {
   const formData = await request.formData();
   const email = formData.get('email') as string;
 
+  if (!email) return {success: false};
+
   try {
-    const storeDomain = context.env.PUBLIC_STORE_DOMAIN;
-    const token = context.env.PUBLIC_STOREFRONT_API_TOKEN;
-    const apiVersion = context.env.STOREFRONT_API_VERSION || 'unstable';
-
-    // Use customerEmailMarketingSubscribe for newsletter-only subscription
-    // No account/password needed — just adds them to marketing list
-    const response = await fetch(
-      `https://${storeDomain}/api/${apiVersion}/graphql.json`,
-      {
-        method: 'POST',
-        headers: {
-          'X-Shopify-Storefront-Access-Token': token,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          query: NEWSLETTER_SUBSCRIBE_MUTATION,
-          variables: {email},
-        }),
-      },
-    );
-
-    const json = (await response.json()) as {
-      data?: {
-        customerEmailMarketingSubscribe?: {
-          customerUserErrors: {message: string; code?: string}[];
-        };
-      };
-      errors?: {message: string}[];
-    };
-
-    if (json.errors?.length) {
-      console.error('[newsletter] GraphQL errors:', JSON.stringify(json.errors));
-      return {success: false};
-    }
-
-    const errors =
-      json.data?.customerEmailMarketingSubscribe?.customerUserErrors ?? [];
-    if (errors.length > 0) {
-      // ALREADY_SUBSCRIBED or ALREADY_A_CUSTOMER = treat as success
-      const alreadyExists = errors.some(
-        (err) =>
-          err.code === 'ALREADY_SUBSCRIBED' ||
-          err.code === 'ALREADY_A_CUSTOMER' ||
-          err.message.toLowerCase().includes('already'),
-      );
-      return {success: alreadyExists};
-    }
-
-    // Send confirmation email via Resend
     const resendKey = context.env.RESEND_API_KEY;
-    if (resendKey) {
-      const origin = new URL(request.url).origin;
-      await fetch('https://api.resend.com/emails', {
+    if (!resendKey) return {success: false};
+
+    const origin = new URL(request.url).origin;
+
+    await Promise.all([
+      // Confirmation to subscriber
+      fetch('https://api.resend.com/emails', {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${resendKey}`,
-          'Content-Type': 'application/json',
-        },
+        headers: {Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json'},
         body: JSON.stringify({
           from: context.env.FROM_EMAIL,
           to: [email],
@@ -103,18 +57,27 @@ export async function action({request, context}: Route.ActionArgs) {
           text: [
             'Szia!',
             '',
-            'Sikeres feliratkozás a hírlevelünkre! Hamarosan értesíted lesz az akciókról és az új termékekről.',
+            'Sikeres feliratkozás a hírlevelünkre! Hamarosan értesítünk az akciókról és az új termékekről.',
             '',
-            `Ha szeretnéd megtekinteni a termékeinket: ${origin}`,
+            `Termékek megtekintése: ${origin}`,
             '',
             'Üdvözlet,',
             'Ars Mosoris',
           ].join('\n'),
         }),
-      }).catch(() => {
-        // Non-fatal: subscription already succeeded
-      });
-    }
+      }),
+      // Notification to store owner
+      fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          from: context.env.FROM_EMAIL,
+          to: [context.env.CONTACT_EMAIL],
+          subject: 'Új hírlevél feliratkozó',
+          text: `Új feliratkozó: ${email}`,
+        }),
+      }),
+    ]);
 
     return {success: true};
   } catch (err) {
@@ -388,14 +351,3 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
   }
 ` as const;
 
-const NEWSLETTER_SUBSCRIBE_MUTATION = `#graphql
-  mutation NewsletterSubscribe($email: String!) {
-    customerEmailMarketingSubscribe(email: $email) {
-      customerUserErrors {
-        field
-        message
-        code
-      }
-    }
-  }
-` as const;
