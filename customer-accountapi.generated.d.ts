@@ -69,6 +69,46 @@ export type CustomerAddressCreateMutation = {
   }>;
 };
 
+export type DashboardOrdersQueryVariables = CustomerAccountAPI.Exact<{
+  language?: CustomerAccountAPI.InputMaybe<CustomerAccountAPI.LanguageCode>;
+}>;
+
+export type DashboardOrdersQuery = {
+  customer: {
+    emailAddress?: CustomerAccountAPI.Maybe<
+      Pick<CustomerAccountAPI.CustomerEmailAddress, 'emailAddress'>
+    >;
+    orders: {
+      nodes: Array<
+        Pick<
+          CustomerAccountAPI.Order,
+          'id' | 'number' | 'processedAt' | 'financialStatus'
+        > & {
+          fulfillments: {
+            nodes: Array<Pick<CustomerAccountAPI.Fulfillment, 'status'>>;
+          };
+          totalPrice: Pick<
+            CustomerAccountAPI.MoneyV2,
+            'amount' | 'currencyCode'
+          >;
+          lineItems: {
+            nodes: Array<
+              Pick<CustomerAccountAPI.LineItem, 'title' | 'quantity'> & {
+                image?: CustomerAccountAPI.Maybe<
+                  Pick<
+                    CustomerAccountAPI.Image,
+                    'url' | 'altText' | 'width' | 'height'
+                  >
+                >;
+              }
+            >;
+          };
+        }
+      >;
+    };
+  };
+};
+
 export type CustomerFragment = Pick<
   CustomerAccountAPI.Customer,
   'id' | 'firstName' | 'lastName'
@@ -504,6 +544,10 @@ export type CustomerUpdateMutation = {
 };
 
 interface GeneratedQueryTypes {
+  '#graphql\n  query DashboardOrders($language: LanguageCode) @inContext(language: $language) {\n    customer {\n      emailAddress {\n        emailAddress\n      }\n      orders(first: 5, sortKey: PROCESSED_AT, reverse: true) {\n        nodes {\n          id\n          number\n          processedAt\n          financialStatus\n          fulfillments(first: 1) {\n            nodes {\n              status\n            }\n          }\n          totalPrice {\n            amount\n            currencyCode\n          }\n          lineItems(first: 2) {\n            nodes {\n              title\n              quantity\n              image {\n                url\n                altText\n                width\n                height\n              }\n            }\n          }\n        }\n      }\n    }\n  }\n': {
+    return: DashboardOrdersQuery;
+    variables: DashboardOrdersQueryVariables;
+  };
   '#graphql\n  query CustomerDetails($language: LanguageCode) @inContext(language: $language) {\n    customer {\n      ...Customer\n    }\n  }\n  #graphql\n  fragment Customer on Customer {\n    id\n    firstName\n    lastName\n    defaultAddress {\n      ...Address\n    }\n    addresses(first: 6) {\n      nodes {\n        ...Address\n      }\n    }\n  }\n  fragment Address on CustomerAddress {\n    id\n    formatted\n    firstName\n    lastName\n    company\n    address1\n    address2\n    territoryCode\n    zoneCode\n    city\n    zip\n    phoneNumber\n  }\n\n': {
     return: CustomerDetailsQuery;
     variables: CustomerDetailsQueryVariables;

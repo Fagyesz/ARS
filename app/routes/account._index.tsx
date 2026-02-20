@@ -3,6 +3,7 @@ import type {Route} from './+types/account._index';
 import {Money} from '@shopify/hydrogen';
 import type {CurrencyCode} from '@shopify/hydrogen/storefront-api-types';
 import type {CustomerFragment} from 'customer-accountapi.generated';
+import {DASHBOARD_ORDERS_QUERY} from '~/graphql/customer-account/CustomerDashboardQuery';
 
 type DashboardOrder = {
   id: string;
@@ -19,45 +20,6 @@ type DashboardOrder = {
     }>;
   };
 };
-
-const DASHBOARD_ORDERS_QUERY = `#graphql
-  query DashboardOrders($language: LanguageCode) @inContext(language: $language) {
-    customer {
-      emailAddress {
-        emailAddress
-      }
-      orders(first: 5, sortKey: PROCESSED_AT, reverse: true) {
-        nodes {
-          id
-          number
-          processedAt
-          financialStatus
-          fulfillments(first: 1) {
-            nodes {
-              status
-            }
-          }
-          totalPrice {
-            amount
-            currencyCode
-          }
-          lineItems(first: 2) {
-            nodes {
-              title
-              quantity
-              image {
-                url
-                altText
-                width
-                height
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-` as const;
 
 export const meta: Route.MetaFunction = () => {
   return [{title: 'Fiókom | Ars Mosoris'}];

@@ -8,7 +8,7 @@ const CUSTOMER_RESET_MUTATION = `#graphql
         id
         email
       }
-      customerErrors {
+      customerUserErrors {
         field
         message
       }
@@ -60,7 +60,7 @@ export async function action({
     data?: {
       customerReset?: {
         customer?: {id: string; email: string} | null;
-        customerErrors: {field: string; message: string}[];
+        customerUserErrors: {field: string; message: string}[];
       };
     };
     errors?: {message: string}[];
@@ -71,7 +71,7 @@ export async function action({
   }
 
   const resetErrors =
-    json.data?.customerReset?.customerErrors ?? [];
+    json.data?.customerReset?.customerUserErrors ?? [];
   if (resetErrors.length > 0) {
     return {error: resetErrors[0].message};
   }
