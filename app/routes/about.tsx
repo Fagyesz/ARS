@@ -32,12 +32,12 @@ export default function About() {
               <h2>A történetünk</h2>
               <p>
                 Az Ars Mosoris 2024-ben alakult hat képzőművész hallgató közös víziójaként.
-                Mindannyian a Moholy-Nagy Művészeti Egyetem (MOME) különböző szakjain tanulunk,
+                Mindannyian a Magyar Képzőművészeti Egyetem (MKE) különböző szakjain tanulunk,
                 és összeköt minket a művészet iránti szenvedély és az a vágy, hogy alkotásainkat
                 minél több emberhez eljuttassuk.
               </p>
               <p>
-                A név - "Ars Mosoris" - a latin "művészet" szóból és a MOME rövidítéséből
+                A név - "Ars Mosoris" - a latin "művészet" szóból és az MKE rövidítéséből
                 származik, tükrözve gyökereinket és hitvallásunkat. Célunk, hogy a kortárs
                 képzőművészetet a mindennapok részévé tegyük, viselhetővé és hozzáférhetővé
                 téve alkotásainkat.

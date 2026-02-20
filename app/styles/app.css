@@ -561,6 +561,29 @@ aside main {
 }
 
 /* ============================================
+   Infinite Scroll
+   ============================================ */
+.pagination-loading {
+  display: flex;
+  justify-content: center;
+  padding: 2.5rem;
+}
+
+.pagination-spinner {
+  display: block;
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--color-border, #e5e5e5);
+  border-top-color: var(--color-ars-red, #FC0004);
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================
    Product Grid
    ============================================ */
 .products-grid {

@@ -26,6 +26,7 @@ export default async function handleRequest(
       'https://fonts.googleapis.com',
     ],
     fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+    imgSrc: ["'self'", 'https://cdn.shopify.com', 'https://images.unsplash.com', 'data:'],
     frameSrc: ["'self'", 'https://www.openstreetmap.org'],
   });
 
