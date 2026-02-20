@@ -33,6 +33,15 @@ function loadDeferredData({context}: Route.LoaderArgs) {
   };
 }
 
+const CUSTOMER_CREATE_MUTATION = `#graphql
+  mutation customerCreate($input: CustomerCreateInput!) {
+    customerCreate(input: $input) {
+      customer { id }
+      customerUserErrors { code field message }
+    }
+  }
+` as const;
+
 export async function action({request, context}: Route.ActionArgs) {
   const formData = await request.formData();
   const email = formData.get('email') as string;
@@ -40,52 +49,69 @@ export async function action({request, context}: Route.ActionArgs) {
   if (!email) return {success: false};
 
   try {
-    const resendKey = context.env.RESEND_API_KEY;
-    if (!resendKey) {
-      console.error('[newsletter] RESEND_API_KEY not set');
-      return {success: false};
+    // 1. Create customer in Shopify with marketing consent
+    const randomPassword = crypto.randomUUID();
+    const {data} = await context.storefront.mutate(CUSTOMER_CREATE_MUTATION, {
+      variables: {
+        input: {
+          email,
+          password: randomPassword,
+          acceptsMarketing: true,
+        },
+      },
+    });
+
+    const errors = data?.customerCreate?.customerUserErrors ?? [];
+    // "TAKEN" means customer already exists — that's fine
+    if (errors.length > 0 && errors[0].code !== 'TAKEN') {
+      console.error('[newsletter] Shopify error:', errors[0].message);
     }
 
+    // 2. Send confirmation emails via Resend (non-blocking)
+    const resendKey = context.env.RESEND_API_KEY;
     const fromEmail = context.env.FROM_EMAIL;
     const contactEmail = context.env.CONTACT_EMAIL;
-    const origin = new URL(request.url).origin;
 
-    const sendEmail = async (payload: object) => {
-      const res = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json'},
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) {
-        const body = await res.text();
-        throw new Error(`Resend ${res.status}: ${body}`);
-      }
-      return res;
-    };
+    if (resendKey && fromEmail) {
+      const origin = new URL(request.url).origin;
+      const sendEmail = async (payload: object) => {
+        const res = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${resendKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) {
+          console.error(`[newsletter] Resend ${res.status}: ${await res.text()}`);
+        }
+      };
 
-    await Promise.all([
-      sendEmail({
-        from: fromEmail,
-        to: [email],
-        subject: 'Feliratkozás megerősítve – Ars Mosoris',
-        text: [
-          'Szia!',
-          '',
-          'Sikeres feliratkozás a hírlevelünkre! Hamarosan értesítünk az akciókról és az új termékekről.',
-          '',
-          `Termékek megtekintése: ${origin}`,
-          '',
-          'Üdvözlet,',
-          'Ars Mosoris',
-        ].join('\n'),
-      }),
-      sendEmail({
-        from: fromEmail,
-        to: [contactEmail],
-        subject: 'Új hírlevél feliratkozó',
-        text: `Új feliratkozó: ${email}`,
-      }),
-    ]);
+      await Promise.all([
+        sendEmail({
+          from: fromEmail,
+          to: [email],
+          subject: 'Feliratkozás megerősítve – Ars Mosoris',
+          text: [
+            'Szia!',
+            '',
+            'Sikeres feliratkozás a hírlevelünkre! Hamarosan értesítünk az akciókról és az új termékekről.',
+            '',
+            `Termékek megtekintése: ${origin}`,
+            '',
+            'Üdvözlet,',
+            'Ars Mosoris',
+          ].join('\n'),
+        }),
+        sendEmail({
+          from: fromEmail,
+          to: [contactEmail],
+          subject: 'Új hírlevél feliratkozó',
+          text: `Új feliratkozó: ${email}`,
+        }),
+      ]);
+    }
 
     return {success: true};
   } catch (err) {
