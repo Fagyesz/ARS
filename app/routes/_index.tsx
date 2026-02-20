@@ -41,41 +41,49 @@ export async function action({request, context}: Route.ActionArgs) {
 
   try {
     const resendKey = context.env.RESEND_API_KEY;
-    if (!resendKey) return {success: false};
+    if (!resendKey) {
+      console.error('[newsletter] RESEND_API_KEY not set');
+      return {success: false};
+    }
 
+    const fromEmail = context.env.FROM_EMAIL;
+    const contactEmail = context.env.CONTACT_EMAIL;
     const origin = new URL(request.url).origin;
 
+    const sendEmail = async (payload: object) => {
+      const res = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json'},
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const body = await res.text();
+        throw new Error(`Resend ${res.status}: ${body}`);
+      }
+      return res;
+    };
+
     await Promise.all([
-      // Confirmation to subscriber
-      fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json'},
-        body: JSON.stringify({
-          from: context.env.FROM_EMAIL,
-          to: [email],
-          subject: 'Feliratkozás megerősítve – Ars Mosoris',
-          text: [
-            'Szia!',
-            '',
-            'Sikeres feliratkozás a hírlevelünkre! Hamarosan értesítünk az akciókról és az új termékekről.',
-            '',
-            `Termékek megtekintése: ${origin}`,
-            '',
-            'Üdvözlet,',
-            'Ars Mosoris',
-          ].join('\n'),
-        }),
+      sendEmail({
+        from: fromEmail,
+        to: [email],
+        subject: 'Feliratkozás megerősítve – Ars Mosoris',
+        text: [
+          'Szia!',
+          '',
+          'Sikeres feliratkozás a hírlevelünkre! Hamarosan értesítünk az akciókról és az új termékekről.',
+          '',
+          `Termékek megtekintése: ${origin}`,
+          '',
+          'Üdvözlet,',
+          'Ars Mosoris',
+        ].join('\n'),
       }),
-      // Notification to store owner
-      fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json'},
-        body: JSON.stringify({
-          from: context.env.FROM_EMAIL,
-          to: [context.env.CONTACT_EMAIL],
-          subject: 'Új hírlevél feliratkozó',
-          text: `Új feliratkozó: ${email}`,
-        }),
+      sendEmail({
+        from: fromEmail,
+        to: [contactEmail],
+        subject: 'Új hírlevél feliratkozó',
+        text: `Új feliratkozó: ${email}`,
       }),
     ]);
 
