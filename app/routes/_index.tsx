@@ -69,6 +69,7 @@ export async function action({request, context}: Route.ActionArgs) {
     };
 
     if (json.errors?.length) {
+      console.error('[newsletter] GraphQL errors:', JSON.stringify(json.errors));
       return {success: false};
     }
 
@@ -116,7 +117,8 @@ export async function action({request, context}: Route.ActionArgs) {
     }
 
     return {success: true};
-  } catch {
+  } catch (err) {
+    console.error('[newsletter] Exception:', err);
     return {success: false};
   }
 }
