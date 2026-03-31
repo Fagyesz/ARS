@@ -38,7 +38,7 @@ export function Footer({
     youtube: env?.youtubeUrl || SOCIAL_LINKS.youtube,
   };
   return (
-    <Suspense>
+    <Suspense fallback={null}>
       <Await resolve={footerPromise}>
         {(footer) => (
           <footer className="footer">
@@ -126,7 +126,7 @@ export function Footer({
               </div>
 
               <div className="footer-bottom">
-                <p>&copy; {new Date().getFullYear()} Ars Mosoris. Minden jog fenntartva.</p>
+                <p suppressHydrationWarning>&copy; {new Date().getFullYear()} Ars Mosoris. Minden jog fenntartva.</p>
                 <p>
                   <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
                   {' · '}
