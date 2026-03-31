@@ -11,12 +11,12 @@ export const meta: Route.MetaFunction = ({data}) => {
     {title: `${artist?.name ?? 'Alkotó'} | Ars Mosoris`},
     {
       name: 'description',
-      content: artist?.bio || 'Ars Mosoris alkotó',
+      content: artist?.bio ?? 'Ars Mosoris alkotó',
     },
     {property: 'og:type', content: 'website'},
-    {property: 'og:title', content: `${data?.artist.name ?? 'Művész'} | Ars Mosoris`},
-    {property: 'og:description', content: data?.artist.bio ?? 'Magyar képzőművész — Ars Mosoris'},
-    {property: 'og:image', content: data?.artist.image ?? '/og-default.png'},
+    {property: 'og:title', content: `${artist?.name ?? 'Művész'} | Ars Mosoris`},
+    {property: 'og:description', content: artist?.bio ?? 'Magyar képzőművész — Ars Mosoris'},
+    {property: 'og:image', content: artist?.image ?? '/og-default.png'},
     {name: 'twitter:card', content: 'summary_large_image'},
   ];
 };
