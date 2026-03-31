@@ -27,7 +27,7 @@ export const meta: Route.MetaFunction = ({data}) => {
     {property: 'og:title', content: data?.product.title ?? 'Termék'},
     {property: 'og:description', content: data?.product.description || 'Ars Mosoris termék'},
     {property: 'og:image', content: data?.product.selectedOrFirstAvailableVariant?.image?.url ?? '/og-default.png'},
-    {property: 'og:url', content: `/products/${data?.product.handle}`},
+    {property: 'og:url', content: data?.canonicalUrl ?? `/products/${data?.product.handle}`},
     {name: 'twitter:card', content: 'summary_large_image'},
   ];
 };
@@ -75,11 +75,15 @@ export async function loader(args: Route.LoaderArgs) {
         .catch(() => [])
     : Promise.resolve([]);
 
-  return {product, relatedProducts};
+  const url = new URL(request.url);
+  const canonicalUrl = `${url.origin}/products/${product.handle}`;
+  const origin = url.origin;
+
+  return {product, relatedProducts, canonicalUrl, origin};
 }
 
 export default function Product() {
-  const {product, relatedProducts} = useLoaderData<typeof loader>();
+  const {product, relatedProducts, canonicalUrl, origin} = useLoaderData<typeof loader>();
 
   const selectedVariant = useOptimisticVariant(
     product.selectedOrFirstAvailableVariant,
@@ -185,7 +189,7 @@ export default function Product() {
               availability: selectedVariant?.availableForSale
                 ? 'https://schema.org/InStock'
                 : 'https://schema.org/OutOfStock',
-              url: `/products/${product.handle}`,
+              url: canonicalUrl,
             },
           }),
         }}
@@ -201,7 +205,7 @@ export default function Product() {
                 '@type': 'ListItem',
                 position: 1,
                 name: 'Bolt',
-                item: '/collections/all',
+                item: `${origin}/collections/all`,
               },
               ...(product.vendor
                 ? [
@@ -209,7 +213,7 @@ export default function Product() {
                       '@type': 'ListItem',
                       position: 2,
                       name: product.vendor,
-                      item: `/collections/${product.vendor.toLowerCase()}`,
+                      item: `${origin}/collections/${product.vendor.toLowerCase()}`,
                     },
                     {
                       '@type': 'ListItem',
