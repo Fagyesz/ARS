@@ -588,6 +588,40 @@ aside main {
   color: white;
 }
 
+.shop-sort-group {
+  margin-left: auto;
+}
+
+.shop-sort-select {
+  padding: 0.4375rem 2rem 0.4375rem 0.875rem;
+  font-size: 0.8125rem;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  border: 1px solid var(--color-border);
+  border-radius: 2rem;
+  background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%231B1B1B' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 0.75rem center;
+  appearance: none;
+  cursor: pointer;
+  color: var(--color-text);
+  transition: border-color 0.2s ease;
+}
+
+.shop-sort-select:hover,
+.shop-sort-select:focus {
+  border-color: var(--color-ars-dark);
+  outline: none;
+}
+
+@media (max-width: 767px) {
+  .shop-sort-group {
+    margin-left: 0;
+    width: 100%;
+  }
+  .shop-sort-select {
+    width: 100%;
+  }
+}
+
 /* Shop empty state */
 .shop-empty {
   text-align: center;
