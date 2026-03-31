@@ -23,11 +23,13 @@ export const meta: Route.MetaFunction = ({data}) => {
       name: 'description',
       content: data?.product.description || 'Ars Mosoris termék',
     },
-    {
-      rel: 'canonical',
-      href: `/products/${data?.product.handle}`,
-    },
   ];
+};
+
+export const links: Route.LinksFunction = ({data}) => {
+  return data?.product.handle
+    ? [{rel: 'canonical', href: `/products/${data.product.handle}`}]
+    : [];
 };
 
 export async function loader(args: Route.LoaderArgs) {
