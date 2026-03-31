@@ -79,6 +79,8 @@ export function ImageSlider({slides}: ImageSliderProps) {
                 src={slide.url}
                 alt={slide.alt}
                 loading={i === 0 ? 'eager' : 'lazy'}
+                decoding={i === 0 ? 'sync' : 'async'}
+                fetchPriority={i === 0 ? 'high' : 'low'}
               />
             </div>
           ))}
@@ -128,7 +130,7 @@ export function ImageSlider({slides}: ImageSliderProps) {
             onClick={() => setCurrent(i)}
             aria-label={`${i + 1}. kép`}
           >
-            <img src={slide.url} alt="" loading="lazy" />
+            <img src={slide.url} alt="" loading="lazy" decoding="async" />
           </button>
         ))}
       </div>
