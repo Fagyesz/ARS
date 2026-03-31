@@ -9,6 +9,20 @@ type ImageSliderProps = {
   slides: Slide[];
 };
 
+/** Append ?width=X (or &width=X) to a Shopify CDN URL */
+function shopifyUrl(url: string, width: number): string {
+  const sep = url.includes('?') ? '&' : '?';
+  return `${url}${sep}width=${width}`;
+}
+
+/** Build a srcset string for a Shopify CDN image */
+function shopifySrcSet(url: string, widths: number[]): string {
+  return widths.map((w) => `${shopifyUrl(url, w)} ${w}w`).join(', ');
+}
+
+const SLIDE_WIDTHS = [400, 800, 1200, 1600];
+const THUMB_WIDTHS = [80, 120];
+
 export function ImageSlider({slides}: ImageSliderProps) {
   const [current, setCurrent] = useState(0);
   const touchStartX = useRef<number | null>(null);
@@ -59,7 +73,15 @@ export function ImageSlider({slides}: ImageSliderProps) {
   if (slides.length === 1) {
     return (
       <div className="slider-single">
-        <img src={slides[0].url} alt={slides[0].alt} loading="lazy" />
+        <img
+          src={shopifyUrl(slides[0].url, 1200)}
+          srcSet={shopifySrcSet(slides[0].url, SLIDE_WIDTHS)}
+          sizes="(max-width: 600px) 100vw, (max-width: 1200px) 80vw, 1200px"
+          alt={slides[0].alt}
+          loading="eager"
+          decoding="sync"
+          fetchPriority="high"
+        />
       </div>
     );
   }
@@ -76,7 +98,9 @@ export function ImageSlider({slides}: ImageSliderProps) {
           {slides.map((slide, i) => (
             <div key={i} className="slider-slide">
               <img
-                src={slide.url}
+                src={shopifyUrl(slide.url, 1200)}
+                srcSet={shopifySrcSet(slide.url, SLIDE_WIDTHS)}
+                sizes="(max-width: 600px) 100vw, (max-width: 1200px) 80vw, 1200px"
                 alt={slide.alt}
                 loading={i === 0 ? 'eager' : 'lazy'}
                 decoding={i === 0 ? 'sync' : 'async'}
@@ -130,7 +154,14 @@ export function ImageSlider({slides}: ImageSliderProps) {
             onClick={() => setCurrent(i)}
             aria-label={`${i + 1}. kép`}
           >
-            <img src={slide.url} alt="" loading="lazy" decoding="async" />
+            <img
+              src={shopifyUrl(slide.url, 120)}
+              srcSet={shopifySrcSet(slide.url, THUMB_WIDTHS)}
+              sizes="80px"
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
           </button>
         ))}
       </div>
