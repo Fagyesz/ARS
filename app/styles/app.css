@@ -4049,3 +4049,39 @@ button.reset {
     text-align: right;
   }
 }
+
+/* ============================================
+   Wishlist Heart Button
+   ============================================ */
+.product-card-wrapper {
+  position: relative;
+}
+
+.wishlist-heart {
+  position: absolute;
+  top: 0.625rem;
+  right: 0.625rem;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.92);
+  border: none;
+  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  transition: color 0.2s ease, transform 0.15s ease, background 0.2s ease;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+.wishlist-heart:hover {
+  color: var(--color-ars-red);
+  transform: scale(1.1);
+}
+
+.wishlist-heart.active {
+  color: var(--color-ars-red);
+}

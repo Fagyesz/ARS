@@ -6,6 +6,7 @@ import type {
   RecommendedProductFragment,
 } from 'storefrontapi.generated';
 import {useVariantUrl} from '~/lib/variants';
+import {useWishlist} from '~/hooks/useWishlist';
 
 export function ProductItem({
   product,
@@ -20,37 +21,71 @@ export function ProductItem({
   const variantUrl = useVariantUrl(product.handle);
   const image = product.featuredImage;
   const isAvailable = 'availableForSale' in product ? product.availableForSale : true;
+  const {has, toggle} = useWishlist();
+  const wishlisted = has(product.handle);
 
   return (
-    <Link
-      className="product-card"
-      key={product.id}
-      prefetch="intent"
-      to={variantUrl}
-    >
-      <div className="product-card-image">
-        {image && (
-          <Image
-            alt={image.altText || product.title}
-            aspectRatio="1/1"
-            data={image}
-            loading={loading}
-            sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
-          />
-        )}
-        {!isAvailable && (
-          <span className="product-card-badge sold-out">Elfogyott</span>
-        )}
-      </div>
-      <div className="product-card-info">
-        {'vendor' in product && product.vendor && (
-          <span className="product-card-artist">{product.vendor}</span>
-        )}
-        <h3 className="product-card-title">{product.title}</h3>
-        <div className="product-card-price">
-          <Money data={product.priceRange.minVariantPrice} />
+    <div className="product-card-wrapper">
+      <Link
+        className="product-card"
+        key={product.id}
+        prefetch="intent"
+        to={variantUrl}
+      >
+        <div className="product-card-image">
+          {image && (
+            <Image
+              alt={image.altText || product.title}
+              aspectRatio="1/1"
+              data={image}
+              loading={loading}
+              sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
+            />
+          )}
+          {!isAvailable && (
+            <span className="product-card-badge sold-out">Elfogyott</span>
+          )}
         </div>
-      </div>
-    </Link>
+        <div className="product-card-info">
+          {'vendor' in product && product.vendor && (
+            <span className="product-card-artist">{product.vendor}</span>
+          )}
+          <h3 className="product-card-title">{product.title}</h3>
+          <div className="product-card-price">
+            <Money data={product.priceRange.minVariantPrice} />
+          </div>
+        </div>
+      </Link>
+      <button
+        type="button"
+        className={`wishlist-heart${wishlisted ? ' active' : ''}`}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          toggle(product.handle);
+        }}
+        aria-label={wishlisted ? 'Eltávolítás a kívánságlistáról' : 'Hozzáadás a kívánságlistához'}
+      >
+        <HeartIcon filled={wishlisted} />
+      </button>
+    </div>
+  );
+}
+
+function HeartIcon({filled}: {filled: boolean}) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill={filled ? 'currentColor' : 'none'}
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+    </svg>
   );
 }
