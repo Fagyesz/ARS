@@ -93,7 +93,7 @@ export function Footer({
                   <nav className="footer-links">
                     <NavLink to="/collections/all">Minden termék</NavLink>
                     {COLLECTION_TYPES.map((type) => (
-                      <NavLink key={type.value} to={`/collections/${type.value}`}>{type.label}</NavLink>
+                      <NavLink key={type.value} to={`/collections/all?type=${type.value}`}>{type.label}</NavLink>
                     ))}
                   </nav>
                 </div>
