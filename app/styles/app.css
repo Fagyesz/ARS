@@ -945,7 +945,9 @@ aside .cart-details {
 aside [aria-labelledby="cart-lines"] {
   flex: 1;
   overflow-y: auto;
-  scrollbar-gutter: stable;
+  @supports (scrollbar-gutter: stable) {
+    scrollbar-gutter: stable;
+  }
   padding: 1.5rem;
   min-height: 0;
 }
