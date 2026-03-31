@@ -181,6 +181,7 @@ a:hover {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--color-ars-dark);
+  white-space: nowrap;
 }
 
 .header-logo:hover {
@@ -193,7 +194,7 @@ a:hover {
   margin-left: 4rem;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .header-menu-desktop {
     display: flex;
   }
@@ -209,7 +210,7 @@ a:hover {
 }
 
 .header-menu-item:hover,
-.header-menu-item[data-active="true"] {
+.header-menu-item.active {
   color: var(--color-primary);
 }
 
@@ -257,7 +258,7 @@ a:hover {
   justify-content: center;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .header-menu-mobile-toggle {
     display: none;
   }
@@ -410,6 +411,11 @@ aside main {
 
 .footer-links a:hover {
   color: var(--color-primary);
+}
+
+.footer-links a:visited,
+.footer-links a.active {
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .footer-social {
@@ -1365,6 +1371,11 @@ aside .cart-empty {
   transition: transform 0.5s ease;
 }
 
+.artist-card-image:empty {
+  background: linear-gradient(135deg, var(--color-ars-dark) 0%, var(--color-ars-burgundy) 100%);
+  min-height: 280px;
+}
+
 .artist-card:hover .artist-card-image {
   transform: scale(1.05);
 }
@@ -1422,6 +1433,11 @@ aside .cart-empty {
   overflow: hidden;
   margin-bottom: 1.5rem;
   background-color: #e8e8e8;
+}
+
+.artist-page-card-image:empty {
+  background: linear-gradient(135deg, var(--color-ars-dark) 0%, var(--color-ars-burgundy) 100%);
+  min-height: 280px;
 }
 
 .artist-page-card-image img {
