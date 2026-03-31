@@ -9,7 +9,10 @@ import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 
 export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `${data?.blog.title} | Ars Mosoris`}];
+  return [
+    {title: `${data?.blog.title} | Ars Mosoris`},
+    ...(data?.blog.seo?.description ? [{name: 'description', content: data.blog.seo.description}] : []),
+  ];
 };
 
 export async function loader(args: Route.LoaderArgs) {
