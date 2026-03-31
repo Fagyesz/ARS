@@ -1,12 +1,28 @@
 import {useLoaderData} from 'react-router';
 import type {Route} from './+types/blogs.$blogHandle.$articleHandle';
-import {Image} from '@shopify/hydrogen';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {ImageSlider, extractImagesFromHtml} from '~/components/ImageSlider';
 
 export const meta: Route.MetaFunction = ({data}) => {
   return [{title: `${data?.article.title ?? ''} | Ars Mosoris`}];
 };
+
+export const links = ((args: {data?: {firstImageUrl?: string | null}}) => {
+  const firstImage = args?.data?.firstImageUrl;
+  if (!firstImage) return [];
+  const sep = firstImage.includes('?') ? '&' : '?';
+  return [
+    {
+      rel: 'preload',
+      as: 'image',
+      href: `${firstImage}${sep}width=1200`,
+      imageSrcSet: [400, 800, 1200, 1600]
+        .map((w) => `${firstImage}${sep}width=${w} ${w}w`)
+        .join(', '),
+      imageSizes: '(max-width: 600px) 100vw, (max-width: 1200px) 80vw, 1200px',
+    },
+  ];
+}) as Route.LinksFunction;
 
 export async function loader(args: Route.LoaderArgs) {
   // Start fetching non-critical data without blocking time to first byte
@@ -32,6 +48,7 @@ async function loadCriticalData({context, request, params}: Route.LoaderArgs) {
   const [{blog}] = await Promise.all([
     context.storefront.query(ARTICLE_QUERY, {
       variables: {blogHandle, articleHandle},
+      cache: context.storefront.CacheLong(),
     }),
     // Add other queries here, so that they are loaded in parallel
   ]);
@@ -54,7 +71,12 @@ async function loadCriticalData({context, request, params}: Route.LoaderArgs) {
 
   const article = blog.articleByHandle;
 
-  return {article};
+  // First image for <link rel="preload"> — featured image or first in body
+  const {slides} = extractImagesFromHtml(article.contentHtml ?? '');
+  const firstImageUrl =
+    article.image?.url ?? (slides.length > 0 ? slides[0].url : null);
+
+  return {article, firstImageUrl};
 }
 
 /**
