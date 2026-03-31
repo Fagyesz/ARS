@@ -287,14 +287,15 @@ function ArtistsPreview() {
               to={`/artists/${artist.handle}`}
               className="artist-card"
             >
-              {artist.image && (
-                <img
-                  src={artist.image}
-                  alt={artist.name}
-                  className="artist-card-image"
-                  loading="lazy"
-                />
-              )}
+              <div className="artist-card-image">
+                {artist.image && (
+                  <img
+                    src={artist.image}
+                    alt={artist.name}
+                    loading="lazy"
+                  />
+                )}
+              </div>
               <div className="artist-card-overlay">
                 <span className="artist-card-name">{artist.name}</span>
                 <span className="artist-card-role">{artist.role}</span>
