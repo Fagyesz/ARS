@@ -73,7 +73,7 @@ export function PageLayout({
 
 function CartAside({cart}: {cart: PageLayoutProps['cart']}) {
   return (
-    <Aside type="cart" heading="CART">
+    <Aside type="cart" heading="KOSÁR">
       <Suspense fallback={<p>Kosár betöltése...</p>}>
         <Await resolve={cart}>
           {(cart) => {
@@ -88,7 +88,7 @@ function CartAside({cart}: {cart: PageLayoutProps['cart']}) {
 function SearchAside() {
   const queriesDatalistId = useId();
   return (
-    <Aside type="search" heading="SEARCH">
+    <Aside type="search" heading="KERESÉS">
       <div className="predictive-search">
         <br />
         <SearchFormPredictive>
@@ -104,7 +104,7 @@ function SearchAside() {
                 list={queriesDatalistId}
               />
               &nbsp;
-              <button onClick={goToSearch}>Search</button>
+              <button onClick={goToSearch}>Keresés</button>
             </>
           )}
         </SearchFormPredictive>
@@ -177,7 +177,7 @@ function MobileMenuAside({
   return (
     header.menu &&
     header.shop.primaryDomain?.url && (
-      <Aside type="mobile" heading="MENU">
+      <Aside type="mobile" heading="MENÜ">
         <HeaderMenu
           menu={header.menu}
           viewport="mobile"

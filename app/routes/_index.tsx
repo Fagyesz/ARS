@@ -203,7 +203,7 @@ function ProductCard({
   const isAvailable = product.availableForSale !== false;
 
   return (
-    <Link to={`/products/${product.handle}`} className="product-card">
+    <Link to={`/products/${product.handle}`} className="product-card" prefetch="intent">
       <div className="product-card-image">
         {product.featuredImage && (
           <Image
