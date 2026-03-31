@@ -13,7 +13,7 @@ import {
 import type {RegularSearchQuery, PredictiveSearchQuery} from 'storefrontapi.generated';
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: `Hydrogen | Search`}];
+  return [{title: `Keresés | Ars Mosoris`}];
 };
 
 export async function loader({request, context}: Route.LoaderArgs) {

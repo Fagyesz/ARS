@@ -5,7 +5,12 @@ import type {Route} from './+types/pages.$handle';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 
 export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `Hydrogen | ${data?.page.title ?? ''}`}];
+  const seoTitle = data?.page.seo?.title || data?.page.title || '';
+  const seoDescription = data?.page.seo?.description;
+  return [
+    {title: `${seoTitle} | Ars Mosoris`},
+    ...(seoDescription ? [{name: 'description', content: seoDescription}] : []),
+  ];
 };
 
 export async function loader(args: Route.LoaderArgs) {
