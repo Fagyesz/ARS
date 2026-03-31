@@ -170,6 +170,18 @@ export function Layout({children}: {children?: React.ReactNode}) {
       </head>
       <body>
         {children}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Organization',
+              name: 'Ars Mosoris',
+              url: 'https://arsmosoris.vincze.app',
+              logo: 'https://arsmosoris.vincze.app/og-default.png',
+            }),
+          }}
+        />
         <ScrollRestoration nonce={nonce} />
         <Scripts nonce={nonce} />
       </body>

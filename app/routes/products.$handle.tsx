@@ -164,6 +164,70 @@ export default function Product() {
           ],
         }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Product',
+            name: product.title,
+            description: product.description,
+            image: selectedVariant?.image?.url,
+            brand: {
+              '@type': 'Brand',
+              name: product.vendor || 'Ars Mosoris',
+            },
+            sku: selectedVariant?.sku,
+            offers: {
+              '@type': 'Offer',
+              price: selectedVariant?.price.amount,
+              priceCurrency: selectedVariant?.price.currencyCode,
+              availability: selectedVariant?.availableForSale
+                ? 'https://schema.org/InStock'
+                : 'https://schema.org/OutOfStock',
+              url: `/products/${product.handle}`,
+            },
+          }),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              {
+                '@type': 'ListItem',
+                position: 1,
+                name: 'Bolt',
+                item: '/collections/all',
+              },
+              ...(product.vendor
+                ? [
+                    {
+                      '@type': 'ListItem',
+                      position: 2,
+                      name: product.vendor,
+                      item: `/collections/${product.vendor.toLowerCase()}`,
+                    },
+                    {
+                      '@type': 'ListItem',
+                      position: 3,
+                      name: product.title,
+                    },
+                  ]
+                : [
+                    {
+                      '@type': 'ListItem',
+                      position: 2,
+                      name: product.title,
+                    },
+                  ]),
+            ],
+          }),
+        }}
+      />
     </>
   );
 }
