@@ -1848,6 +1848,110 @@ aside .cart-empty {
   height: 100%;
 }
 
+/* ============================================
+   Image Slider
+   ============================================ */
+.slider {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  background: #000;
+  aspect-ratio: 4/3;
+}
+
+.slider-track {
+  display: flex;
+  height: 100%;
+  transition: transform 0.4s ease;
+}
+
+.slider-slide {
+  flex: 0 0 100%;
+  height: 100%;
+}
+
+.slider-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.slider-single img {
+  width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  display: block;
+}
+
+.slider-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.55);
+  border: none;
+  color: #fff;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  transition: background 0.2s;
+}
+
+.slider-btn:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.slider-btn-prev { left: 0.75rem; }
+.slider-btn-next { right: 0.75rem; }
+
+.slider-dots {
+  position: absolute;
+  bottom: 0.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.4rem;
+  z-index: 2;
+}
+
+.slider-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s;
+}
+
+.slider-dot.active {
+  background: #fff;
+}
+
+.slider-counter {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 1rem;
+  z-index: 2;
+}
+
+.article-slider {
+  margin: 1.5rem 0 2rem;
+}
+
+/* ============================================
+   Article
+   ============================================ */
 .article-body {
   font-size: 1rem;
   line-height: 1.8;

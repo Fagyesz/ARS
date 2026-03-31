@@ -2,6 +2,7 @@ import {useLoaderData} from 'react-router';
 import type {Route} from './+types/blogs.$blogHandle.$articleHandle';
 import {Image} from '@shopify/hydrogen';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
+import {ImageSlider, extractImagesFromHtml} from '~/components/ImageSlider';
 
 export const meta: Route.MetaFunction = ({data}) => {
   return [{title: `${data?.article.title ?? ''} | Ars Mosoris`}];
@@ -75,6 +76,14 @@ export default function Article() {
     day: 'numeric',
   }).format(new Date(article.publishedAt));
 
+  const {slides, cleanHtml} = extractImagesFromHtml(contentHtml);
+
+  // If the featured image is not already in the slides, prepend it
+  const allSlides =
+    image && !slides.some((s) => s.url === image.url)
+      ? [{url: image.url, alt: image.altText || title}, ...slides]
+      : slides;
+
   return (
     <div className="section">
       <div className="container">
@@ -84,11 +93,19 @@ export default function Article() {
             <time dateTime={article.publishedAt}>{publishedDate}</time>
             {author?.name && <span>&middot; {author.name}</span>}
           </div>
-          {image && <Image data={image} sizes="(min-width: 768px) 720px, 90vw" loading="eager" className="article-image" />}
-          <div
-            dangerouslySetInnerHTML={{__html: contentHtml}}
-            className="article-body"
-          />
+
+          {allSlides.length > 0 && (
+            <div className="article-slider">
+              <ImageSlider slides={allSlides} />
+            </div>
+          )}
+
+          {cleanHtml && (
+            <div
+              dangerouslySetInnerHTML={{__html: cleanHtml}}
+              className="article-body"
+            />
+          )}
         </article>
       </div>
     </div>
