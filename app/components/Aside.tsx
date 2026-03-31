@@ -83,6 +83,17 @@ Aside.Provider = function AsideProvider({children}: {children: ReactNode}) {
     setType('closed');
   }, [location.pathname]);
 
+  useEffect(() => {
+    if (type !== 'closed') {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [type]);
+
   return (
     <AsideContext.Provider
       value={{
