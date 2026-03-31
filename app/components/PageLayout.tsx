@@ -98,7 +98,7 @@ function SearchAside() {
                 name="q"
                 onChange={fetchResults}
                 onFocus={fetchResults}
-                placeholder="Search"
+                placeholder="Keresés..."
                 ref={inputRef}
                 type="search"
                 list={queriesDatalistId}
@@ -114,7 +114,7 @@ function SearchAside() {
             const {articles, collections, pages, products, queries} = items;
 
             if (state === 'loading' && term.current) {
-              return <div>Loading...</div>;
+              return <div>Betöltés...</div>;
             }
 
             if (!total) {
@@ -153,7 +153,7 @@ function SearchAside() {
                     to={`${SEARCH_ENDPOINT}?q=${term.current}`}
                   >
                     <p>
-                      View all results for <q>{term.current}</q>
+                      Összes találat: <q>{term.current}</q>
                       &nbsp; →
                     </p>
                   </Link>
