@@ -112,7 +112,7 @@ export default function Product() {
           </nav>
 
           <div className="product">
-            <ProductImage image={selectedVariant?.image} />
+            <ProductImage image={selectedVariant?.image} productTitle={product.title} />
             <div className="product-main">
               {vendor && (
                 <Link to={`/collections/${vendor.toLowerCase()}`} className="product-artist">
