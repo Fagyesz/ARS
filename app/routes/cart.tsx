@@ -9,7 +9,11 @@ import {CartForm} from '@shopify/hydrogen';
 import {CartMain} from '~/components/CartMain';
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: `Kosár | Ars Mosoris`}];
+  return [
+    {title: `Kosár | Ars Mosoris`},
+    {name: 'description', content: 'Kosár — Ars Mosoris'},
+    {name: 'robots', content: 'noindex, nofollow'},
+  ];
 };
 
 export const headers: HeadersFunction = ({actionHeaders}) => actionHeaders;

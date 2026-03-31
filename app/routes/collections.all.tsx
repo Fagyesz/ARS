@@ -8,7 +8,10 @@ import {ARTISTS} from '~/lib/artists';
 import {COLLECTION_TYPES} from '~/lib/config';
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: 'Katalógus | Ars Mosoris'}];
+  return [
+    {title: 'Katalógus | Ars Mosoris'},
+    {name: 'description', content: 'Fedezd fel a teljes Ars Mosoris kollekcióját — egyedi póló és táska dizájnok magyar képzőművészektől.'},
+  ];
 };
 
 const ARTIST_NAMES = ['Ars Mosoris', ...ARTISTS.map((a) => a.name)];

@@ -10,7 +10,10 @@ import type {BlogsQuery} from 'storefrontapi.generated';
 type BlogNode = BlogsQuery['blogs']['nodes'][0];
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: 'Blog | Ars Mosoris'}];
+  return [
+    {title: 'Blog | Ars Mosoris'},
+    {name: 'description', content: 'Az Ars Mosoris blogja — hírek, történetek és inspiráció a magyar képzőművészet világából.'},
+  ];
 };
 
 export async function loader(args: Route.LoaderArgs) {

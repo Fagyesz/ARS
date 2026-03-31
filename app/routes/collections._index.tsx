@@ -1,5 +1,12 @@
 import {useLoaderData, Link} from 'react-router';
 import type {Route} from './+types/collections._index';
+
+export const meta: Route.MetaFunction = () => {
+  return [
+    {title: 'Kollekcióink | Ars Mosoris'},
+    {name: 'description', content: 'Böngéssz az Ars Mosoris kollekciói között — egyedi ruházat és kiegészítők képzőművészeti alkotásokkal.'},
+  ];
+};
 import {getPaginationVariables, Image} from '@shopify/hydrogen';
 import type {CollectionFragment} from 'storefrontapi.generated';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';

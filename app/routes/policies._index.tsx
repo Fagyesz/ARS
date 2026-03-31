@@ -2,7 +2,10 @@ import {Link} from 'react-router';
 import type {Route} from './+types/policies._index';
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: 'Jogi feltételek | Ars Mosoris'}];
+  return [
+    {title: 'Jogi feltételek | Ars Mosoris'},
+    {name: 'description', content: 'Ars Mosoris jogi feltételek — adatvédelem, szállítás, visszaküldés és általános feltételek.'},
+  ];
 };
 
 const POLICIES = [
