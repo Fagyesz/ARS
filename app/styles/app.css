@@ -4085,3 +4085,30 @@ button.reset {
 .wishlist-heart.active {
   color: var(--color-ars-red);
 }
+
+/* ============================================
+   Wishlist Page
+   ============================================ */
+.wishlist-page h1 {
+  margin-bottom: 2rem;
+}
+
+.wishlist-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 4rem 1rem;
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.wishlist-empty h2 {
+  font-size: 1.5rem;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.wishlist-empty .btn {
+  margin-top: 0.5rem;
+}

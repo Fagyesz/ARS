@@ -95,6 +95,7 @@ export function Footer({
                     {COLLECTION_TYPES.map((type) => (
                       <NavLink key={type.value} to={`/collections/all?type=${type.value}`}>{type.label}</NavLink>
                     ))}
+                    <NavLink to="/wishlist">Kívánságlista</NavLink>
                   </nav>
                 </div>
 
