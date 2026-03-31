@@ -32,10 +32,9 @@ export const meta: Route.MetaFunction = ({data}) => {
   ];
 };
 
-export const links: Route.LinksFunction = ({data}) => {
-  return data?.product.handle
-    ? [{rel: 'canonical', href: `/products/${data.product.handle}`}]
-    : [];
+export const links: Route.LinksFunction = (args) => {
+  const handle = args?.data?.product?.handle;
+  return handle ? [{rel: 'canonical', href: `/products/${handle}`}] : [];
 };
 
 export async function loader(args: Route.LoaderArgs) {
