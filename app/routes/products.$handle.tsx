@@ -23,6 +23,12 @@ export const meta: Route.MetaFunction = ({data}) => {
       name: 'description',
       content: data?.product.description || 'Ars Mosoris termék',
     },
+    {property: 'og:type', content: 'product'},
+    {property: 'og:title', content: data?.product.title ?? 'Termék'},
+    {property: 'og:description', content: data?.product.description || 'Ars Mosoris termék'},
+    {property: 'og:image', content: data?.product.selectedOrFirstAvailableVariant?.image?.url ?? '/og-default.png'},
+    {property: 'og:url', content: `/products/${data?.product.handle}`},
+    {name: 'twitter:card', content: 'summary_large_image'},
   ];
 };
 

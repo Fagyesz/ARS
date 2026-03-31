@@ -13,6 +13,11 @@ export const meta: Route.MetaFunction = () => {
       content:
         'Öt képzőművész hallgató által alapított márka, ahol a mindennapi viselet és a kortárs művészet találkozik.',
     },
+    {property: 'og:type', content: 'website'},
+    {property: 'og:title', content: 'Ars Mosoris — Magyar Képzőművészeti Bolt'},
+    {property: 'og:description', content: 'Fedezd fel egyedi póló és táska dizájnjainkat, magyar képzőművészek alkotásaival.'},
+    {property: 'og:image', content: '/og-default.png'},
+    {name: 'twitter:card', content: 'summary_large_image'},
   ];
 };
 

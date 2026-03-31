@@ -39,6 +39,11 @@ export const meta: Route.MetaFunction = () => {
       name: 'description',
       content: 'Lépj velünk kapcsolatba! Kérdésed van termékeinkről vagy együttműködési lehetőségekről?',
     },
+    {property: 'og:type', content: 'website'},
+    {property: 'og:title', content: 'Kapcsolat | Ars Mosoris'},
+    {property: 'og:description', content: 'Lépj kapcsolatba az Ars Mosoris csapatával.'},
+    {property: 'og:image', content: '/og-default.png'},
+    {name: 'twitter:card', content: 'summary_large_image'},
   ];
 };
 

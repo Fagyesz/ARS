@@ -8,6 +8,11 @@ export const meta: Route.MetaFunction = () => {
       name: 'description',
       content: 'Az Ars Mosoris története - hat képzőművész hallgató, akik viselhetővé teszik a művészetet.',
     },
+    {property: 'og:type', content: 'website'},
+    {property: 'og:title', content: 'Rólunk | Ars Mosoris'},
+    {property: 'og:description', content: 'Az Ars Mosoris story — képzőművészet találkozik a mindennapi divattárgyakkal.'},
+    {property: 'og:image', content: '/og-default.png'},
+    {name: 'twitter:card', content: 'summary_large_image'},
   ];
 };
 

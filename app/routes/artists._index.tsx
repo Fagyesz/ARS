@@ -9,6 +9,11 @@ export const meta: Route.MetaFunction = () => {
       name: 'description',
       content: 'Ismerd meg az Ars Mosoris alkotóit - hat tehetséges képzőművész, hat egyedi látásmód.',
     },
+    {property: 'og:type', content: 'website'},
+    {property: 'og:title', content: 'Művészeink | Ars Mosoris'},
+    {property: 'og:description', content: 'Ismerd meg az Ars Mosoris képzőművészeit — tehetséges magyar alkotók.'},
+    {property: 'og:image', content: '/og-default.png'},
+    {name: 'twitter:card', content: 'summary_large_image'},
   ];
 };
 

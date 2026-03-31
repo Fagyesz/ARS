@@ -13,6 +13,11 @@ export const meta: Route.MetaFunction = ({data}) => {
       name: 'description',
       content: artist?.bio || 'Ars Mosoris alkotó',
     },
+    {property: 'og:type', content: 'website'},
+    {property: 'og:title', content: `${data?.artist.name ?? 'Művész'} | Ars Mosoris`},
+    {property: 'og:description', content: data?.artist.bio ?? 'Magyar képzőművész — Ars Mosoris'},
+    {property: 'og:image', content: data?.artist.image ?? '/og-default.png'},
+    {name: 'twitter:card', content: 'summary_large_image'},
   ];
 };
 
