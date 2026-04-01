@@ -1,5 +1,6 @@
 import {useOptimisticCart, type OptimisticCartLine} from '@shopify/hydrogen';
-import {Link} from 'react-router';
+import {Link, useFetcher} from 'react-router';
+import {useEffect, useState} from 'react';
 import type {CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
 import {CartLineItem, type CartLine} from '~/components/CartLineItem';
@@ -74,6 +75,15 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
   );
 }
 
+type FeaturedProduct = {
+  id: string;
+  handle: string;
+  title: string;
+  vendor: string;
+  featuredImage: {url: string; altText: string | null} | null;
+  priceRange: {minVariantPrice: {amount: string; currencyCode: string}};
+};
+
 function CartEmpty({
   hidden = false,
 }: {
@@ -81,15 +91,58 @@ function CartEmpty({
   layout?: CartMainProps['layout'];
 }) {
   const {close} = useAside();
+  const fetcher = useFetcher<{products: FeaturedProduct[]}>();
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated || hidden) return;
+    fetcher.load('/api/featured-products');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hydrated, hidden]);
+
+  const suggestions = fetcher.data?.products ?? [];
+
   return (
     <div hidden={hidden} className="cart-empty">
       <p>A kosarad üres</p>
-      <p className="text-muted">
-        Úgy tűnik, még nem választottál ki semmit. Kezdjük el a böngészést!
-      </p>
+      <p className="text-muted">Úgy tűnik, még nem választottál ki semmit.</p>
       <Link to="/collections/all" onClick={close} prefetch="viewport" className="btn btn-primary">
         Vásárlás folytatása
       </Link>
+      {suggestions.length > 0 && (
+        <div className="cart-empty-suggestions">
+          <p className="cart-empty-suggestions-title">Talán ezek érdekelnek</p>
+          <div className="cart-empty-suggestions-grid">
+            {suggestions.map((p) => (
+              <Link
+                key={p.id}
+                to={`/products/${p.handle}`}
+                onClick={close}
+                className="cart-empty-product"
+                prefetch="intent"
+              >
+                {p.featuredImage && (
+                  <img
+                    src={`${p.featuredImage.url}${p.featuredImage.url.includes('?') ? '&' : '?'}width=120`}
+                    alt={p.featuredImage.altText || p.title}
+                    loading="lazy"
+                  />
+                )}
+                <div className="cart-empty-product-info">
+                  <span className="cart-empty-product-title">{p.title}</span>
+                  <span className="cart-empty-product-price">
+                    {parseFloat(p.priceRange.minVariantPrice.amount).toLocaleString('hu-HU')} {p.priceRange.minVariantPrice.currencyCode}
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
