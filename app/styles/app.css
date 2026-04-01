@@ -725,7 +725,7 @@ aside main {
 
 .product-card-image {
   position: relative;
-  aspect-ratio: 1;
+  aspect-ratio: 4 / 5;
   background-color: var(--color-background-alt);
   overflow: hidden;
   margin-bottom: 1rem;
