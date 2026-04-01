@@ -642,6 +642,13 @@ aside main {
   }
 }
 
+/* Shop grid loading state */
+.shop-grid-loading {
+  opacity: 0.5;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
 /* Shop empty state */
 .shop-empty {
   text-align: center;

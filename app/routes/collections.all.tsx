@@ -149,9 +149,7 @@ export default function Collection() {
           </div>
         </div>
 
-        {isLoading ? (
-          <ProductGridSkeleton />
-        ) : products.nodes.length === 0 ? (
+        {products.nodes.length === 0 && !isLoading ? (
           <div className="shop-empty">
             <p>Nincs eredmény a kiválasztott szűrőkre.</p>
             <Link to="/collections/all" className="btn btn-outline">
@@ -159,18 +157,20 @@ export default function Collection() {
             </Link>
           </div>
         ) : (
-          <PaginatedResourceSection<CollectionItemFragment>
-            connection={products}
-            resourcesClassName="products-grid"
-          >
-            {({node: product, index}) => (
-              <ProductItem
-                key={product.id}
-                product={product}
-                loading={index < 8 ? 'eager' : undefined}
-              />
-            )}
-          </PaginatedResourceSection>
+          <div className={isLoading ? 'shop-grid-loading' : undefined}>
+            <PaginatedResourceSection<CollectionItemFragment>
+              connection={products}
+              resourcesClassName="products-grid"
+            >
+              {({node: product, index}) => (
+                <ProductItem
+                  key={product.id}
+                  product={product}
+                  loading={index < 8 ? 'eager' : undefined}
+                />
+              )}
+            </PaginatedResourceSection>
+          </div>
         )}
       </div>
     </div>
