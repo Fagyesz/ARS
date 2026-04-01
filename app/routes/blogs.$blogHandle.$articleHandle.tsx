@@ -4,7 +4,18 @@ import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {ImageSlider, extractImagesFromHtml} from '~/components/ImageSlider';
 
 export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `${data?.article.title ?? ''} | Ars Mosoris`}];
+  const title = `${data?.article.seo?.title ?? data?.article.title ?? ''} | Ars Mosoris`;
+  const description = data?.article.seo?.description || 'Ars Mosoris blog cikk';
+  const image = data?.firstImageUrl ?? '/og-default.png';
+  return [
+    {title},
+    {name: 'description', content: description},
+    {property: 'og:type', content: 'article'},
+    {property: 'og:title', content: title},
+    {property: 'og:description', content: description},
+    {property: 'og:image', content: image},
+    {name: 'twitter:card', content: 'summary_large_image'},
+  ];
 };
 
 export const links = ((args: {data?: {firstImageUrl?: string | null}}) => {

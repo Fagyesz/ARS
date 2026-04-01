@@ -9,9 +9,16 @@ import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 
 export const meta: Route.MetaFunction = ({data}) => {
+  const title = `${data?.blog.title ?? 'Blog'} | Ars Mosoris`;
+  const description = data?.blog.seo?.description || 'Az Ars Mosoris blogja — hírek, történetek és inspiráció a magyar képzőművészet világából.';
   return [
-    {title: `${data?.blog.title} | Ars Mosoris`},
-    ...(data?.blog.seo?.description ? [{name: 'description', content: data.blog.seo.description}] : []),
+    {title},
+    {name: 'description', content: description},
+    {property: 'og:type', content: 'website'},
+    {property: 'og:title', content: title},
+    {property: 'og:description', content: description},
+    {property: 'og:image', content: '/og-default.png'},
+    {name: 'twitter:card', content: 'summary_large_image'},
   ];
 };
 

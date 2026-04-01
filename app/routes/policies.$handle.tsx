@@ -11,9 +11,16 @@ type SelectedPolicies = keyof Pick<
 >;
 
 export const meta: Route.MetaFunction = ({data}) => {
+  const title = `${data?.policy.title ?? 'Szabályzat'} | Ars Mosoris`;
+  const description = data?.policy.title ?? 'Ars Mosoris szabályzat';
   return [
-    {title: `${data?.policy.title ?? 'Feltételek'} | Ars Mosoris`},
-    {name: 'description', content: `${data?.policy.title ?? 'Szabályzat'} — Ars Mosoris`},
+    {title},
+    {name: 'description', content: description},
+    {property: 'og:type', content: 'website'},
+    {property: 'og:title', content: title},
+    {property: 'og:description', content: description},
+    {property: 'og:image', content: '/og-default.png'},
+    {name: 'twitter:card', content: 'summary_large_image'},
   ];
 };
 
