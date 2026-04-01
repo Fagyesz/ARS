@@ -46,7 +46,7 @@ export function Footer({
               <div className="footer-grid">
                 {/* Brand Column */}
                 <div className="footer-brand">
-                  <div className="footer-logo">ARS MOSORIS</div>
+                  <div className="footer-logo"><img src="/logo.svg" alt="Ars Mosoris" className="footer-logo-img" /></div>
                   <p className="footer-description">
                     Öt képzőművész hallgató által alapított márka, ahol a
                     mindennapi viselet és a kortárs művészet találkozik.

@@ -27,7 +27,7 @@ export function Header({
   return (
     <header className="header">
       <NavLink prefetch="intent" to="/" className="header-logo" end>
-        ARS MOSORIS
+        <img src="/logo.svg" alt="Ars Mosoris" className="header-logo-img" />
       </NavLink>
       <HeaderMenu
         menu={menu}
