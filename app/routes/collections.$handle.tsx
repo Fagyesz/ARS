@@ -7,12 +7,17 @@ import {ProductItem} from '~/components/ProductItem';
 import type {ProductItemFragment} from 'storefrontapi.generated';
 
 export const meta: Route.MetaFunction = ({data}) => {
+  const title = `${data?.collection.title ?? 'Kollekció'} | Ars Mosoris`;
+  const description = data?.collection.description || 'Ars Mosoris kollekció';
+  const image = data?.collection.image?.url ?? '/og-default.png';
   return [
-    {title: `${data?.collection.title ?? 'Kollekció'} | Ars Mosoris`},
-    {
-      name: 'description',
-      content: data?.collection.description || 'Ars Mosoris kollekció',
-    },
+    {title},
+    {name: 'description', content: description},
+    {property: 'og:type', content: 'website'},
+    {property: 'og:title', content: title},
+    {property: 'og:description', content: description},
+    {property: 'og:image', content: image},
+    {name: 'twitter:card', content: 'summary_large_image'},
   ];
 };
 
@@ -208,6 +213,10 @@ const COLLECTION_QUERY = `#graphql
       handle
       title
       description
+      image {
+        url
+        altText
+      }
       products(
         first: $first,
         last: $last,
