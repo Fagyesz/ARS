@@ -1,4 +1,4 @@
-import {Await, useLoaderData, Link} from 'react-router';
+import {Await, useLoaderData, Link, useFetcher} from 'react-router';
 import type {Route} from './+types/products.$handle';
 import {Suspense} from 'react';
 import {
@@ -131,6 +131,13 @@ export default function Product() {
                 productOptions={productOptions}
                 selectedVariant={selectedVariant}
               />
+              {!selectedVariant?.availableForSale && (
+                <BackInStockForm
+                  productTitle={title}
+                  variantTitle={selectedVariant?.title ?? ''}
+                  productUrl={canonicalUrl}
+                />
+              )}
               {descriptionHtml && (
                 <div className="product-description">
                   <div dangerouslySetInnerHTML={{__html: descriptionHtml}} />
@@ -321,6 +328,59 @@ function RelatedProducts({
         </div>
       </div>
     </section>
+  );
+}
+
+function BackInStockForm({
+  productTitle,
+  variantTitle,
+  productUrl,
+}: {
+  productTitle: string;
+  variantTitle: string;
+  productUrl: string;
+}) {
+  const fetcher = useFetcher<{success: boolean; error?: string}>();
+  const submitted = fetcher.data?.success === true;
+
+  if (submitted) {
+    return (
+      <div className="back-in-stock-success">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+        Értesítünk, amint elérhető lesz!
+      </div>
+    );
+  }
+
+  return (
+    <fetcher.Form method="post" action="/api/back-in-stock" className="back-in-stock-form">
+      <input type="hidden" name="productTitle" value={productTitle} />
+      <input type="hidden" name="variantTitle" value={variantTitle} />
+      <input type="hidden" name="productUrl" value={productUrl} />
+      <p className="back-in-stock-label">Értesítést kérek, ha ismét elérhető:</p>
+      <div className="back-in-stock-row">
+        <input
+          type="email"
+          name="email"
+          placeholder="E-mail címed"
+          required
+          className="back-in-stock-input"
+        />
+        <button
+          type="submit"
+          className="btn btn-primary back-in-stock-btn"
+          disabled={fetcher.state === 'submitting'}
+        >
+          {fetcher.state === 'submitting' ? '...' : 'Értesíts'}
+        </button>
+      </div>
+      {fetcher.data?.error && (
+        <p className="back-in-stock-error">{fetcher.data.error}</p>
+      )}
+    </fetcher.Form>
   );
 }
 

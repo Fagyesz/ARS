@@ -4112,3 +4112,71 @@ button.reset {
 .wishlist-empty .btn {
   margin-top: 0.5rem;
 }
+
+/* ============================================
+   Back-in-Stock Form
+   ============================================ */
+.back-in-stock-form {
+  margin-top: 1rem;
+  padding: 1.25rem;
+  background: var(--color-background-alt);
+  border: 1px solid var(--color-border);
+}
+
+.back-in-stock-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+  color: var(--color-text);
+}
+
+.back-in-stock-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.back-in-stock-input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  border: 1px solid var(--color-border);
+  background: white;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.back-in-stock-input:focus {
+  border-color: var(--color-ars-dark);
+}
+
+.back-in-stock-btn {
+  padding: 0.75rem 1.25rem;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.back-in-stock-success {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding: 1rem 1.25rem;
+  background: var(--color-background-alt);
+  border: 1px solid var(--color-border);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.back-in-stock-error {
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--color-ars-red);
+}
+
+@media (max-width: 480px) {
+  .back-in-stock-row {
+    flex-direction: column;
+  }
+}
