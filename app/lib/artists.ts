@@ -24,8 +24,8 @@ export const ARTISTS: Artist[] = [
     collectionHandle: 'ancsa',
   },
   {
-    name: 'Dóri',
-    fullName: 'Nagy Dóri',
+    name: 'Dóra',
+    fullName: 'Kéringer Dóra',
     role: 'Képzőművész',
     image: '/artists/dori.jpg',
     handle: 'dori',
@@ -47,7 +47,7 @@ export const ARTISTS: Artist[] = [
   },
   {
     name: 'Emese',
-    fullName: 'Tóth Emese',
+    fullName: 'Nagy Emese',
     role: 'Képzőművész',
     image: '/artists/emese.jpg',
     handle: 'emese',
@@ -59,7 +59,7 @@ export const ARTISTS: Artist[] = [
   },
   {
     name: 'Zorka',
-    fullName: 'Szabó Zorka',
+    fullName: 'Nagy Zorka Hanna',
     role: 'Képzőművész',
     image: '/artists/zorka.jpg',
     handle: 'zorka',
@@ -71,7 +71,7 @@ export const ARTISTS: Artist[] = [
   },
   {
     name: 'Zsolt',
-    fullName: 'Molnár Zsolt',
+    fullName: 'Nagy Zsolt',
     role: 'Képzőművész',
     image: '/artists/zsolt.jpg',
     handle: 'zsolt',
