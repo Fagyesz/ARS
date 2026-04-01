@@ -116,7 +116,7 @@ export function ImageSlider({slides}: ImageSliderProps) {
         <button
           type="button"
           className="slider-btn slider-btn-prev"
-          onClick={prev}
+          onClick={(e) => { e.stopPropagation(); prev(); }}
           aria-label="Előző kép"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -126,7 +126,7 @@ export function ImageSlider({slides}: ImageSliderProps) {
         <button
           type="button"
           className="slider-btn slider-btn-next"
-          onClick={next}
+          onClick={(e) => { e.stopPropagation(); next(); }}
           aria-label="Következő kép"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
