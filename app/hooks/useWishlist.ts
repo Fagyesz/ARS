@@ -1,6 +1,7 @@
 import {useState, useEffect, useCallback} from 'react';
 
 const STORAGE_KEY = 'ars-wishlist';
+const SYNC_EVENT = 'ars-wishlist-sync';
 
 function readStorage(): string[] {
   if (typeof window === 'undefined') return [];
@@ -15,6 +16,7 @@ function readStorage(): string[] {
 function writeStorage(handles: string[]): void {
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(handles));
+    window.dispatchEvent(new CustomEvent(SYNC_EVENT));
   } catch {
     // localStorage unavailable (private mode, quota exceeded) — silently ignore
   }
@@ -28,14 +30,20 @@ export function useWishlist() {
     setHandles(readStorage());
   }, []);
 
+  // Re-sync when another instance writes (same tab)
+  useEffect(() => {
+    const handler = () => setHandles(readStorage());
+    window.addEventListener(SYNC_EVENT, handler);
+    return () => window.removeEventListener(SYNC_EVENT, handler);
+  }, []);
+
   const toggle = useCallback((handle: string) => {
-    setHandles((prev) => {
-      const next = prev.includes(handle)
-        ? prev.filter((h) => h !== handle)
-        : [...prev, handle];
-      writeStorage(next);
-      return next;
-    });
+    const current = readStorage();
+    const next = current.includes(handle)
+      ? current.filter((h) => h !== handle)
+      : [...current, handle];
+    writeStorage(next);
+    setHandles(next);
   }, []);
 
   const has = useCallback(
