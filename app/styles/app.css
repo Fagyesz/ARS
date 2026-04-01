@@ -4327,3 +4327,71 @@ button.reset {
     transform: translateY(0);
   }
 }
+
+/* ============================================
+   Sticky Add-to-Cart Bar
+   ============================================ */
+.sticky-cart-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  background: white;
+  border-top: 1px solid var(--color-border);
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.08);
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+}
+
+.sticky-cart-bar--visible {
+  transform: translateY(0);
+}
+
+.sticky-cart-bar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.sticky-cart-bar-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.sticky-cart-bar-title {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 280px;
+}
+
+.sticky-cart-bar-variant {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.sticky-cart-bar-price {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.sticky-cart-bar .add-to-cart-btn {
+  white-space: nowrap;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.875rem;
+}
+
+@media (max-width: 767px) {
+  .sticky-cart-bar--visible {
+    bottom: 64px;
+  }
+}

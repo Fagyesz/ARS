@@ -1,6 +1,6 @@
 import {Await, useLoaderData, Link, useFetcher} from 'react-router';
 import type {Route} from './+types/products.$handle';
-import {Suspense, useEffect} from 'react';
+import {Suspense, useEffect, useState, useRef} from 'react';
 import {
   getSelectedProductOptions,
   Analytics,
@@ -12,6 +12,7 @@ import {
 import {ProductPrice} from '~/components/ProductPrice';
 import {ProductImage} from '~/components/ProductImage';
 import {ProductForm} from '~/components/ProductForm';
+import {AddToCartButton} from '~/components/AddToCartButton';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import type {ProductItemFragment} from 'storefrontapi.generated';
 import {ProductItem} from '~/components/ProductItem';
@@ -82,6 +83,45 @@ export async function loader(args: Route.LoaderArgs) {
   return {product, relatedProducts, canonicalUrl, origin};
 }
 
+function StickyCartBar({
+  visible,
+  title,
+  variantTitle,
+  price,
+  currencyCode,
+  lines,
+  selectedVariant,
+}: {
+  visible: boolean;
+  title: string;
+  variantTitle: string;
+  price: string;
+  currencyCode: string;
+  lines: Array<{merchandiseId: string; quantity: number}>;
+  selectedVariant: {availableForSale: boolean};
+}) {
+  if (!selectedVariant.availableForSale) return null;
+
+  return (
+    <div className={`sticky-cart-bar${visible ? ' sticky-cart-bar--visible' : ''}`}>
+      <div className="container sticky-cart-bar-inner">
+        <div className="sticky-cart-bar-info">
+          <span className="sticky-cart-bar-title">{title}</span>
+          {variantTitle && variantTitle !== 'Default Title' && (
+            <span className="sticky-cart-bar-variant">{variantTitle}</span>
+          )}
+          <span className="sticky-cart-bar-price">
+            {parseFloat(price).toLocaleString('hu-HU')} {currencyCode}
+          </span>
+        </div>
+        <AddToCartButton lines={lines} disabled={!selectedVariant.availableForSale}>
+          KOSÁRBA
+        </AddToCartButton>
+      </div>
+    </div>
+  );
+}
+
 export default function Product() {
   const {product, relatedProducts, canonicalUrl, origin} = useLoaderData<typeof loader>();
 
@@ -93,6 +133,20 @@ export default function Product() {
   useSelectedOptionInUrlParam(selectedVariant.selectedOptions);
 
   const {addItem, displayItems: recentItems} = useRecentlyViewed(product.handle);
+
+  const [stickyVisible, setStickyVisible] = useState(false);
+  const addToCartRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = addToCartRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setStickyVisible(!entry.isIntersecting),
+      {threshold: 0},
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const item: RecentProduct = {
@@ -144,17 +198,19 @@ export default function Product() {
                 price={selectedVariant?.price}
                 compareAtPrice={selectedVariant?.compareAtPrice}
               />
-              <ProductForm
-                productOptions={productOptions}
-                selectedVariant={selectedVariant}
-              />
-              {!selectedVariant?.availableForSale && (
-                <BackInStockForm
-                  productTitle={title}
-                  variantTitle={selectedVariant?.title ?? ''}
-                  productUrl={canonicalUrl}
+              <div ref={addToCartRef}>
+                <ProductForm
+                  productOptions={productOptions}
+                  selectedVariant={selectedVariant}
                 />
-              )}
+                {!selectedVariant?.availableForSale && (
+                  <BackInStockForm
+                    productTitle={title}
+                    variantTitle={selectedVariant?.title ?? ''}
+                    productUrl={canonicalUrl}
+                  />
+                )}
+              </div>
               {descriptionHtml && (
                 <div className="product-description">
                   <div dangerouslySetInnerHTML={{__html: descriptionHtml}} />
@@ -220,6 +276,19 @@ export default function Product() {
             },
           }),
         }}
+      />
+      <StickyCartBar
+        visible={stickyVisible}
+        title={title}
+        variantTitle={selectedVariant?.title ?? ''}
+        price={selectedVariant?.price.amount ?? '0'}
+        currencyCode={selectedVariant?.price.currencyCode ?? 'HUF'}
+        lines={
+          selectedVariant
+            ? [{merchandiseId: selectedVariant.id, quantity: 1}]
+            : []
+        }
+        selectedVariant={{availableForSale: selectedVariant?.availableForSale ?? false}}
       />
       <script
         type="application/ld+json"
