@@ -13,6 +13,11 @@ export const meta: Route.MetaFunction = () => {
   return [
     {title: 'Blog | Ars Mosoris'},
     {name: 'description', content: 'Az Ars Mosoris blogja — hírek, történetek és inspiráció a magyar képzőművészet világából.'},
+    {property: 'og:type', content: 'website'},
+    {property: 'og:title', content: 'Blog | Ars Mosoris'},
+    {property: 'og:description', content: 'Az Ars Mosoris blogja — hírek, történetek és inspiráció a magyar képzőművészet világából.'},
+    {property: 'og:image', content: '/og-default.png'},
+    {name: 'twitter:card', content: 'summary_large_image'},
   ];
 };
 

@@ -13,7 +13,16 @@ import {
 import type {RegularSearchQuery, PredictiveSearchQuery} from 'storefrontapi.generated';
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: `Keresés | Ars Mosoris`}];
+  return [
+    {title: 'Keresés | Ars Mosoris'},
+    {name: 'description', content: 'Keresés az Ars Mosoris termékek és tartalmak között.'},
+    {property: 'og:type', content: 'website'},
+    {property: 'og:title', content: 'Keresés | Ars Mosoris'},
+    {property: 'og:description', content: 'Keresés az Ars Mosoris termékek és tartalmak között.'},
+    {property: 'og:image', content: '/og-default.png'},
+    {name: 'twitter:card', content: 'summary_large_image'},
+    {name: 'robots', content: 'noindex'},
+  ];
 };
 
 export async function loader({request, context}: Route.LoaderArgs) {

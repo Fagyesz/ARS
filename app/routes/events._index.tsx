@@ -5,10 +5,12 @@ import {Image} from '@shopify/hydrogen';
 export const meta: Route.MetaFunction = () => {
   return [
     {title: 'Események | Ars Mosoris'},
-    {
-      name: 'description',
-      content: 'Ars Mosoris események, popup shopok és kiállítások. Találkozz velünk személyesen!',
-    },
+    {name: 'description', content: 'Ars Mosoris események, popup shopok és kiállítások. Találkozz velünk személyesen!'},
+    {property: 'og:type', content: 'website'},
+    {property: 'og:title', content: 'Események | Ars Mosoris'},
+    {property: 'og:description', content: 'Ars Mosoris események, popup shopok és kiállítások. Találkozz velünk személyesen!'},
+    {property: 'og:image', content: '/og-default.png'},
+    {name: 'twitter:card', content: 'summary_large_image'},
   ];
 };
 

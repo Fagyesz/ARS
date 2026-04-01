@@ -5,6 +5,11 @@ export const meta: Route.MetaFunction = () => {
   return [
     {title: 'Jogi feltételek | Ars Mosoris'},
     {name: 'description', content: 'Ars Mosoris jogi feltételek — adatvédelem, szállítás, visszaküldés és általános feltételek.'},
+    {property: 'og:type', content: 'website'},
+    {property: 'og:title', content: 'Jogi feltételek | Ars Mosoris'},
+    {property: 'og:description', content: 'Ars Mosoris jogi feltételek — adatvédelem, szállítás, visszaküldés és általános feltételek.'},
+    {property: 'og:image', content: '/og-default.png'},
+    {name: 'twitter:card', content: 'summary_large_image'},
   ];
 };
 

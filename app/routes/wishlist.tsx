@@ -5,7 +5,16 @@ import {useWishlist} from '~/hooks/useWishlist';
 import {ProductItem} from '~/components/ProductItem';
 
 export const meta: Route.MetaFunction = () => {
-  return [{title: 'Kívánságlista | Ars Mosoris'}];
+  return [
+    {title: 'Kívánságlista | Ars Mosoris'},
+    {name: 'description', content: 'A mentett termékeim az Ars Mosoris boltban.'},
+    {property: 'og:type', content: 'website'},
+    {property: 'og:title', content: 'Kívánságlista | Ars Mosoris'},
+    {property: 'og:description', content: 'A mentett termékeim az Ars Mosoris boltban.'},
+    {property: 'og:image', content: '/og-default.png'},
+    {name: 'twitter:card', content: 'summary_large_image'},
+    {name: 'robots', content: 'noindex'},
+  ];
 };
 
 type WishlistProduct = {
