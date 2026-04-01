@@ -14,7 +14,7 @@ export const meta: Route.MetaFunction = () => {
     {property: 'og:type', content: 'website'},
     {property: 'og:title', content: 'Katalógus | Ars Mosoris'},
     {property: 'og:description', content: 'Fedezd fel a teljes Ars Mosoris kollekcióját — egyedi póló és táska dizájnok magyar képzőművészektől.'},
-    {property: 'og:image', content: '/og-default.png'},
+    {property: 'og:image', content: 'https://arsmosoris.vincze.app/og-default.png'},
     {name: 'twitter:card', content: 'summary_large_image'},
   ];
 };

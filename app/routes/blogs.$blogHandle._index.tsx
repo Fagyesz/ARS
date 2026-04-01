@@ -17,7 +17,7 @@ export const meta: Route.MetaFunction = ({data}) => {
     {property: 'og:type', content: 'website'},
     {property: 'og:title', content: title},
     {property: 'og:description', content: description},
-    {property: 'og:image', content: '/og-default.png'},
+    {property: 'og:image', content: 'https://arsmosoris.vincze.app/og-default.png'},
     {name: 'twitter:card', content: 'summary_large_image'},
   ];
 };

@@ -9,7 +9,7 @@ import type {ProductItemFragment} from 'storefrontapi.generated';
 export const meta: Route.MetaFunction = ({data}) => {
   const title = `${data?.collection.title ?? 'Kollekció'} | Ars Mosoris`;
   const description = data?.collection.description || 'Ars Mosoris kollekció';
-  const image = data?.collection.image?.url ?? '/og-default.png';
+  const image = data?.collection.image?.url ?? 'https://arsmosoris.vincze.app/og-default.png';
   return [
     {title},
     {name: 'description', content: description},

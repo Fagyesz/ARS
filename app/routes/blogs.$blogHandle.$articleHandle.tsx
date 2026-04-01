@@ -6,7 +6,7 @@ import {ImageSlider, extractImagesFromHtml} from '~/components/ImageSlider';
 export const meta: Route.MetaFunction = ({data}) => {
   const title = `${data?.article.seo?.title ?? data?.article.title ?? ''} | Ars Mosoris`;
   const description = data?.article.seo?.description || 'Ars Mosoris blog cikk';
-  const image = data?.firstImageUrl ?? '/og-default.png';
+  const image = data?.firstImageUrl ?? 'https://arsmosoris.vincze.app/og-default.png';
   return [
     {title},
     {name: 'description', content: description},
