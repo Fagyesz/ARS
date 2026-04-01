@@ -1,11 +1,12 @@
-import {Await, Link} from 'react-router';
+import {Await, Link, NavLink, useLocation} from 'react-router';
 import {Suspense, useId} from 'react';
+import {useOptimisticCart} from '@shopify/hydrogen';
 import type {
   CartApiQueryFragment,
   FooterQuery,
   HeaderQuery,
 } from 'storefrontapi.generated';
-import {Aside} from '~/components/Aside';
+import {Aside, useAside} from '~/components/Aside';
 import {ToastProvider} from '~/components/Toast';
 import {Footer} from '~/components/Footer';
 import {Header, HeaderMenu} from '~/components/Header';
@@ -69,6 +70,7 @@ export function PageLayout({
           publicStoreDomain={publicStoreDomain}
           env={env}
         />
+        <MobileBottomNav cart={cart} />
       </Aside.Provider>
     </ToastProvider>
   );
@@ -189,5 +191,71 @@ function MobileMenuAside({
         />
       </Aside>
     )
+  );
+}
+
+function MobileBottomNavInner({cart: originalCart}: {cart: CartApiQueryFragment | null}) {
+  const cart = useOptimisticCart(originalCart);
+  const count = cart?.totalQuantity ?? 0;
+  const {open} = useAside();
+
+  return (
+    <nav className="mobile-bottom-nav" aria-label="Mobil navigáció">
+      <NavLink to="/" end className={({isActive}) => `mobile-nav-item${isActive ? ' active' : ''}`}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        <span>Főoldal</span>
+      </NavLink>
+      <NavLink to="/collections/all" className={({isActive}) => `mobile-nav-item${isActive ? ' active' : ''}`}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <rect x="2" y="3" width="7" height="7"/><rect x="15" y="3" width="7" height="7"/>
+          <rect x="15" y="15" width="7" height="7"/><rect x="2" y="15" width="7" height="7"/>
+        </svg>
+        <span>Shop</span>
+      </NavLink>
+      <button
+        className="mobile-nav-item"
+        onClick={() => open('search')}
+        aria-label="Keresés"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <span>Keresés</span>
+      </button>
+      <NavLink to="/wishlist" className={({isActive}) => `mobile-nav-item${isActive ? ' active' : ''}`}>
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+        <span>Kedvencek</span>
+      </NavLink>
+      <button
+        className="mobile-nav-item"
+        onClick={() => open('cart')}
+        aria-label="Kosár"
+      >
+        <span className="mobile-nav-cart-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <path d="M16 10a4 4 0 0 1-8 0"/>
+          </svg>
+          {count > 0 && <span className="mobile-nav-badge">{count}</span>}
+        </span>
+        <span>Kosár</span>
+      </button>
+    </nav>
+  );
+}
+
+function MobileBottomNav({cart}: {cart: Promise<CartApiQueryFragment | null>}) {
+  return (
+    <Suspense fallback={<MobileBottomNavInner cart={null} />}>
+      <Await resolve={cart}>
+        {(resolvedCart) => <MobileBottomNavInner cart={resolvedCart} />}
+      </Await>
+    </Suspense>
   );
 }
