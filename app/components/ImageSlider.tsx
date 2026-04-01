@@ -1,4 +1,4 @@
-import {useState, useCallback, useRef, useEffect} from 'react';
+import {useState, useCallback, useRef, useEffect, createPortal} from 'react';
 
 type Slide = {
   url: string;
@@ -25,6 +25,7 @@ const THUMB_WIDTHS = [80, 120];
 
 export function ImageSlider({slides}: ImageSliderProps) {
   const [current, setCurrent] = useState(0);
+  const [lightbox, setLightbox] = useState(false);
   const touchStartX = useRef<number | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
@@ -49,6 +50,7 @@ export function ImageSlider({slides}: ImageSliderProps) {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'ArrowLeft') prev();
       if (e.key === 'ArrowRight') next();
+      if (e.key === 'Escape') setLightbox(false);
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
@@ -93,7 +95,7 @@ export function ImageSlider({slides}: ImageSliderProps) {
       onTouchEnd={handleTouchEnd}
     >
       {/* Main stage */}
-      <div className="slider-stage">
+      <div className="slider-stage" onClick={() => setLightbox(true)}>
         <div ref={trackRef} className="slider-track">
           {slides.map((slide, i) => (
             <div key={i} className="slider-slide">
@@ -165,6 +167,61 @@ export function ImageSlider({slides}: ImageSliderProps) {
           </button>
         ))}
       </div>
+
+      {lightbox && typeof document !== 'undefined' && createPortal(
+        <div
+          className="slider-lightbox"
+          onClick={() => setLightbox(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Kép nagyítva"
+        >
+          <button
+            type="button"
+            className="slider-lightbox-close"
+            onClick={() => setLightbox(false)}
+            aria-label="Bezárás"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+          {slides.length > 1 && (
+            <button
+              type="button"
+              className="slider-lightbox-nav slider-lightbox-nav--prev"
+              onClick={(e) => { e.stopPropagation(); prev(); }}
+              aria-label="Előző kép"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
+          )}
+          <img
+            className="slider-lightbox-img"
+            src={shopifyUrl(slides[current].url, 1600)}
+            srcSet={shopifySrcSet(slides[current].url, SLIDE_WIDTHS)}
+            sizes="92vw"
+            alt={slides[current].alt}
+            onClick={(e) => e.stopPropagation()}
+          />
+          {slides.length > 1 && (
+            <button
+              type="button"
+              className="slider-lightbox-nav slider-lightbox-nav--next"
+              onClick={(e) => { e.stopPropagation(); next(); }}
+              aria-label="Következő kép"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </button>
+          )}
+        </div>,
+        document.body,
+      )}
     </div>
   );
 }
