@@ -12,18 +12,6 @@ export interface Artist {
 
 export const ARTISTS: Artist[] = [
   {
-    name: 'Ancsa',
-    fullName: 'Kovács Ancsa',
-    role: 'Képzőművész',
-    image: '/artists/ancsa.jpg',
-    handle: 'ancsa',
-    bio: 'Ancsa munkáiban a női test és a természet kapcsolatát vizsgálja. Alkotásaiban az organikus formák és a figuratív ábrázolás találkozik, egyedi vizuális világot teremtve.',
-    statement:
-      'A művészetem a női test és a természet kapcsolatának felfedezéséről szól. Minden alkotásomban arra törekszem, hogy megmutassam az organikus formák és az emberi test közötti harmóniát. A "Női test", "Bogár" és "Napvilág/Holdvilág" sorozataim ezt a kapcsolatot különböző perspektívákból közelítik meg.',
-    instagram: 'https://instagram.com/u.ancsa',
-    collectionHandle: 'ancsa',
-  },
-  {
     name: 'Dóra',
     fullName: 'Kéringer Dóra',
     role: 'Képzőművész',
@@ -34,16 +22,6 @@ export const ARTISTS: Artist[] = [
       'A rovarok világa végtelenül lenyűgöz. A "Dongó", "Góliátbogár" és "Cserebogár" munkáimban ezeket az apró lényeket próbálom nagyítólencsén keresztül bemutatni, feltárva részleteik és mintázataik szépségét. A tarot kártyák inspirálta táskáim, mint a "The Tower" és "The Lovers", a misztikum és a természet találkozását képviselik.',
     instagram: 'https://instagram.com/keringerart',
     collectionHandle: 'dori',
-  },
-  {
-    name: 'Gábor',
-    fullName: 'Kiss Gábor',
-    role: 'Képzőművész',
-    handle: 'gabor',
-    bio: 'Gábor a víz alatti világ ihlette alkotásait jellemzi a fluid vonalvezetés és a kék árnyalatok játéka. Munkáiban a halak dinamikus mozgása elevenedik meg.',
-    statement:
-      'A víz és a halak mozgása örök inspirációm. A "Hal" sorozatomban a tengeri élőlények dinamikus mozgását és a víz alatti fények játékát próbálom megragadni. A kék árnyalatok végtelen palettája lehetővé teszi, hogy minden munkámban új mélységeket fedezzek fel.',
-    collectionHandle: 'gabor',
   },
   {
     name: 'Emese',

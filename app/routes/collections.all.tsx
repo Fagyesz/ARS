@@ -89,7 +89,7 @@ export default function Collection() {
         <div className="text-center mb-8">
           <h1>Katalógus</h1>
           <p className="text-muted">
-            Válassz kedveseid közül — hat tehetséges művész munkái
+            Válassz kedveseid közül — négy tehetséges művész munkái
           </p>
         </div>
 

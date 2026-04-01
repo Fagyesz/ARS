@@ -6,7 +6,7 @@ export const meta: Route.MetaFunction = () => {
     {title: 'Rólunk | Ars Mosoris'},
     {
       name: 'description',
-      content: 'Az Ars Mosoris története - hat képzőművész hallgató, akik viselhetővé teszik a művészetet.',
+      content: 'Az Ars Mosoris története - négy képzőművész, akik viselhetővé teszik a művészetet.',
     },
     {property: 'og:type', content: 'website'},
     {property: 'og:title', content: 'Rólunk | Ars Mosoris'},
@@ -36,7 +36,7 @@ export default function About() {
             <div className="about-story-content">
               <h2>A történetünk</h2>
               <p>
-                Az Ars Mosoris 2024-ben alakult hat képzőművész hallgató közös víziójaként.
+                Az Ars Mosoris 2024-ben alakult négy képzőművész közös víziójaként.
                 Mindannyian a Magyar Képzőművészeti Egyetem (MKE) különböző szakjain tanulunk,
                 és összeköt minket a művészet iránti szenvedély és az a vágy, hogy alkotásainkat
                 minél több emberhez eljuttassuk.
@@ -111,7 +111,7 @@ export default function About() {
                 </svg>
               </div>
               <h3>Közösség</h3>
-              <p>Hat művész, egy csapat. Egymást támogatva alkotunk és fejlődünk együtt.</p>
+              <p>Négy művész, egy csapat. Egymást támogatva alkotunk és fejlődünk együtt.</p>
             </div>
           </div>
         </div>

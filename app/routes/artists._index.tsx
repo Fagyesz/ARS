@@ -7,7 +7,7 @@ export const meta: Route.MetaFunction = () => {
     {title: 'Alkotóink | Ars Mosoris'},
     {
       name: 'description',
-      content: 'Ismerd meg az Ars Mosoris alkotóit - hat tehetséges képzőművész, hat egyedi látásmód.',
+      content: 'Ismerd meg az Ars Mosoris alkotóit - négy tehetséges képzőművész, négy egyedi látásmód.',
     },
     {property: 'og:type', content: 'website'},
     {property: 'og:title', content: 'Művészeink | Ars Mosoris'},
@@ -24,7 +24,7 @@ export default function ArtistsIndex() {
         <div className="text-center mb-12">
           <h1>Alkotóink</h1>
           <p className="text-muted" style={{maxWidth: '600px', margin: '0 auto', fontSize: '1.125rem'}}>
-            Hat tehetséges képzőművész hallgató, akik egyedi látásmódjukat viselhetővé varázsolják.
+            Négy tehetséges képzőművész, akik egyedi látásmódjukat viselhetővé varázsolják.
             Minden alkotó saját művészi világot képvisel, de közös bennük a kreativitás és a minőség iránti elkötelezettség.
           </p>
         </div>

@@ -11,7 +11,7 @@ export const meta: Route.MetaFunction = () => {
     {
       name: 'description',
       content:
-        'Öt képzőművész hallgató által alapított márka, ahol a mindennapi viselet és a kortárs művészet találkozik.',
+        'Négy képzőművész által alapított márka, ahol a mindennapi viselet és a kortárs művészet találkozik.',
     },
     {property: 'og:type', content: 'website'},
     {property: 'og:title', content: 'Ars Mosoris — Magyar Képzőművészeti Bolt'},
@@ -282,7 +282,7 @@ function ArtistsPreview() {
         <div className="text-center mb-8">
           <h2>Alkotóink</h2>
           <p className="text-muted">
-            Hat tehetséges művész, hat egyedi látásmód
+            Négy tehetséges művész, négy egyedi látásmód
           </p>
         </div>
         <div className="artists-grid">
