@@ -47,17 +47,24 @@ function AutoLoadTrigger({
     const sentinel = sentinelRef.current;
     if (!sentinel) return;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !isLoadingRef.current) {
-          sentinel.querySelector('a')?.click();
-        }
-      },
-      {rootMargin: '400px'}, // trigger 400px before sentinel enters view
-    );
+    let observer: IntersectionObserver;
+    // Delay observer setup so it doesn't immediately fire on initial page load/refresh
+    const timer = setTimeout(() => {
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting && !isLoadingRef.current) {
+            sentinel.querySelector('a')?.click();
+          }
+        },
+        {rootMargin: '400px'},
+      );
+      observer.observe(sentinel);
+    }, 500);
 
-    observer.observe(sentinel);
-    return () => observer.disconnect();
+    return () => {
+      clearTimeout(timer);
+      observer?.disconnect();
+    };
   }, []);
 
   return (
