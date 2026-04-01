@@ -1,5 +1,5 @@
 import type {Route} from './+types/collections.all';
-import {useLoaderData, Link, useNavigation} from 'react-router';
+import {useLoaderData, Link, useNavigation, redirect} from 'react-router';
 import {getPaginationVariables} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {ProductItem} from '~/components/ProductItem';
@@ -49,6 +49,22 @@ export async function loader(args: Route.LoaderArgs) {
 async function loadCriticalData({context, request}: Route.LoaderArgs) {
   const {storefront} = context;
   const url = new URL(request.url);
+
+  // On hard refresh/direct load with cursor params, redirect to page 1
+  if (url.searchParams.has('cursor')) {
+    const referer = request.headers.get('Referer');
+    const isSpaNav = referer && new URL(referer).origin === url.origin;
+    if (!isSpaNav) {
+      const clean = new URLSearchParams();
+      for (const key of ['artist', 'type', 'sort']) {
+        const val = url.searchParams.get(key);
+        if (val) clean.set(key, val);
+      }
+      const qs = clean.toString();
+      throw redirect(`/collections/all${qs ? `?${qs}` : ''}`);
+    }
+  }
+
   const artistFilter = url.searchParams.get('artist') || '';
   const typeFilter = url.searchParams.get('type') || '';
   const sortParam = (url.searchParams.get('sort') || '') as SortValue;

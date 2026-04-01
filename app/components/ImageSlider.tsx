@@ -1,4 +1,5 @@
-import {useState, useCallback, useRef, useEffect, createPortal} from 'react';
+import {useState, useCallback, useRef, useEffect} from 'react';
+import {createPortal} from 'react-dom';
 
 type Slide = {
   url: string;
@@ -151,7 +152,7 @@ export function ImageSlider({slides}: ImageSliderProps) {
           <button
             key={i}
             role="tab"
-            aria-selected={i === current ? 'true' : 'false'}
+            aria-selected={i === current}
             className={`slider-thumb ${i === current ? 'active' : ''}`}
             onClick={() => setCurrent(i)}
             aria-label={`${i + 1}. kép`}
