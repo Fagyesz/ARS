@@ -17,6 +17,7 @@ import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import type {ProductItemFragment} from 'storefrontapi.generated';
 import {ProductItem} from '~/components/ProductItem';
 import {useRecentlyViewed, type RecentProduct} from '~/hooks/useRecentlyViewed';
+import {ImageSlider} from '~/components/ImageSlider';
 
 export const meta: Route.MetaFunction = ({data}) => {
   return [
@@ -81,6 +82,39 @@ export async function loader(args: Route.LoaderArgs) {
   const origin = url.origin;
 
   return {product, relatedProducts, canonicalUrl, origin};
+}
+
+function ProductGallery({
+  images,
+  selectedImage,
+  productTitle,
+}: {
+  images: Array<{id: string; url: string; altText: string | null; width: number | null; height: number | null}>;
+  selectedImage: {url: string; altText: string | null} | null | undefined;
+  productTitle: string;
+}) {
+  const seen = new Set<string>();
+  const slides: {url: string; alt: string}[] = [];
+
+  if (selectedImage?.url) {
+    seen.add(selectedImage.url);
+    slides.push({url: selectedImage.url, alt: selectedImage.altText || productTitle});
+  }
+
+  for (const img of images) {
+    if (!seen.has(img.url)) {
+      seen.add(img.url);
+      slides.push({url: img.url, alt: img.altText || productTitle});
+    }
+  }
+
+  if (slides.length === 0) return null;
+
+  return (
+    <div className="product-gallery">
+      <ImageSlider slides={slides} />
+    </div>
+  );
 }
 
 function StickyCartBar({
@@ -186,7 +220,11 @@ export default function Product() {
           </nav>
 
           <div className="product">
-            <ProductImage image={selectedVariant?.image} productTitle={product.title} />
+            <ProductGallery
+              images={(product as any).images?.nodes ?? []}
+              selectedImage={selectedVariant?.image}
+              productTitle={product.title}
+            />
             <div className="product-main">
               {vendor && (
                 <Link to={`/collections/${vendor.toLowerCase()}`} className="product-artist">
@@ -588,6 +626,15 @@ const PRODUCT_FRAGMENT = `#graphql
     seo {
       description
       title
+    }
+    images(first: 10) {
+      nodes {
+        id
+        url
+        altText
+        width
+        height
+      }
     }
   }
   ${PRODUCT_VARIANT_FRAGMENT}

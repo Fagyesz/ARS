@@ -4395,3 +4395,16 @@ button.reset {
     bottom: 64px;
   }
 }
+
+/* ============================================
+   Product Gallery
+   ============================================ */
+.product-gallery {
+  width: 100%;
+}
+
+.product-gallery .slider-single img,
+.product-gallery .slider-slide img {
+  object-fit: contain;
+  background: var(--color-background-alt);
+}
