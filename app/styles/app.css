@@ -269,8 +269,26 @@ a:hover {
   justify-content: center;
 }
 
+/* Hide hamburger on mobile — bottom nav handles navigation there */
+@media (max-width: 1023px) {
+  .header-menu-mobile-toggle {
+    display: none;
+  }
+}
+
 @media (min-width: 1024px) {
   .header-menu-mobile-toggle {
+    display: none;
+  }
+  /* Hide wishlist icon on desktop nav since it's in the header CTAs */
+  .header-wishlist-icon {
+    display: flex;
+  }
+}
+
+/* On mobile, wishlist is in bottom nav — hide from header */
+@media (max-width: 1023px) {
+  .header-wishlist-icon {
     display: none;
   }
 }
@@ -321,7 +339,7 @@ aside {
 @media (min-width: 480px) {
   aside {
     width: min(var(--aside-width), 100vw);
-    height: 100vh;
+    height: 100dvh;
   }
 }
 
@@ -4526,6 +4544,7 @@ button.reset {
 .cart-empty-suggestions {
   margin-top: 2rem;
   width: 100%;
+  text-align: left;
 }
 
 .cart-empty-suggestions-title {
