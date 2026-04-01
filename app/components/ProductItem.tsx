@@ -7,6 +7,7 @@ import type {
 } from 'storefrontapi.generated';
 import {useVariantUrl} from '~/lib/variants';
 import {useWishlist} from '~/hooks/useWishlist';
+import {useToast} from '~/components/Toast';
 
 export function ProductItem({
   product,
@@ -23,6 +24,7 @@ export function ProductItem({
   const isAvailable = 'availableForSale' in product ? product.availableForSale : true;
   const {has, toggle} = useWishlist();
   const wishlisted = has(product.handle);
+  const {addToast} = useToast();
 
   return (
     <div className="product-card-wrapper">
@@ -63,6 +65,10 @@ export function ProductItem({
           e.preventDefault();
           e.stopPropagation();
           toggle(product.handle);
+          addToast(
+            wishlisted ? 'Eltávolítva a kívánságlistáról' : 'Kívánságlistához adva ♥',
+            'success',
+          );
         }}
         aria-label={wishlisted ? 'Eltávolítás a kívánságlistáról' : 'Hozzáadás a kívánságlistához'}
       >
