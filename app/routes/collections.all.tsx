@@ -1,5 +1,5 @@
 import type {Route} from './+types/collections.all';
-import {useLoaderData, Link} from 'react-router';
+import {useLoaderData, Link, useNavigation} from 'react-router';
 import {getPaginationVariables} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {ProductItem} from '~/components/ProductItem';
@@ -80,6 +80,8 @@ function loadDeferredData({context}: Route.LoaderArgs) {
 export default function Collection() {
   const {products, artistFilter, typeFilter, sortParam} =
     useLoaderData<typeof loader>();
+  const navigation = useNavigation();
+  const isLoading = navigation.state === 'loading';
 
   return (
     <div className="section">
@@ -147,7 +149,9 @@ export default function Collection() {
           </div>
         </div>
 
-        {products.nodes.length === 0 ? (
+        {isLoading ? (
+          <ProductGridSkeleton />
+        ) : products.nodes.length === 0 ? (
           <div className="shop-empty">
             <p>Nincs eredmény a kiválasztott szűrőkre.</p>
             <Link to="/collections/all" className="btn btn-outline">
@@ -169,6 +173,23 @@ export default function Collection() {
           </PaginatedResourceSection>
         )}
       </div>
+    </div>
+  );
+}
+
+function ProductGridSkeleton() {
+  return (
+    <div className="products-grid">
+      {Array.from({length: 12}).map((_, i) => (
+        <div key={i} className="product-card skeleton-card">
+          <div className="skeleton-image" />
+          <div className="product-card-info">
+            <div className="skeleton-line skeleton-line-short" />
+            <div className="skeleton-line skeleton-line-medium" />
+            <div className="skeleton-line skeleton-line-short" />
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

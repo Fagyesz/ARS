@@ -1,4 +1,4 @@
-import {redirect, useLoaderData, Link} from 'react-router';
+import {redirect, useLoaderData, Link, useNavigation} from 'react-router';
 import type {Route} from './+types/collections.$handle';
 import {getPaginationVariables, Analytics} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
@@ -16,6 +16,24 @@ export const meta: Route.MetaFunction = ({data}) => {
   ];
 };
 
+const SORT_OPTIONS = [
+  {label: 'Legújabb', value: ''},
+  {label: 'Ár: növekvő', value: 'price-asc'},
+  {label: 'Ár: csökkenő', value: 'price-desc'},
+  {label: 'Név: A–Z', value: 'title-asc'},
+] as const;
+
+type SortValue = (typeof SORT_OPTIONS)[number]['value'];
+
+function parseSortKey(sort: string): {sortKey: string; reverse: boolean} {
+  switch (sort) {
+    case 'price-asc': return {sortKey: 'PRICE', reverse: false};
+    case 'price-desc': return {sortKey: 'PRICE', reverse: true};
+    case 'title-asc': return {sortKey: 'TITLE', reverse: false};
+    default: return {sortKey: 'CREATED_AT', reverse: true};
+  }
+}
+
 export async function loader(args: Route.LoaderArgs) {
   const deferredData = loadDeferredData(args);
   const criticalData = await loadCriticalData(args);
@@ -25,9 +43,10 @@ export async function loader(args: Route.LoaderArgs) {
 async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   const {handle} = params;
   const {storefront} = context;
-  const paginationVariables = getPaginationVariables(request, {
-    pageBy: 12,
-  });
+  const url = new URL(request.url);
+  const sortParam = (url.searchParams.get('sort') || '') as SortValue;
+  const {sortKey, reverse} = parseSortKey(sortParam);
+  const paginationVariables = getPaginationVariables(request, {pageBy: 12});
 
   if (!handle) {
     throw redirect('/collections');
@@ -35,30 +54,45 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
 
   const [{collection}] = await Promise.all([
     storefront.query(COLLECTION_QUERY, {
-      variables: {handle, ...paginationVariables},
+      variables: {handle, ...paginationVariables, sortKey, reverse},
       cache: storefront.CacheShort(),
     }),
   ]);
 
   if (!collection) {
-    throw new Response(`Collection ${handle} not found`, {
-      status: 404,
-    });
+    throw new Response(`Collection ${handle} not found`, {status: 404});
   }
 
   redirectIfHandleIsLocalized(request, {handle, data: collection});
 
-  return {
-    collection,
-  };
+  return {collection, sortParam};
 }
 
 function loadDeferredData({context}: Route.LoaderArgs) {
   return {};
 }
 
+function ProductGridSkeleton() {
+  return (
+    <div className="products-grid">
+      {Array.from({length: 12}).map((_, i) => (
+        <div key={i} className="product-card skeleton-card">
+          <div className="skeleton-image" />
+          <div className="product-card-info">
+            <div className="skeleton-line skeleton-line-short" />
+            <div className="skeleton-line skeleton-line-medium" />
+            <div className="skeleton-line skeleton-line-short" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function Collection() {
-  const {collection} = useLoaderData<typeof loader>();
+  const {collection, sortParam} = useLoaderData<typeof loader>();
+  const navigation = useNavigation();
+  const isLoading = navigation.state === 'loading';
 
   return (
     <div className="section">
@@ -77,18 +111,43 @@ export default function Collection() {
             </p>
           )}
         </div>
-        <PaginatedResourceSection<ProductItemFragment>
-          connection={collection.products}
-          resourcesClassName="products-grid"
-        >
-          {({node: product, index}) => (
-            <ProductItem
-              key={product.id}
-              product={product}
-              loading={index < 8 ? 'eager' : undefined}
-            />
-          )}
-        </PaginatedResourceSection>
+
+        <div className="shop-filters">
+          <div className="shop-filter-group shop-sort-group">
+            <span className="shop-filter-label">Rendezés</span>
+            <select
+              className="shop-sort-select"
+              title="Rendezési sorrend"
+              value={sortParam}
+              onChange={(e) => {
+                const params = new URLSearchParams();
+                if (e.target.value) params.set('sort', e.target.value);
+                window.location.href = `/collections/${collection.handle}${params.toString() ? `?${params}` : ''}`;
+              }}
+            >
+              {SORT_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {isLoading ? (
+          <ProductGridSkeleton />
+        ) : (
+          <PaginatedResourceSection<ProductItemFragment>
+            connection={collection.products}
+            resourcesClassName="products-grid"
+          >
+            {({node: product, index}) => (
+              <ProductItem
+                key={product.id}
+                product={product}
+                loading={index < 8 ? 'eager' : undefined}
+              />
+            )}
+          </PaginatedResourceSection>
+        )}
         <Analytics.CollectionView
           data={{
             collection: {
@@ -141,6 +200,8 @@ const COLLECTION_QUERY = `#graphql
     $last: Int
     $startCursor: String
     $endCursor: String
+    $sortKey: ProductCollectionSortKeys
+    $reverse: Boolean
   ) @inContext(country: $country, language: $language) {
     collection(handle: $handle) {
       id
@@ -151,7 +212,9 @@ const COLLECTION_QUERY = `#graphql
         first: $first,
         last: $last,
         before: $startCursor,
-        after: $endCursor
+        after: $endCursor,
+        sortKey: $sortKey,
+        reverse: $reverse
       ) {
         nodes {
           ...ProductItem
