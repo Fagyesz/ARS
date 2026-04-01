@@ -1,6 +1,6 @@
 import {Await, useLoaderData, Link, useFetcher} from 'react-router';
 import type {Route} from './+types/products.$handle';
-import {Suspense} from 'react';
+import {Suspense, useEffect} from 'react';
 import {
   getSelectedProductOptions,
   Analytics,
@@ -15,6 +15,7 @@ import {ProductForm} from '~/components/ProductForm';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import type {ProductItemFragment} from 'storefrontapi.generated';
 import {ProductItem} from '~/components/ProductItem';
+import {useRecentlyViewed, type RecentProduct} from '~/hooks/useRecentlyViewed';
 
 export const meta: Route.MetaFunction = ({data}) => {
   return [
@@ -91,6 +92,22 @@ export default function Product() {
 
   useSelectedOptionInUrlParam(selectedVariant.selectedOptions);
 
+  const {addItem, displayItems: recentItems} = useRecentlyViewed(product.handle);
+
+  useEffect(() => {
+    const item: RecentProduct = {
+      handle: product.handle,
+      title: product.title,
+      vendor: product.vendor ?? '',
+      imageUrl: selectedVariant?.image?.url ?? null,
+      imageAlt: selectedVariant?.image?.altText ?? null,
+      price: selectedVariant?.price.amount ?? '0',
+      currencyCode: selectedVariant?.price.currencyCode ?? 'HUF',
+    };
+    addItem(item);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product.handle]);
+
   const productOptions = getProductOptions({
     ...product,
     selectedOrFirstAvailableVariant: selectedVariant,
@@ -148,6 +165,10 @@ export default function Product() {
           </div>
         </div>
       </div>
+
+      {recentItems.length >= 1 && (
+        <RecentlyViewedStrip items={recentItems} />
+      )}
 
       <Suspense fallback={null}>
         <Await resolve={relatedProducts}>
@@ -324,6 +345,47 @@ function RelatedProducts({
               product={product}
               loading="lazy"
             />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function RecentlyViewedStrip({items}: {items: RecentProduct[]}) {
+  return (
+    <section className="section recently-viewed-section">
+      <div className="container">
+        <h2 className="recently-viewed-title">Nemrég megnézted</h2>
+        <div className="recently-viewed-strip">
+          {items.map((item) => (
+            <Link
+              key={item.handle}
+              to={`/products/${item.handle}`}
+              className="recently-viewed-card"
+              prefetch="intent"
+            >
+              <div className="recently-viewed-image">
+                {item.imageUrl ? (
+                  <img
+                    src={`${item.imageUrl}${item.imageUrl.includes('?') ? '&' : '?'}width=300`}
+                    alt={item.imageAlt || item.title}
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="recently-viewed-placeholder" />
+                )}
+              </div>
+              <div className="recently-viewed-info">
+                {item.vendor && (
+                  <span className="recently-viewed-vendor">{item.vendor}</span>
+                )}
+                <p className="recently-viewed-name">{item.title}</p>
+                <p className="recently-viewed-price">
+                  {parseFloat(item.price).toLocaleString('hu-HU')} {item.currencyCode}
+                </p>
+              </div>
+            </Link>
           ))}
         </div>
       </div>
