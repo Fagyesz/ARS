@@ -213,8 +213,8 @@ function ProductCard({
         {product.featuredImage && (
           <Image
             data={product.featuredImage}
-            aspectRatio="1/1"
-            sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
+            aspectRatio="4/5"
+            sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 50vw"
           />
         )}
         {!isAvailable && (
