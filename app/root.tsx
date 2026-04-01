@@ -16,6 +16,7 @@ import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
 import {PageLayout} from './components/PageLayout';
+import {CookieConsentProvider, CookieConsentBanner} from '~/components/CookieConsent';
 
 export type RootLoader = typeof loader;
 
@@ -202,9 +203,12 @@ export default function App() {
       shop={data.shop}
       consent={data.consent}
     >
-      <PageLayout {...data}>
-        <Outlet />
-      </PageLayout>
+      <CookieConsentProvider>
+        <PageLayout {...data}>
+          <Outlet />
+        </PageLayout>
+        <CookieConsentBanner />
+      </CookieConsentProvider>
     </Analytics.Provider>
   );
 }
