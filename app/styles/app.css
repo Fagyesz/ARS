@@ -1548,6 +1548,13 @@ aside .cart-empty {
   display: block;
 }
 
+@media (max-width: 767px) {
+  .artist-page-card + .artist-page-card {
+    padding-top: 3rem;
+    border-top: 1px solid var(--color-border);
+  }
+}
+
 .artist-page-card-image {
   aspect-ratio: 1;
   overflow: hidden;
