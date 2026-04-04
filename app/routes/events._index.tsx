@@ -14,23 +14,31 @@ export const meta: Route.MetaFunction = () => {
   ];
 };
 
+/** Parse event date from tag — accepts "event-date:2026-06-15" or plain "2026-06-15" */
+function getEventDate(article: {tags: string[]; publishedAt: string}): Date {
+  for (const tag of article.tags) {
+    const dateStr = tag.startsWith('event-date:') ? tag.replace('event-date:', '') : tag;
+    const parsed = new Date(dateStr);
+    if (!isNaN(parsed.getTime()) && /^\d{4}-\d{2}-\d{2}/.test(dateStr)) return parsed;
+  }
+  return new Date(article.publishedAt);
+}
+
 export async function loader({context}: Route.LoaderArgs) {
   const {storefront} = context;
 
-  // Fetch blog articles for events
   const {blogs} = await storefront.query(EVENTS_QUERY);
 
-  // Get the first blog (events blog)
   const eventsBlog = blogs.nodes[0];
-  const articles = eventsBlog?.articles?.nodes || [];
+  const articles: any[] = eventsBlog?.articles?.nodes || [];
 
   const now = new Date();
-  const upcoming = articles.filter(
-    (a: any) => new Date(a.publishedAt) >= now,
-  );
-  const past = articles.filter(
-    (a: any) => new Date(a.publishedAt) < now,
-  );
+  const upcoming = articles
+    .filter((a) => getEventDate(a) >= now)
+    .sort((a, b) => getEventDate(a).getTime() - getEventDate(b).getTime());
+  const past = articles
+    .filter((a) => getEventDate(a) < now)
+    .sort((a, b) => getEventDate(b).getTime() - getEventDate(a).getTime());
 
   return {upcoming, past};
 }
@@ -170,7 +178,7 @@ function EventCard({event}: {event: any}) {
               <line x1="8" y1="2" x2="8" y2="6" />
               <line x1="3" y1="10" x2="21" y2="10" />
             </svg>
-            {isArticle ? formatDate(event.publishedAt) : event.date}
+            {isArticle ? formatDate(getEventDate(event).toISOString()) : event.date}
           </span>
           {event.location && (
             <span className="event-card-location">
@@ -235,12 +243,13 @@ const EVENTS_QUERY = `#graphql
         id
         title
         handle
-        articles(first: 10, sortKey: PUBLISHED_AT, reverse: true) {
+        articles(first: 50, sortKey: PUBLISHED_AT, reverse: true) {
           nodes {
             id
             title
             handle
             publishedAt
+            tags
             excerpt
             content
             image {
