@@ -69,9 +69,9 @@ export default function EventsIndex() {
         <section className="events-past-section">
           <div className="container">
             <p className="events-section-label">Korábbi események</p>
-            <div className="events-past-list">
+            <div className="events-past-cards">
               {past.map((event: any, i: number) => (
-                <EventListItem key={event.id} event={event} index={i} />
+                <PastEventCard key={event.id} event={event} index={i} />
               ))}
             </div>
           </div>
@@ -169,23 +169,25 @@ function EventCard({event}: {event: any}) {
   );
 }
 
-function EventListItem({event, index}: {event: any; index: number}) {
+function PastEventCard({event, index: _index}: {event: any; index: number}) {
   const eventDate = getEventDate(event);
   return (
-    <Link
-      to={`/blogs/event/${event.handle}`}
-      className="event-list-item"
-      style={{animationDelay: `${index * 55}ms`}}
-    >
-      <span className="event-list-date">{formatDate(eventDate.toISOString())}</span>
-      <span className="event-list-title">{event.title}</span>
-      <span className="event-list-arrow">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <line x1="5" y1="12" x2="19" y2="12" />
-          <polyline points="12 5 19 12 12 19" />
-        </svg>
-      </span>
-    </Link>
+    <article className="past-event-card">
+      <Link to={`/blogs/event/${event.handle}`} className="past-event-card-link">
+        <div className="past-event-card-image">
+          {event.image ? (
+            <Image data={event.image} aspectRatio="16/9" sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" />
+          ) : (
+            <div className="past-event-card-placeholder"><CalendarSvg size={36} /></div>
+          )}
+          <span className="past-event-card-badge">Lezárult</span>
+        </div>
+        <div className="past-event-card-content">
+          <span className="past-event-card-date">{formatDate(eventDate.toISOString())}</span>
+          <h3 className="past-event-card-title">{event.title}</h3>
+        </div>
+      </Link>
+    </article>
   );
 }
 
