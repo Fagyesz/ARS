@@ -1,9 +1,10 @@
 import {Await, useLoaderData, useActionData, useNavigation, Link, Form} from 'react-router';
 import type {Route} from './+types/_index';
 import {Suspense} from 'react';
-import {Image, Money} from '@shopify/hydrogen';
+import {Image} from '@shopify/hydrogen';
 import type {RecommendedProductsQuery} from 'storefrontapi.generated';
 import {ARTISTS} from '~/lib/artists';
+import {ProductItem} from '~/components/ProductItem';
 
 export const meta: Route.MetaFunction = () => {
   return [
@@ -184,7 +185,7 @@ function FeaturedProducts({
             {(response) => (
               <div className="products-grid">
                 {response?.products.nodes.map((product) => (
-                  <ProductCard key={product.id} product={product} />
+                  <ProductItem key={product.id} product={product} />
                 ))}
               </div>
             )}
@@ -200,39 +201,6 @@ function FeaturedProducts({
   );
 }
 
-function ProductCard({
-  product,
-}: {
-  product: RecommendedProductsQuery['products']['nodes'][0];
-}) {
-  const isAvailable = product.availableForSale !== false;
-
-  return (
-    <Link to={`/products/${product.handle}`} className="product-card" prefetch="intent">
-      <div className="product-card-image">
-        {product.featuredImage && (
-          <Image
-            data={product.featuredImage}
-            aspectRatio="4/5"
-            sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 50vw"
-          />
-        )}
-        {!isAvailable && (
-          <span className="product-card-badge sold-out">Elfogyott</span>
-        )}
-      </div>
-      <div className="product-card-info">
-        {product.vendor && (
-          <span className="product-card-artist">{product.vendor}</span>
-        )}
-        <h3 className="product-card-title">{product.title}</h3>
-        <div className="product-card-price">
-          <Money data={product.priceRange.minVariantPrice} />
-        </div>
-      </div>
-    </Link>
-  );
-}
 
 function ProductGridSkeleton() {
   return (
