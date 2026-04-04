@@ -24,46 +24,19 @@ export async function loader({context}: Route.LoaderArgs) {
   const eventsBlog = blogs.nodes[0];
   const articles = eventsBlog?.articles?.nodes || [];
 
-  return {
-    articles,
-  };
+  const now = new Date();
+  const upcoming = articles.filter(
+    (a: any) => new Date(a.publishedAt) >= now,
+  );
+  const past = articles.filter(
+    (a: any) => new Date(a.publishedAt) < now,
+  );
+
+  return {upcoming, past};
 }
 
 export default function EventsIndex() {
-  const {articles} = useLoaderData<typeof loader>();
-
-  // Sample events data for demo if no blog articles exist
-  const sampleEvents = [
-    {
-      id: '1',
-      title: 'Popup Shop - Gólyabál',
-      date: '2026. Február 15.',
-      location: 'Budapest, Műegyetem',
-      description: 'Gyere és nézd meg legújabb kollekcióinkat a Gólyabálon! Exkluzív kedvezmények helyszínen.',
-      image: null,
-      handle: 'popup-shop-golyabal',
-    },
-    {
-      id: '2',
-      title: 'Kiállítás - Art Market',
-      date: '2026. Március 8-10.',
-      location: 'Budapest, Millenáris',
-      description: 'Az Ars Mosoris kollektíva standjánál találkozhatsz alkotóinkkal és megvásárolhatod kedvenc darabjaidat.',
-      image: null,
-      handle: 'art-market-kiallitas',
-    },
-    {
-      id: '3',
-      title: 'Workshop - Szitanyomás alapok',
-      date: '2026. Április 5.',
-      location: 'Budapest, Tűzraktér',
-      description: 'Tanuld meg a szitanyomás alapjait és készítsd el saját egyedi pólódat velünk!',
-      image: null,
-      handle: 'szitanyomas-workshop',
-    },
-  ];
-
-  const displayEvents = articles.length > 0 ? articles : sampleEvents;
+  const {upcoming, past} = useLoaderData<typeof loader>();
 
   return (
     <div className="events-page">
@@ -83,20 +56,28 @@ export default function EventsIndex() {
           {/* Upcoming events */}
           <div className="events-section">
             <h2 className="events-section-title">Közelgő események</h2>
-            <div className="events-grid">
-              {displayEvents.map((event: any) => (
-                <EventCard key={event.id} event={event} />
-              ))}
-            </div>
+            {upcoming.length > 0 ? (
+              <div className="events-grid">
+                {upcoming.map((event: any) => (
+                  <EventCard key={event.id} event={event} />
+                ))}
+              </div>
+            ) : (
+              <p className="text-center text-muted">Hamarosan új eseményeket hirdetünk!</p>
+            )}
           </div>
 
-          {/* Past events section (could be added later) */}
-          <div className="events-section mt-12">
-            <h2 className="events-section-title">Korábbi események</h2>
-            <p className="text-center text-muted">
-              Hamarosan itt találod korábbi eseményeinket!
-            </p>
-          </div>
+          {/* Past events */}
+          {past.length > 0 && (
+            <div className="events-section mt-12">
+              <h2 className="events-section-title">Korábbi események</h2>
+              <div className="events-grid">
+                {past.map((event: any) => (
+                  <EventCard key={event.id} event={event} />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
