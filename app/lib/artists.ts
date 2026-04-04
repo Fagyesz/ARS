@@ -12,8 +12,8 @@ export interface Artist {
 
 export const ARTISTS: Artist[] = [
   {
-    name: 'Dóra',
-    fullName: 'Kéringer Dóra',
+    name: 'Dóri',
+    fullName: 'Kéringer Dóri',
     role: 'Képzőművész',
     image: '/artists/dori.jpg',
     handle: 'dori',
