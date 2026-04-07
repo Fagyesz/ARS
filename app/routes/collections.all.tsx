@@ -1,6 +1,6 @@
 import type {Route} from './+types/collections.all';
-import {useLoaderData, Link, useNavigation} from 'react-router';
-import {getPaginationVariables, redirect} from '@shopify/hydrogen';
+import {useLoaderData, Link, useNavigation, redirect} from 'react-router';
+import {getPaginationVariables} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {ProductItem} from '~/components/ProductItem';
 import type {CollectionItemFragment} from 'storefrontapi.generated';
@@ -81,7 +81,7 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
 
   const [{products}] = await Promise.all([
     storefront.query(CATALOG_QUERY, {
-      variables: {...paginationVariables, query, sortKey, reverse},
+      variables: {...paginationVariables, query, sortKey: sortKey as any, reverse},
       cache: storefront.CacheShort(),
     }),
   ]);
@@ -89,7 +89,7 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
   return {products, artistFilter, typeFilter, sortParam};
 }
 
-function loadDeferredData({context}: Route.LoaderArgs) {
+function loadDeferredData(_args: Route.LoaderArgs) {
   return {};
 }
 

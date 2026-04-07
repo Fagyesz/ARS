@@ -543,6 +543,28 @@ export type RecommendedProductsQuery = {
   };
 };
 
+export type HomepageCollectionFragment = Pick<
+  StorefrontAPI.Collection,
+  'id' | 'title' | 'handle'
+> & {image?: StorefrontAPI.Maybe<Pick<StorefrontAPI.Image, 'url' | 'altText'>>};
+
+export type HomepageCollectionsQueryVariables = StorefrontAPI.Exact<{
+  country?: StorefrontAPI.InputMaybe<StorefrontAPI.CountryCode>;
+  language?: StorefrontAPI.InputMaybe<StorefrontAPI.LanguageCode>;
+}>;
+
+export type HomepageCollectionsQuery = {
+  collections: {
+    nodes: Array<
+      Pick<StorefrontAPI.Collection, 'id' | 'title' | 'handle'> & {
+        image?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.Image, 'url' | 'altText'>
+        >;
+      }
+    >;
+  };
+};
+
 export type CustomerResetMutationVariables = StorefrontAPI.Exact<{
   id: StorefrontAPI.Scalars['ID']['input'];
   input: StorefrontAPI.CustomerResetInput;
@@ -964,7 +986,13 @@ export type EventsBlogQuery = {
           nodes: Array<
             Pick<
               StorefrontAPI.Article,
-              'id' | 'title' | 'handle' | 'publishedAt' | 'excerpt' | 'content'
+              | 'id'
+              | 'title'
+              | 'handle'
+              | 'publishedAt'
+              | 'tags'
+              | 'excerpt'
+              | 'content'
             > & {
               image?: StorefrontAPI.Maybe<
                 Pick<
@@ -1562,6 +1590,10 @@ interface GeneratedQueryTypes {
     return: RecommendedProductsQuery;
     variables: RecommendedProductsQueryVariables;
   };
+  '#graphql\n  fragment HomepageCollection on Collection {\n    id\n    title\n    handle\n    image {\n      url\n      altText\n    }\n  }\n  query HomepageCollections($country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    collections(first: 6, sortKey: UPDATED_AT) {\n      nodes {\n        ...HomepageCollection\n      }\n    }\n  }\n': {
+    return: HomepageCollectionsQuery;
+    variables: HomepageCollectionsQueryVariables;
+  };
   '#graphql\n  query FeaturedProducts($country: CountryCode, $language: LanguageCode)\n  @inContext(country: $country, language: $language) {\n    products(first: 4, sortKey: UPDATED_AT, reverse: true) {\n      nodes {\n        id\n        handle\n        title\n        vendor\n        featuredImage {\n          url\n          altText\n        }\n        priceRange {\n          minVariantPrice {\n            amount\n            currencyCode\n          }\n        }\n      }\n    }\n  }\n': {
     return: FeaturedProductsQuery;
     variables: FeaturedProductsQueryVariables;
@@ -1598,7 +1630,7 @@ interface GeneratedQueryTypes {
     return: CatalogQuery;
     variables: CatalogQueryVariables;
   };
-  '#graphql\n  query EventsBlog(\n    $country: CountryCode\n    $language: LanguageCode\n  ) @inContext(country: $country, language: $language) {\n    blogs(first: 1, query: "handle:event") {\n      nodes {\n        id\n        title\n        handle\n        articles(first: 10, sortKey: PUBLISHED_AT, reverse: true) {\n          nodes {\n            id\n            title\n            handle\n            publishedAt\n            excerpt\n            content\n            image {\n              id\n              altText\n              url\n              width\n              height\n            }\n          }\n        }\n      }\n    }\n  }\n': {
+  '#graphql\n  query EventsBlog(\n    $country: CountryCode\n    $language: LanguageCode\n  ) @inContext(country: $country, language: $language) {\n    blogs(first: 1, query: "handle:event") {\n      nodes {\n        id\n        title\n        handle\n        articles(first: 50, sortKey: PUBLISHED_AT, reverse: true) {\n          nodes {\n            id\n            title\n            handle\n            publishedAt\n            tags\n            excerpt\n            content\n            image {\n              id\n              altText\n              url\n              width\n              height\n            }\n          }\n        }\n      }\n    }\n  }\n': {
     return: EventsBlogQuery;
     variables: EventsBlogQueryVariables;
   };
