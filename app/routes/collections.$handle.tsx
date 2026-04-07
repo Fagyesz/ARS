@@ -233,7 +233,7 @@ const COLLECTION_QUERY = `#graphql
         altText
       }
       products(
-        first: 500
+        first: 250
         sortKey: $sortKey
         reverse: $reverse
       ) {

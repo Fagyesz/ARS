@@ -248,7 +248,7 @@ const CATALOG_QUERY = `#graphql
     $reverse: Boolean
   ) @inContext(country: $country, language: $language) {
     products(
-      first: 500
+      first: 250
       query: $query
       sortKey: $sortKey
       reverse: $reverse
