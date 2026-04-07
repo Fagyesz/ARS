@@ -35,10 +35,7 @@ export const meta: Route.MetaFunction = ({data}) => {
   ];
 };
 
-export const links: Route.LinksFunction = (args) => {
-  const handle = args?.data?.product?.handle;
-  return handle ? [{rel: 'canonical', href: `/products/${handle}`}] : [];
-};
+export const links: Route.LinksFunction = () => [];
 
 export async function loader(args: Route.LoaderArgs) {
   const {context, params, request} = args;
@@ -212,7 +209,7 @@ export default function Product() {
             <span className="breadcrumb-sep">/</span>
             {vendor && (
               <>
-                <Link to={`/collections/${vendor.toLowerCase()}`}>{vendor}</Link>
+                <Link to={`/collections/all?artist=${encodeURIComponent(vendor)}`}>{vendor}</Link>
                 <span className="breadcrumb-sep">/</span>
               </>
             )}
@@ -222,12 +219,12 @@ export default function Product() {
           <div className="product">
             <ProductGallery
               images={(product as any).images?.nodes ?? []}
-              selectedImage={selectedVariant?.image}
+              selectedImage={selectedVariant?.image ? {url: selectedVariant.image.url, altText: selectedVariant.image.altText ?? null} : null}
               productTitle={product.title}
             />
             <div className="product-main">
               {vendor && (
-                <Link to={`/collections/${vendor.toLowerCase()}`} className="product-artist">
+                <Link to={`/collections/all?artist=${encodeURIComponent(vendor)}`} className="product-artist">
                   {vendor}
                 </Link>
               )}
@@ -347,7 +344,7 @@ export default function Product() {
                       '@type': 'ListItem',
                       position: 2,
                       name: product.vendor,
-                      item: `${origin}/collections/${product.vendor.toLowerCase()}`,
+                      item: `${origin}/collections/all?artist=${encodeURIComponent(product.vendor)}`,
                     },
                     {
                       '@type': 'ListItem',
