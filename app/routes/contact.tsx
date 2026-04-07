@@ -63,7 +63,7 @@ export async function action({request, context}: Route.ActionArgs) {
   }
 
   try {
-    const response = await fetch('https://api.resend.com/emails', {
+    const emailResponse = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${apiKey}`,
@@ -78,8 +78,32 @@ export async function action({request, context}: Route.ActionArgs) {
       }),
     });
 
-    if (!response.ok) {
+    if (!emailResponse.ok) {
       return {success: false, error: 'Az üzenet küldése sikertelen volt. Próbáld újra.'};
+    }
+
+    // Fire Discord notification if webhook is configured (non-blocking)
+    const discordWebhookUrl = context.env.DISCORD_WEBHOOK_URL;
+    if (discordWebhookUrl) {
+      fetch(discordWebhookUrl, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          embeds: [
+            {
+              title: `📬 Új üzenet: ${SUBJECT_LABELS[subject] || subject}`,
+              color: 0x6e56cf,
+              fields: [
+                {name: 'Név', value: name, inline: true},
+                {name: 'E-mail', value: email, inline: true},
+                {name: 'Üzenet', value: message, inline: false},
+              ],
+              footer: {text: 'Ars Mosoris – Kontaktlap'},
+              timestamp: new Date().toISOString(),
+            },
+          ],
+        }),
+      }).catch(() => {/* ignore Discord errors */});
     }
 
     return {success: true};
