@@ -31,7 +31,7 @@ export function ProductItem({
       <Link
         className="product-card"
         key={product.id}
-        prefetch="intent"
+        prefetch="viewport"
         to={variantUrl}
       >
         <div className="product-card-image">

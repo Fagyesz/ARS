@@ -6,6 +6,7 @@ import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {ProductItem} from '~/components/ProductItem';
 import type {ProductItemFragment} from 'storefrontapi.generated';
 
+// eslint-disable-next-line @typescript-eslint/no-deprecated
 export const meta: Route.MetaFunction = ({data}) => {
   const title = `${data?.collection.title ?? 'Kollekció'} | Ars Mosoris`;
   const description = data?.collection.description || 'Ars Mosoris kollekció';
@@ -60,7 +61,7 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   const [{collection}] = await Promise.all([
     storefront.query(COLLECTION_QUERY, {
       variables: {handle, ...paginationVariables, sortKey, reverse},
-      cache: storefront.CacheNone(),
+      cache: storefront.CacheShort(),
     }),
   ]);
 
@@ -73,7 +74,7 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   return {collection, sortParam};
 }
 
-function loadDeferredData({context}: Route.LoaderArgs) {
+function loadDeferredData(_args: Route.LoaderArgs) {
   return {};
 }
 
