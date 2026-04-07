@@ -14,9 +14,9 @@ export function PaginatedResourceSection<NodesType>({
 }) {
   return (
     <Pagination connection={connection}>
-      {({nodes, isLoading, NextLink, pageInfo}) => (
+      {({nodes, isLoading, NextLink, hasNextPage}) => (
         <div>
-          {renderMeta?.({count: nodes.length, hasNextPage: pageInfo.hasNextPage, isLoading})}
+          {renderMeta?.({count: nodes.length, hasNextPage, isLoading})}
           {resourcesClassName ? (
             <div className={resourcesClassName}>
               {nodes.map((node, index) => children({node, index}))}
