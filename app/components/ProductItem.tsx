@@ -1,5 +1,6 @@
 import {Link} from 'react-router';
 import {Image, Money} from '@shopify/hydrogen';
+import {useRef, useEffect} from 'react';
 import type {
   ProductItemFragment,
   CollectionItemFragment,
@@ -25,9 +26,26 @@ export function ProductItem({
   const {has, toggle} = useWishlist();
   const wishlisted = has(product.handle);
   const {addToast} = useToast();
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = wrapperRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add('revealed');
+          observer.disconnect();
+        }
+      },
+      {rootMargin: '0px 0px -40px 0px', threshold: 0.05},
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <div className="product-card-wrapper">
+    <div className="product-card-wrapper" ref={wrapperRef}>
       <Link
         className="product-card"
         key={product.id}

@@ -672,8 +672,14 @@ aside main {
 }
 
 /* ============================================
-   Infinite Scroll
+   Infinite Scroll / Eager Load
    ============================================ */
+.pagination-eager-trigger {
+  opacity: 0;
+  pointer-events: none;
+  height: 1px;
+}
+
 .pagination-loading {
   display: flex;
   justify-content: center;
@@ -4486,6 +4492,15 @@ button.reset {
    ============================================ */
 .product-card-wrapper {
   position: relative;
+  opacity: 0;
+  translate: 0 18px;
+  transition: opacity 0.4s ease, translate 0.4s ease;
+  will-change: opacity, translate;
+}
+
+.product-card-wrapper.revealed {
+  opacity: 1;
+  translate: 0 0;
 }
 
 .wishlist-heart {

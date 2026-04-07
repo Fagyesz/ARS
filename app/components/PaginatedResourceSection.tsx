@@ -24,67 +24,48 @@ export function PaginatedResourceSection<NodesType>({
           ) : (
             nodes.map((node, index) => children({node, index}))
           )}
-          <AutoLoadTrigger isLoading={isLoading} NextLink={NextLink} />
+          {/* Silently fetch all remaining pages in background — no scroll trigger needed */}
+          <EagerLoadTrigger isLoading={isLoading} NextLink={NextLink} />
         </div>
       )}
     </Pagination>
   );
 }
 
-function AutoLoadTrigger({
+function EagerLoadTrigger({
   isLoading,
   NextLink,
 }: {
   isLoading: boolean;
   NextLink: React.ComponentType<{children: React.ReactNode}>;
 }) {
-  const sentinelRef = React.useRef<HTMLDivElement>(null);
+  const linkRef = React.useRef<HTMLDivElement>(null);
   const isLoadingRef = React.useRef(isLoading);
+  const firedRef = React.useRef(false);
 
-  // Keep ref current without recreating the observer on every render
   React.useEffect(() => {
     isLoadingRef.current = isLoading;
   });
 
   React.useEffect(() => {
-    const sentinel = sentinelRef.current;
-    if (!sentinel) return;
-
-    let observer: IntersectionObserver;
-    // Delay observer setup so it doesn't immediately fire on initial page load/refresh
+    // As soon as this sentinel mounts (next page exists) and we're not
+    // already loading, immediately fetch the next page — no scroll needed.
     const timer = setTimeout(() => {
-      observer = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting && !isLoadingRef.current) {
-            sentinel.querySelector('a')?.click();
-          }
-        },
-        {rootMargin: '400px'},
-      );
-      observer.observe(sentinel);
-    }, 500);
-
-    return () => {
-      clearTimeout(timer);
-      observer?.disconnect();
-    };
+      if (!isLoadingRef.current && !firedRef.current) {
+        firedRef.current = true;
+        linkRef.current?.querySelector('a')?.click();
+      }
+    }, 80); // tiny delay so React finishes painting current batch first
+    return () => clearTimeout(timer);
   }, []);
 
   return (
-    <>
-      {isLoading && (
-        <div className="pagination-loading">
-          <span className="pagination-spinner" />
-        </div>
-      )}
-      {/* Invisible sentinel — IntersectionObserver watches this */}
-      <div
-        ref={sentinelRef}
-        aria-hidden="true"
-        style={{opacity: 0, pointerEvents: 'none', height: '1px'}}
-      >
-        <NextLink>more</NextLink>
-      </div>
-    </>
+    <div
+      ref={linkRef}
+      aria-hidden="true"
+      className="pagination-eager-trigger"
+    >
+      <NextLink>more</NextLink>
+    </div>
   );
 }
