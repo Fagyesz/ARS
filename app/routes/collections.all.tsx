@@ -1,7 +1,5 @@
 import type {Route} from './+types/collections.all';
-import {useLoaderData, Link, useNavigation, redirect} from 'react-router';
-import {getPaginationVariables} from '@shopify/hydrogen';
-import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
+import {useLoaderData, Link, useNavigation} from 'react-router';
 import {ProductItem} from '~/components/ProductItem';
 import type {CollectionItemFragment} from 'storefrontapi.generated';
 import {ARTISTS} from '~/lib/artists';
@@ -53,38 +51,20 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
   const {storefront} = context;
   const url = new URL(request.url);
 
-  if (url.searchParams.has('cursor')) {
-    const referer = request.headers.get('Referer');
-    const isSpaNav = referer && new URL(referer).origin === url.origin;
-    if (!isSpaNav) {
-      const clean = new URLSearchParams();
-      for (const key of ['artist', 'type', 'sort']) {
-        const val = url.searchParams.get(key);
-        if (val) clean.set(key, val);
-      }
-      const qs = clean.toString();
-      throw redirect(`/collections/all${qs ? `?${qs}` : ''}`);
-    }
-  }
-
   const artistFilter = url.searchParams.get('artist') || '';
   const typeFilter = url.searchParams.get('type') || '';
   const sortParam = (url.searchParams.get('sort') || '') as SortValue;
   const {sortKey, reverse} = parseSortKey(sortParam);
-
-  const paginationVariables = getPaginationVariables(request, {pageBy: 12});
 
   const queryParts: string[] = [];
   if (artistFilter) queryParts.push(artistFilter);
   if (typeFilter) queryParts.push(typeFilter);
   const query = queryParts.join(' ');
 
-  const [{products}] = await Promise.all([
-    storefront.query(CATALOG_QUERY, {
-      variables: {...paginationVariables, query, sortKey: sortKey as any, reverse},
-      cache: storefront.CacheShort(),
-    }),
-  ]);
+  const {products} = await storefront.query(CATALOG_QUERY, {
+    variables: {query, sortKey: sortKey as any, reverse},
+    cache: storefront.CacheShort(),
+  });
 
   return {products, artistFilter, typeFilter, sortParam};
 }
@@ -198,35 +178,30 @@ export default function Collection() {
           </div>
         ) : (
           <div className={isLoading ? 'shop-grid-loading' : undefined}>
-            <PaginatedResourceSection<CollectionItemFragment>
-              connection={products}
-              resourcesClassName="products-grid"
-              renderMeta={({count, hasNextPage, isLoading: paginationLoading}) =>
-                (hasFilters || count > 0) ? (
-                  <div className="catalog-meta">
-                    <span className="catalog-meta-count">
-                      {paginationLoading && count === 0 ? '…' : `${count}${hasNextPage ? '+' : ''} termék`}
-                      {activeFilterLabel && (
-                        <span className="catalog-meta-filters"> · {activeFilterLabel}</span>
-                      )}
-                    </span>
-                    {hasFilters && (
-                      <Link to="/collections/all" className="catalog-clear-btn">
-                        Szűrők törlése
-                      </Link>
-                    )}
-                  </div>
-                ) : null
-              }
-            >
-              {({node: product, index}) => (
+            {(hasFilters || products.nodes.length > 0) && (
+              <div className="catalog-meta">
+                <span className="catalog-meta-count">
+                  {products.nodes.length} termék
+                  {activeFilterLabel && (
+                    <span className="catalog-meta-filters"> · {activeFilterLabel}</span>
+                  )}
+                </span>
+                {hasFilters && (
+                  <Link to="/collections/all" className="catalog-clear-btn">
+                    Szűrők törlése
+                  </Link>
+                )}
+              </div>
+            )}
+            <div className="products-grid">
+              {products.nodes.map((product, index) => (
                 <ProductItem
                   key={product.id}
                   product={product}
                   loading={index < 8 ? 'eager' : undefined}
                 />
-              )}
-            </PaginatedResourceSection>
+              ))}
+            </div>
           </div>
         )}
       </div>
@@ -268,31 +243,18 @@ const CATALOG_QUERY = `#graphql
   query Catalog(
     $country: CountryCode
     $language: LanguageCode
-    $first: Int
-    $last: Int
-    $startCursor: String
-    $endCursor: String
     $query: String
     $sortKey: ProductSortKeys
     $reverse: Boolean
   ) @inContext(country: $country, language: $language) {
     products(
-      first: $first
-      last: $last
-      before: $startCursor
-      after: $endCursor
+      first: 500
       query: $query
       sortKey: $sortKey
       reverse: $reverse
     ) {
       nodes {
         ...CollectionItem
-      }
-      pageInfo {
-        hasPreviousPage
-        hasNextPage
-        startCursor
-        endCursor
       }
     }
   }
