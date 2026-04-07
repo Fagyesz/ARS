@@ -60,7 +60,7 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   const [{collection}] = await Promise.all([
     storefront.query(COLLECTION_QUERY, {
       variables: {handle, ...paginationVariables, sortKey, reverse},
-      cache: storefront.CacheShort(),
+      cache: storefront.CacheNone(),
     }),
   ]);
 
