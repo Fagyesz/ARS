@@ -30,12 +30,12 @@ const SORT_OPTIONS = [
 
 type SortValue = (typeof SORT_OPTIONS)[number]['value'];
 
-function parseSortKey(sort: string): {sortKey: string; reverse: boolean} {
+function parseSortKey(sort: string): {sortKey: 'PRICE' | 'TITLE' | 'CREATED'; reverse: boolean} {
   switch (sort) {
     case 'price-asc': return {sortKey: 'PRICE', reverse: false};
     case 'price-desc': return {sortKey: 'PRICE', reverse: true};
     case 'title-asc': return {sortKey: 'TITLE', reverse: false};
-    default: return {sortKey: 'CREATED_AT', reverse: true};
+    default: return {sortKey: 'CREATED', reverse: true};
   }
 }
 
