@@ -23,9 +23,9 @@ export const meta: Route.MetaFunction = ({data}) => {
 
 const SORT_OPTIONS = [
   {label: 'Legújabb', value: ''},
-  {label: 'Ár: növekvő', value: 'price-asc'},
-  {label: 'Ár: csökkenő', value: 'price-desc'},
-  {label: 'Név: A–Z', value: 'title-asc'},
+  {label: 'Ár ↑', value: 'price-asc'},
+  {label: 'Ár ↓', value: 'price-desc'},
+  {label: 'A–Z', value: 'title-asc'},
 ] as const;
 
 type SortValue = (typeof SORT_OPTIONS)[number]['value'];
@@ -94,21 +94,46 @@ function ProductGridSkeleton() {
   );
 }
 
+function buildSortUrl(handle: string, sort: string) {
+  const params = new URLSearchParams();
+  if (sort) params.set('sort', sort);
+  return `/collections/${handle}${params.toString() ? `?${params}` : ''}`;
+}
+
 export default function Collection() {
   const {collection, sortParam} = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const isLoading = navigation.state === 'loading';
 
   return (
-    <div className="section">
-      <div className="container">
-        <nav className="breadcrumb">
-          <Link to="/collections/all">Bolt</Link>
-          <span className="breadcrumb-sep">/</span>
-          <span className="breadcrumb-current">{collection.title}</span>
-        </nav>
-
-        <div className="text-center mb-8">
+    <div className="collection-page">
+      {/* Hero */}
+      {collection.image ? (
+        <div className="collection-hero">
+          <img
+            src={collection.image.url}
+            alt={collection.image.altText || collection.title}
+            className="collection-hero-image"
+          />
+          <div className="collection-hero-overlay">
+            <nav className="collection-hero-breadcrumb">
+              <Link to="/collections/all">Katalógus</Link>
+              <span> / </span>
+              <span>{collection.title}</span>
+            </nav>
+            <h1 className="collection-hero-title">{collection.title}</h1>
+            {collection.description && (
+              <p className="collection-hero-desc">{collection.description}</p>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className="collection-text-header container">
+          <nav className="breadcrumb">
+            <Link to="/collections/all">Katalógus</Link>
+            <span className="breadcrumb-sep">/</span>
+            <span className="breadcrumb-current">{collection.title}</span>
+          </nav>
           <h1>{collection.title}</h1>
           {collection.description && (
             <p className="text-muted" style={{maxWidth: '600px', margin: '0 auto'}}>
@@ -116,27 +141,27 @@ export default function Collection() {
             </p>
           )}
         </div>
+      )}
 
-        <div className="shop-filters">
-          <div className="shop-filter-group shop-sort-group">
-            <span className="shop-filter-label">Rendezés</span>
-            <select
-              className="shop-sort-select"
-              title="Rendezési sorrend"
-              value={sortParam}
-              onChange={(e) => {
-                const params = new URLSearchParams();
-                if (e.target.value) params.set('sort', e.target.value);
-                window.location.href = `/collections/${collection.handle}${params.toString() ? `?${params}` : ''}`;
-              }}
-            >
-              {SORT_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
+      {/* Sort bar */}
+      <div className="catalog-filters">
+        <div className="catalog-filters-inner container">
+          <div className="catalog-filter-section catalog-sort-section" style={{marginLeft: 'auto', paddingLeft: 0}}>
+            <span className="catalog-sort-label">Rendezés:</span>
+            {SORT_OPTIONS.map((opt) => (
+              <Link
+                key={opt.value}
+                to={buildSortUrl(collection.handle, opt.value)}
+                className={`catalog-sort-btn${sortParam === opt.value ? ' active' : ''}`}
+              >
+                {opt.label}
+              </Link>
+            ))}
           </div>
         </div>
+      </div>
 
+      <div className="container" style={{paddingTop: '1.5rem'}}>
         {isLoading ? (
           <ProductGridSkeleton />
         ) : (

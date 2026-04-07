@@ -1,8 +1,7 @@
 import {Await, useLoaderData, useActionData, useNavigation, Link, Form} from 'react-router';
 import type {Route} from './+types/_index';
 import {Suspense} from 'react';
-import {Image} from '@shopify/hydrogen';
-import type {RecommendedProductsQuery} from 'storefrontapi.generated';
+import type {RecommendedProductsQuery, StoreCollectionsQuery} from 'storefrontapi.generated';
 import {ARTISTS} from '~/lib/artists';
 import {ProductItem} from '~/components/ProductItem';
 
@@ -34,8 +33,16 @@ function loadDeferredData({context}: Route.LoaderArgs) {
       return null;
     });
 
+  const collections = context.storefront
+    .query(HOMEPAGE_COLLECTIONS_QUERY, {cache: context.storefront.CacheLong()})
+    .catch((error: Error) => {
+      console.error(error);
+      return null;
+    });
+
   return {
     recommendedProducts,
+    collections,
   };
 }
 
@@ -132,6 +139,7 @@ export default function Homepage() {
     <div className="home">
       <HeroSection />
       <FeaturedProducts products={data.recommendedProducts} />
+      <CollectionsSection collections={data.collections} />
       <ArtistsPreview />
       <NewsletterSection />
     </div>
@@ -240,6 +248,65 @@ function ProductGridSkeleton() {
         </div>
       ))}
     </div>
+  );
+}
+
+function CollectionsSection({
+  collections,
+}: {
+  collections: Promise<StoreCollectionsQuery | null>;
+}) {
+  return (
+    <section className="collections-drops-section">
+      <div className="container">
+        <div className="collections-drops-header">
+          <span className="collections-drops-label">Kollekciók</span>
+          <h2>Válogatott sorozataink</h2>
+        </div>
+        <Suspense fallback={<div className="collections-drops-skeleton" />}>
+          <Await resolve={collections}>
+            {(data) => {
+              const nodes = data?.collections?.nodes ?? [];
+              if (!nodes.length) return null;
+              return (
+                <div className="collections-drops-grid">
+                  {nodes.map((collection) => (
+                    <Link
+                      key={collection.id}
+                      to={`/collections/${collection.handle}`}
+                      className="collection-drop-card"
+                    >
+                      <div className="collection-drop-image">
+                        {collection.image ? (
+                          <img
+                            src={collection.image.url}
+                            alt={collection.image.altText || collection.title}
+                          />
+                        ) : (
+                          <div className="collection-drop-placeholder" />
+                        )}
+                      </div>
+                      <div className="collection-drop-overlay">
+                        <h3 className="collection-drop-title">{collection.title}</h3>
+                        <span className="collection-drop-cta">Megnézem →</span>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              );
+            }}
+          </Await>
+        </Suspense>
+        <div className="text-center" style={{marginTop: '2.5rem'}}>
+          <Link
+            to="/collections"
+            className="btn btn-outline btn-outline-on-dark"
+          >
+            Összes kollekció
+          </Link>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -354,6 +421,26 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
     products(first: 8, sortKey: UPDATED_AT, reverse: true) {
       nodes {
         ...RecommendedProduct
+      }
+    }
+  }
+` as const;
+
+const HOMEPAGE_COLLECTIONS_QUERY = `#graphql
+  fragment HomepageCollection on Collection {
+    id
+    title
+    handle
+    image {
+      url
+      altText
+    }
+  }
+  query HomepageCollections($country: CountryCode, $language: LanguageCode)
+    @inContext(country: $country, language: $language) {
+    collections(first: 6, sortKey: UPDATED_AT) {
+      nodes {
+        ...HomepageCollection
       }
     }
   }

@@ -1,50 +1,36 @@
 import {useLoaderData, Link} from 'react-router';
 import type {Route} from './+types/collections._index';
-
-export const meta: Route.MetaFunction = () => {
-  return [
-    {title: 'Kollekcióink | Ars Mosoris'},
-    {name: 'description', content: 'Böngéssz az Ars Mosoris kollekciói között — egyedi ruházat és kiegészítők képzőművészeti alkotásokkal.'},
-  ];
-};
 import {getPaginationVariables, Image} from '@shopify/hydrogen';
 import type {CollectionFragment} from 'storefrontapi.generated';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 
+export const meta: Route.MetaFunction = () => {
+  return [
+    {title: 'Kollekciók | Ars Mosoris'},
+    {name: 'description', content: 'Böngéssz az Ars Mosoris kollekciói között — egyedi ruházat és kiegészítők képzőművészeti alkotásokkal.'},
+  ];
+};
+
 export async function loader(args: Route.LoaderArgs) {
-  // Start fetching non-critical data without blocking time to first byte
   const deferredData = loadDeferredData(args);
-
-  // Await the critical data required to render initial state of the page
   const criticalData = await loadCriticalData(args);
-
   return {...deferredData, ...criticalData};
 }
 
-/**
- * Load data necessary for rendering content above the fold. This is the critical data
- * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
- */
 async function loadCriticalData({context, request}: Route.LoaderArgs) {
   const paginationVariables = getPaginationVariables(request, {
-    pageBy: 4,
+    pageBy: 12,
   });
 
   const [{collections}] = await Promise.all([
     context.storefront.query(COLLECTIONS_QUERY, {
       variables: paginationVariables,
     }),
-    // Add other queries here, so that they are loaded in parallel
   ]);
 
   return {collections};
 }
 
-/**
- * Load data for rendering content below the fold. This data is deferred and will be
- * fetched after the initial page load. If it's unavailable, the page should still 200.
- * Make sure to not throw any errors here, as it will cause the page to 500.
- */
 function loadDeferredData({context}: Route.LoaderArgs) {
   return {};
 }
@@ -53,49 +39,45 @@ export default function Collections() {
   const {collections} = useLoaderData<typeof loader>();
 
   return (
-    <div className="collections">
-      <h1>Kollekcióink</h1>
-      <PaginatedResourceSection<CollectionFragment>
-        connection={collections}
-        resourcesClassName="collections-grid"
-      >
-        {({node: collection, index}) => (
-          <CollectionItem
-            key={collection.id}
-            collection={collection}
-            index={index}
-          />
-        )}
-      </PaginatedResourceSection>
+    <div className="collections-editorial">
+      <div className="container">
+        <div className="collections-editorial-header">
+          <span className="collections-editorial-label">Ars Mosoris</span>
+          <h1>Kollekciók</h1>
+        </div>
+        <PaginatedResourceSection<CollectionFragment>
+          connection={collections}
+          resourcesClassName="collections-editorial-grid"
+        >
+          {({node: collection, index}) => (
+            <Link
+              key={collection.id}
+              to={`/collections/${collection.handle}`}
+              className="collection-drop-card"
+              prefetch="intent"
+            >
+              <div className="collection-drop-image">
+                {collection.image ? (
+                  <Image
+                    alt={collection.image.altText || collection.title}
+                    aspectRatio="16/9"
+                    data={collection.image}
+                    loading={index < 4 ? 'eager' : undefined}
+                    sizes="(min-width: 1024px) 50vw, 100vw"
+                  />
+                ) : (
+                  <div className="collection-drop-placeholder" />
+                )}
+              </div>
+              <div className="collection-drop-overlay">
+                <h2 className="collection-drop-title">{collection.title}</h2>
+                <span className="collection-drop-cta">Megnézem →</span>
+              </div>
+            </Link>
+          )}
+        </PaginatedResourceSection>
+      </div>
     </div>
-  );
-}
-
-function CollectionItem({
-  collection,
-  index,
-}: {
-  collection: CollectionFragment;
-  index: number;
-}) {
-  return (
-    <Link
-      className="collection-item"
-      key={collection.id}
-      to={`/collections/${collection.handle}`}
-      prefetch="intent"
-    >
-      {collection?.image && (
-        <Image
-          alt={collection.image.altText || collection.title}
-          aspectRatio="1/1"
-          data={collection.image}
-          loading={index < 3 ? 'eager' : undefined}
-          sizes="(min-width: 45em) 400px, 100vw"
-        />
-      )}
-      <h2>{collection.title}</h2>
-    </Link>
   );
 }
 

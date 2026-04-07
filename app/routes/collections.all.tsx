@@ -1,6 +1,6 @@
 import type {Route} from './+types/collections.all';
-import {useLoaderData, Link, useNavigation, redirect} from 'react-router';
-import {getPaginationVariables} from '@shopify/hydrogen';
+import {useLoaderData, Link, useNavigation} from 'react-router';
+import {getPaginationVariables, redirect} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {ProductItem} from '~/components/ProductItem';
 import type {CollectionItemFragment} from 'storefrontapi.generated';
@@ -19,15 +19,13 @@ export const meta: Route.MetaFunction = () => {
   ];
 };
 
-const ARTIST_NAMES = ['Ars Mosoris', ...ARTISTS.map((a) => a.name)];
-
 const TYPE_FILTERS = [{label: 'Összes', value: ''}, ...COLLECTION_TYPES];
 
 const SORT_OPTIONS = [
   {label: 'Legújabb', value: ''},
-  {label: 'Ár: növekvő', value: 'price-asc'},
-  {label: 'Ár: csökkenő', value: 'price-desc'},
-  {label: 'Név: A–Z', value: 'title-asc'},
+  {label: 'Ár ↑', value: 'price-asc'},
+  {label: 'Ár ↓', value: 'price-desc'},
+  {label: 'A–Z', value: 'title-asc'},
 ] as const;
 
 type SortValue = (typeof SORT_OPTIONS)[number]['value'];
@@ -55,7 +53,6 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
   const {storefront} = context;
   const url = new URL(request.url);
 
-  // On hard refresh/direct load with cursor params, redirect to page 1
   if (url.searchParams.has('cursor')) {
     const referer = request.headers.get('Referer');
     const isSpaNav = referer && new URL(referer).origin === url.origin;
@@ -75,9 +72,7 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
   const sortParam = (url.searchParams.get('sort') || '') as SortValue;
   const {sortKey, reverse} = parseSortKey(sortParam);
 
-  const paginationVariables = getPaginationVariables(request, {
-    pageBy: 12,
-  });
+  const paginationVariables = getPaginationVariables(request, {pageBy: 12});
 
   const queryParts: string[] = [];
   if (artistFilter) queryParts.push(artistFilter);
@@ -98,83 +93,124 @@ function loadDeferredData({context}: Route.LoaderArgs) {
   return {};
 }
 
+function buildFilterUrl({artist, type, sort}: {artist: string; type: string; sort: string}) {
+  const params = new URLSearchParams();
+  if (artist) params.set('artist', artist);
+  if (type) params.set('type', type);
+  if (sort) params.set('sort', sort);
+  const query = params.toString();
+  return `/collections/all${query ? `?${query}` : ''}`;
+}
+
 export default function Collection() {
-  const {products, artistFilter, typeFilter, sortParam} =
-    useLoaderData<typeof loader>();
+  const {products, artistFilter, typeFilter, sortParam} = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const isLoading = navigation.state === 'loading';
 
-  return (
-    <div className="section">
-      <div className="container">
-        <div className="text-center mb-8">
-          <h1>Katalógus</h1>
-          <p className="text-muted">
-            Válassz kedveseid közül — négy tehetséges művész munkái
-          </p>
-        </div>
+  const hasFilters = !!(artistFilter || typeFilter);
+  const activeFilterLabel = [
+    artistFilter || null,
+    typeFilter ? COLLECTION_TYPES.find((t) => t.value === typeFilter)?.label : null,
+  ]
+    .filter(Boolean)
+    .join(' · ');
 
-        {/* Filter + Sort bar */}
-        <div className="shop-filters">
-          <div className="shop-filter-group">
-            <span className="shop-filter-label">Típus</span>
+  return (
+    <div className="catalog-page">
+      {/* Page header */}
+      <div className="catalog-header container">
+        <h1>Katalógus</h1>
+        <p className="catalog-header-sub">Négy tehetséges művész egyedi munkái</p>
+      </div>
+
+      {/* Sticky filter + sort bar */}
+      <div className="catalog-filters">
+        <div className="catalog-filters-inner container">
+          {/* Artist chips */}
+          <div className="catalog-filter-section">
+            <Link
+              to={buildFilterUrl({artist: '', type: typeFilter, sort: sortParam})}
+              className={`catalog-artist-chip${!artistFilter ? ' active' : ''}`}
+            >
+              <span className="catalog-artist-name">Összes</span>
+            </Link>
+            {ARTISTS.map((artist) => (
+              <Link
+                key={artist.name}
+                to={buildFilterUrl({artist: artist.name, type: typeFilter, sort: sortParam})}
+                className={`catalog-artist-chip${artistFilter === artist.name ? ' active' : ''}`}
+              >
+                <span className="catalog-artist-initial">{artist.name[0]}</span>
+                <span className="catalog-artist-name">{artist.name}</span>
+              </Link>
+            ))}
+            <Link
+              to={buildFilterUrl({artist: 'Ars Mosoris', type: typeFilter, sort: sortParam})}
+              className={`catalog-artist-chip${artistFilter === 'Ars Mosoris' ? ' active' : ''}`}
+            >
+              <span className="catalog-artist-initial">A</span>
+              <span className="catalog-artist-name">Ars Mosoris</span>
+            </Link>
+          </div>
+
+          <span className="catalog-filter-divider" aria-hidden="true" />
+
+          {/* Type chips */}
+          <div className="catalog-filter-section">
             {TYPE_FILTERS.map((type) => (
               <Link
                 key={type.value}
                 to={buildFilterUrl({artist: artistFilter, type: type.value, sort: sortParam})}
-                className={`shop-filter-pill${typeFilter === type.value ? ' active' : ''}`}
+                className={`catalog-type-chip${typeFilter === type.value ? ' active' : ''}`}
               >
                 {type.label}
               </Link>
             ))}
           </div>
-          <div className="shop-filter-group">
-            <span className="shop-filter-label">Alkotó</span>
-            <Link
-              to={buildFilterUrl({artist: '', type: typeFilter, sort: sortParam})}
-              className={`shop-filter-pill${!artistFilter ? ' active' : ''}`}
-            >
-              Összes
-            </Link>
-            {ARTIST_NAMES.map((artist) => (
+
+          <span className="catalog-filter-divider" aria-hidden="true" />
+
+          {/* Sort buttons */}
+          <div className="catalog-filter-section catalog-sort-section">
+            {SORT_OPTIONS.map((opt) => (
               <Link
-                key={artist}
-                to={buildFilterUrl({artist, type: typeFilter, sort: sortParam})}
-                className={`shop-filter-pill${artistFilter === artist ? ' active' : ''}`}
+                key={opt.value}
+                to={buildFilterUrl({artist: artistFilter, type: typeFilter, sort: opt.value})}
+                className={`catalog-sort-btn${sortParam === opt.value ? ' active' : ''}`}
               >
-                {artist}
+                {opt.label}
               </Link>
             ))}
           </div>
-          <div className="shop-filter-group shop-sort-group">
-            <span className="shop-filter-label">Rendezés</span>
-            <select
-              className="shop-sort-select"
-              title="Rendezési sorrend"
-              value={sortParam}
-              onChange={(e) => {
-                const url = buildFilterUrl({
-                  artist: artistFilter,
-                  type: typeFilter,
-                  sort: e.target.value,
-                });
-                window.location.href = url;
-              }}
-            >
-              {SORT_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </div>
         </div>
+      </div>
+
+      {/* Meta row: active filters + clear */}
+      <div className="container">
+        {(hasFilters || products.nodes.length > 0) && (
+          <div className="catalog-meta">
+            <span className="catalog-meta-count">
+              {isLoading ? '…' : `${products.nodes.length}+ termék`}
+              {activeFilterLabel && (
+                <span className="catalog-meta-filters"> · {activeFilterLabel}</span>
+              )}
+            </span>
+            {hasFilters && (
+              <Link to="/collections/all" className="catalog-clear-btn">
+                Szűrők törlése
+              </Link>
+            )}
+          </div>
+        )}
 
         {products.nodes.length === 0 && !isLoading ? (
-          <div className="shop-empty">
-            <p>Nincs eredmény a kiválasztott szűrőkre.</p>
+          <div className="catalog-empty">
+            <p className="catalog-empty-title">Nincs találat</p>
+            <p className="catalog-empty-text">
+              Próbálj más szűrőkombinációt, vagy böngéssz a teljes kínálatban.
+            </p>
             <Link to="/collections/all" className="btn btn-outline">
-              Szűrők törölése
+              Összes termék
             </Link>
           </div>
         ) : (
@@ -196,32 +232,6 @@ export default function Collection() {
       </div>
     </div>
   );
-}
-
-function ProductGridSkeleton() {
-  return (
-    <div className="products-grid">
-      {Array.from({length: 12}).map((_, i) => (
-        <div key={i} className="product-card skeleton-card">
-          <div className="skeleton-image" />
-          <div className="product-card-info">
-            <div className="skeleton-line skeleton-line-short" />
-            <div className="skeleton-line skeleton-line-medium" />
-            <div className="skeleton-line skeleton-line-short" />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function buildFilterUrl({artist, type, sort}: {artist: string; type: string; sort: string}) {
-  const params = new URLSearchParams();
-  if (artist) params.set('artist', artist);
-  if (type) params.set('type', type);
-  if (sort) params.set('sort', sort);
-  const query = params.toString();
-  return `/collections/all${query ? `?${query}` : ''}`;
 }
 
 const COLLECTION_ITEM_FRAGMENT = `#graphql
