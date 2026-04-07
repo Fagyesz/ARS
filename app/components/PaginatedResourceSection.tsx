@@ -14,7 +14,7 @@ export function PaginatedResourceSection<NodesType>({
 }) {
   return (
     <Pagination connection={connection}>
-      {({nodes, isLoading, NextLink, hasNextPage}) => (
+      {({nodes, isLoading, NextLink, hasNextPage, nextPageUrl}) => (
         <div>
           {renderMeta?.({count: nodes.length, hasNextPage, isLoading})}
           {resourcesClassName ? (
@@ -25,7 +25,9 @@ export function PaginatedResourceSection<NodesType>({
             nodes.map((node, index) => children({node, index}))
           )}
           {/* Silently fetch all remaining pages in background — no scroll trigger needed */}
-          <EagerLoadTrigger isLoading={isLoading} NextLink={NextLink} />
+          {hasNextPage && (
+            <EagerLoadTrigger key={nextPageUrl} isLoading={isLoading} NextLink={NextLink} />
+          )}
         </div>
       )}
     </Pagination>
