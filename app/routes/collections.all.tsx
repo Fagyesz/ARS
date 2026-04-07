@@ -185,24 +185,7 @@ export default function Collection() {
         </div>
       </div>
 
-      {/* Meta row: active filters + clear */}
       <div className="container">
-        {(hasFilters || products.nodes.length > 0) && (
-          <div className="catalog-meta">
-            <span className="catalog-meta-count">
-              {isLoading ? '…' : `${products.nodes.length}+ termék`}
-              {activeFilterLabel && (
-                <span className="catalog-meta-filters"> · {activeFilterLabel}</span>
-              )}
-            </span>
-            {hasFilters && (
-              <Link to="/collections/all" className="catalog-clear-btn">
-                Szűrők törlése
-              </Link>
-            )}
-          </div>
-        )}
-
         {products.nodes.length === 0 && !isLoading ? (
           <div className="catalog-empty">
             <p className="catalog-empty-title">Nincs találat</p>
@@ -218,6 +201,23 @@ export default function Collection() {
             <PaginatedResourceSection<CollectionItemFragment>
               connection={products}
               resourcesClassName="products-grid"
+              renderMeta={({count, hasNextPage, isLoading: paginationLoading}) =>
+                (hasFilters || count > 0) ? (
+                  <div className="catalog-meta">
+                    <span className="catalog-meta-count">
+                      {paginationLoading && count === 0 ? '…' : `${count}${hasNextPage ? '+' : ''} termék`}
+                      {activeFilterLabel && (
+                        <span className="catalog-meta-filters"> · {activeFilterLabel}</span>
+                      )}
+                    </span>
+                    {hasFilters && (
+                      <Link to="/collections/all" className="catalog-clear-btn">
+                        Szűrők törlése
+                      </Link>
+                    )}
+                  </div>
+                ) : null
+              }
             >
               {({node: product, index}) => (
                 <ProductItem

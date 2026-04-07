@@ -5,15 +5,18 @@ export function PaginatedResourceSection<NodesType>({
   connection,
   children,
   resourcesClassName,
+  renderMeta,
 }: {
   connection: React.ComponentProps<typeof Pagination<NodesType>>['connection'];
   children: React.FunctionComponent<{node: NodesType; index: number}>;
   resourcesClassName?: string;
+  renderMeta?: (args: {count: number; hasNextPage: boolean; isLoading: boolean}) => React.ReactNode;
 }) {
   return (
     <Pagination connection={connection}>
-      {({nodes, isLoading, NextLink}) => (
+      {({nodes, isLoading, NextLink, pageInfo}) => (
         <div>
+          {renderMeta?.({count: nodes.length, hasNextPage: pageInfo.hasNextPage, isLoading})}
           {resourcesClassName ? (
             <div className={resourcesClassName}>
               {nodes.map((node, index) => children({node, index}))}
