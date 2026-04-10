@@ -6249,17 +6249,17 @@ button.reset {
 }
 
 /* ============================================
-   Collections Index Page — Editorial
+   Collections Index Page — Gallery Wall
    ============================================ */
 .collections-editorial {
   background-color: var(--color-ars-dark);
   min-height: 60vh;
-  padding: 3.5rem 0 var(--spacing-section-mobile);
+  padding: 0 0 var(--spacing-section-mobile);
 }
 
 @media (min-width: 768px) {
   .collections-editorial {
-    padding: 4rem 0 var(--spacing-section);
+    padding: 0 0 var(--spacing-section);
   }
 }
 
@@ -6284,18 +6284,19 @@ button.reset {
   background: var(--color-ars-red);
 }
 
-/* Giant ghost letter — atelier atmosphere */
-.collections-hero-bg-num {
+/* Logo watermark — ghost brand mark */
+.collections-hero-bg-logo {
   position: absolute;
-  right: -0.06em;
-  bottom: -0.18em;
-  font-size: clamp(12rem, 32vw, 30rem);
-  font-weight: 900;
-  font-family: var(--font-heading);
-  letter-spacing: -0.04em;
-  line-height: 1;
-  color: rgba(247, 234, 215, 0.028);
-  text-transform: uppercase;
+  right: -5%;
+  bottom: -5%;
+  width: clamp(280px, 50vw, 720px);
+  height: clamp(280px, 50vw, 720px);
+  background-image: url('/logo.svg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: bottom right;
+  opacity: 0.05;
+  filter: invert(1) brightness(1.4);
   pointer-events: none;
   user-select: none;
   -webkit-user-select: none;
@@ -6380,53 +6381,152 @@ button.reset {
   animation: hero-rise 0.9s 0.3s cubic-bezier(0.16,1,0.3,1) both;
 }
 
-/* Grid with featured first card */
-.collections-editorial-grid {
+/* ── Grid section ─────────────────────────── */
+.collections-grid-section {
+  padding-top: 3.5rem;
+}
+
+/* Gallery wall grid */
+.collections-frame-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.25rem;
-  counter-reset: collection-counter;
+  gap: 2.5rem;
+  counter-reset: coll-counter;
 }
 
 @media (min-width: 640px) {
-  .collections-editorial-grid {
+  .collections-frame-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 2rem 1.75rem;
   }
 
-  /* First card spans full width as featured */
-  .collections-editorial-grid > *:first-child {
+  .collections-frame-grid > *:first-child {
     grid-column: 1 / -1;
-  }
-
-  .collections-editorial-grid > *:first-child .collection-drop-card {
-    aspect-ratio: 21 / 9;
-  }
-
-  .collections-editorial-grid > *:first-child .collection-drop-title {
-    font-size: clamp(2rem, 5vw, 3.5rem);
   }
 }
 
 @media (min-width: 1024px) {
-  .collections-editorial-grid {
-    gap: 1.75rem;
+  .collections-frame-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2.5rem 2rem;
+  }
+
+  .collections-frame-grid > *:first-child {
+    grid-column: 1 / -1;
   }
 }
 
-/* Catalog counter on collection cards */
-.collection-drop-card {
-  counter-increment: collection-counter;
+/* ── Collection card — gallery frame ─────── */
+.collections-index-card {
+  display: block;
+  text-decoration: none;
+  color: var(--color-ars-cream);
+  counter-increment: coll-counter;
+  animation: hero-rise 0.65s cubic-bezier(0.16,1,0.3,1) both;
 }
 
-.collection-drop-card::before {
-  content: counter(collection-counter, decimal-leading-zero);
+/* The image frame — artwork on wall */
+.collections-index-img {
+  position: relative;
+  overflow: hidden;
+  /* Frame outline — dormant */
+  box-shadow: 0 0 0 1px rgba(247, 234, 215, 0.1);
+  transition: box-shadow 0.38s ease;
+}
+
+.collections-index-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Catalog number — top right corner stamp */
+.collections-index-img::after {
+  content: counter(coll-counter, decimal-leading-zero);
   position: absolute;
-  top: 1rem;
-  right: 1rem;
-  font-size: 0.5625rem;
+  top: 0.875rem;
+  right: 0.875rem;
+  font-size: 0.5rem;
   font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.2em;
   color: rgba(247, 234, 215, 0.45);
+  font-family: var(--font-heading);
   z-index: 2;
-  font-family: inherit;
+  line-height: 1;
+}
+
+/* Hover: red frame, image breathes */
+.collections-index-card:hover .collections-index-img {
+  box-shadow: 0 0 0 2px var(--color-ars-red);
+}
+
+.collections-index-card:hover .collections-index-img img {
+  transform: scale(1.04);
+}
+
+/* Museum label row below image */
+.collections-index-info {
+  padding: 0.75rem 0 0;
+  border-top: 1px solid rgba(247, 234, 215, 0.1);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  transition: border-top-color 0.38s ease;
+}
+
+.collections-index-card:hover .collections-index-info {
+  border-top-color: var(--color-ars-red);
+}
+
+.collections-index-title {
+  font-size: clamp(0.8125rem, 1.8vw, 1rem);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-ars-cream);
+  margin: 0;
+  line-height: 1.2;
+  flex: 1;
+}
+
+.collections-index-cta {
+  font-size: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-ars-red);
+  white-space: nowrap;
+  flex-shrink: 0;
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.28s ease, transform 0.28s ease;
+}
+
+.collections-index-card:hover .collections-index-cta {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Featured card (index 0) — larger title */
+.collections-index-card--featured .collections-index-title {
+  font-size: clamp(1rem, 2.5vw, 1.375rem);
+}
+
+/* Placeholder for collections without image */
+.collections-index-placeholder {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: linear-gradient(
+    135deg,
+    var(--color-ars-dark) 0%,
+    var(--color-ars-olive) 60%,
+    var(--color-ars-red) 100%
+  );
+}
+
+.collections-index-card--featured .collections-index-placeholder {
+  aspect-ratio: 16 / 9;
 }

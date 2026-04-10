@@ -41,7 +41,7 @@ export default function Collections() {
   return (
     <div className="collections-editorial">
       <section className="collections-hero">
-        <div className="collections-hero-bg-num" aria-hidden="true">K</div>
+        <div className="collections-hero-bg-logo" aria-hidden="true" />
         <div className="container">
           <div className="collections-hero-inner">
             <div className="collections-hero-meta">
@@ -57,39 +57,46 @@ export default function Collections() {
           </div>
         </div>
       </section>
-      <div className="container">
-        <PaginatedResourceSection<CollectionFragment>
-          connection={collections}
-          resourcesClassName="collections-editorial-grid"
-        >
-          {({node: collection, index}) => (
-            <div key={collection.id}>
-              <Link
-                to={`/collections/${collection.handle}`}
-                className="collection-drop-card"
-                prefetch="intent"
-              >
-                <div className="collection-drop-image">
-                  {collection.image ? (
-                    <Image
-                      alt={collection.image.altText || collection.title}
-                      aspectRatio="16/9"
-                      data={collection.image}
-                      loading={index < 4 ? 'eager' : undefined}
-                      sizes="(min-width: 1024px) 50vw, 100vw"
-                    />
-                  ) : (
-                    <div className="collection-drop-placeholder" />
-                  )}
-                </div>
-                <div className="collection-drop-overlay">
-                  <h2 className="collection-drop-title">{collection.title}</h2>
-                  <span className="collection-drop-cta">Megnézem →</span>
-                </div>
-              </Link>
-            </div>
-          )}
-        </PaginatedResourceSection>
+      <div className="collections-grid-section">
+        <div className="container">
+          <PaginatedResourceSection<CollectionFragment>
+            connection={collections}
+            resourcesClassName="collections-frame-grid"
+          >
+            {({node: collection, index}) => (
+              <div key={collection.id}>
+                <Link
+                  to={`/collections/${collection.handle}`}
+                  className={`collections-index-card${index === 0 ? ' collections-index-card--featured' : ''}`}
+                  prefetch="intent"
+                  style={{animationDelay: `${index * 0.09}s`}}
+                >
+                  <div className="collections-index-img">
+                    {collection.image ? (
+                      <Image
+                        alt={collection.image.altText || collection.title}
+                        aspectRatio={index === 0 ? '16/9' : '4/3'}
+                        data={collection.image}
+                        loading={index < 4 ? 'eager' : undefined}
+                        sizes={
+                          index === 0
+                            ? '100vw'
+                            : '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw'
+                        }
+                      />
+                    ) : (
+                      <div className="collections-index-placeholder" />
+                    )}
+                  </div>
+                  <div className="collections-index-info">
+                    <h2 className="collections-index-title">{collection.title}</h2>
+                    <span className="collections-index-cta">Megnézem</span>
+                  </div>
+                </Link>
+              </div>
+            )}
+          </PaginatedResourceSection>
+        </div>
       </div>
     </div>
   );
