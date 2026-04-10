@@ -149,16 +149,7 @@ export default function Homepage() {
 function HeroSection() {
   return (
     <section className="hero">
-      <div className="hero-background">
-        <div
-          style={{
-            width: '100%',
-            height: '100%',
-            background:
-              'linear-gradient(135deg, #1B1B1B 0%, #451442 50%, #FC0004 100%)',
-          }}
-        />
-      </div>
+      <div className="hero-background" />
       <div className="hero-overlay" />
       <div className="hero-content">
         <h1 className="hero-title">Ars Mosoris</h1>
@@ -167,7 +158,7 @@ function HeroSection() {
           <Link to="/collections/all" className="btn btn-primary">
             Shop megtekintése
           </Link>
-          <Link to="/artists" className="btn btn-outline" style={{color: 'white', borderColor: 'white'}}>
+          <Link to="/artists" className="btn btn-outline" style={{color: 'var(--color-ars-cream)', borderColor: 'rgba(247,234,215,0.5)'}}>
             Alkotóink
           </Link>
         </div>
@@ -214,36 +205,12 @@ function ProductGridSkeleton() {
   return (
     <div className="products-grid">
       {[1, 2, 3, 4].map((i) => (
-        <div key={i} className="product-card">
-          <div
-            className="product-card-image"
-            style={{background: '#f0f0f0', aspectRatio: '1'}}
-          />
+        <div key={i} className="product-card skeleton-card">
+          <div className="product-card-image skeleton-image" />
           <div className="product-card-info">
-            <div
-              style={{
-                height: '12px',
-                width: '60px',
-                background: '#f0f0f0',
-                margin: '0 auto 8px',
-              }}
-            />
-            <div
-              style={{
-                height: '16px',
-                width: '120px',
-                background: '#f0f0f0',
-                margin: '0 auto 8px',
-              }}
-            />
-            <div
-              style={{
-                height: '14px',
-                width: '80px',
-                background: '#f0f0f0',
-                margin: '0 auto',
-              }}
-            />
+            <div className="skeleton-line skeleton-line-short" />
+            <div className="skeleton-line skeleton-line-medium" />
+            <div className="skeleton-line skeleton-line-short" />
           </div>
         </div>
       ))}
@@ -297,7 +264,7 @@ function CollectionsSection({
             }}
           </Await>
         </Suspense>
-        <div className="text-center" style={{marginTop: '2.5rem'}}>
+        <div className="text-center collections-cta">
           <Link
             to="/collections"
             className="btn btn-outline btn-outline-on-dark"
@@ -312,7 +279,7 @@ function CollectionsSection({
 
 function ArtistsPreview() {
   return (
-    <section className="section" style={{backgroundColor: 'var(--color-background-alt)'}}>
+    <section className="section section-alt">
       <div className="container">
         <div className="text-center mb-8">
           <h2>Alkotóink</h2>

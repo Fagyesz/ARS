@@ -19,16 +19,20 @@ export const meta: Route.MetaFunction = () => {
 
 export default function ArtistsIndex() {
   return (
-    <div className="section">
-      <div className="container">
-        <div className="text-center mb-12">
-          <h1>Alkotóink</h1>
-          <p className="text-muted" style={{maxWidth: '600px', margin: '0 auto', fontSize: '1.125rem'}}>
+    <div className="artists-index-page">
+      {/* Editorial dark header */}
+      <div className="artists-index-hero">
+        <div className="container">
+          <span className="artists-index-eyebrow">Ars Mosoris</span>
+          <h1 className="artists-index-title">Alkotóink</h1>
+          <p className="artists-index-lead">
             Négy tehetséges képzőművész, akik egyedi látásmódjukat viselhetővé varázsolják.
-            Minden alkotó saját művészi világot képvisel, de közös bennük a kreativitás és a minőség iránti elkötelezettség.
+            Minden alkotó saját művészi világot képvisel.
           </p>
         </div>
+      </div>
 
+      <div className="container">
         <div className="artists-page-grid">
           {ARTISTS.map((artist) => (
             <Link

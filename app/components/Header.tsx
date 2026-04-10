@@ -120,7 +120,7 @@ function HeaderMenuMobileToggle() {
   const {open} = useAside();
   return (
     <button
-      className="header-menu-mobile-toggle"
+      className="header-menu-mobile-toggle reset"
       onClick={() => open('mobile')}
       aria-label="Open menu"
     >
