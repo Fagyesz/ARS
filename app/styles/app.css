@@ -252,6 +252,8 @@ a:hover {
   padding: 0.35rem 1rem;
   position: relative;
   text-decoration: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .header-menu-item::after {
