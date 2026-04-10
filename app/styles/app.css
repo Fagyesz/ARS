@@ -824,6 +824,7 @@ aside main {
 .product-card {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .product-card-image {
@@ -5100,6 +5101,7 @@ button.reset {
    ============================================ */
 .product-card-wrapper {
   position: relative;
+  min-width: 0;
   opacity: 0;
   translate: 0 24px;
   transition: opacity 0.5s cubic-bezier(0.16,1,0.3,1), translate 0.5s cubic-bezier(0.16,1,0.3,1);
