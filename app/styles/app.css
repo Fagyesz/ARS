@@ -1813,31 +1813,32 @@ aside .cart-empty {
 
 .artist-page-card-content {
   text-align: left;
-  padding-top: 0.25rem;
+  padding-top: 1rem;
+  padding-bottom: 0.5rem;
   border-top: 2px solid var(--color-ars-dark);
 }
 
 .artist-page-card-name {
   font-size: 1.375rem;
   font-weight: 700;
-  margin-bottom: 0.5rem;
-  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+  margin-top: 0.5rem;
   color: var(--color-text);
+  text-decoration: none;
 }
 
 .artist-page-card-bio {
   font-size: 0.9375rem;
   color: var(--color-text-muted);
-  line-height: 1.7;
-  margin-bottom: 1rem;
+  line-height: 1.75;
+  margin-bottom: 1.25rem;
   text-decoration: none;
 }
 
 .artist-page-card:hover .artist-page-card-name,
 .artist-page-card:hover .artist-page-card-bio {
   color: inherit;
-  text-decoration: none;
-}
+  text-decoration: none;}
 
 .artist-page-card-link {
   display: inline-flex;
@@ -2263,6 +2264,11 @@ aside .cart-empty {
   text-decoration: none;
 }
 
+.event-card-inner:hover {
+  color: inherit;
+  text-decoration: none;
+}
+
 .event-card-image {
   aspect-ratio: 16/9;
   overflow: hidden;
@@ -2312,6 +2318,8 @@ aside .cart-empty {
   line-height: 1.25;
   letter-spacing: -0.01em;
   margin-bottom: 0.625rem;
+  color: var(--color-text);
+  text-decoration: none;
 }
 
 .event-card-excerpt {
@@ -2320,6 +2328,13 @@ aside .cart-empty {
   line-height: 1.65;
   flex: 1;
   margin-bottom: 1rem;
+  text-decoration: none;
+}
+
+.event-card-inner:hover .event-card-title,
+.event-card-inner:hover .event-card-excerpt {
+  color: inherit;
+  text-decoration: none;
 }
 
 .event-card-cta {
