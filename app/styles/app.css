@@ -7,16 +7,17 @@
 
 @theme {
   /* Brand Colors — Ars Mosoris theme palette */
-  --color-ars-red: #AF2222;
-  --color-ars-red-dark: #8C1A1A;
-  --color-ars-dark: #231725;
-  --color-ars-olive: #84A045;
-  --color-ars-olive-dark: #6B8438;
-  --color-ars-cream: #F5EDD8;
-  --color-ars-cream-dark: #EDE0C4;
-  --color-ars-white: #FAFAF7;
-  --color-ars-gray: #EDE0C4;
-  --color-ars-gray-dark: #D8CDB0;
+  --color-ars-red: #C43F27;
+  --color-ars-red-dark: #A83520;
+  --color-ars-dark: #231F20;
+  --color-ars-olive: #475223;
+  --color-ars-olive-dark: #38411B;
+  --color-ars-sage: #BABD92;
+  --color-ars-cream: #F7EAD7;
+  --color-ars-cream-dark: #EDD9BC;
+  --color-ars-white: #F7EAD7;
+  --color-ars-gray: #EDD9BC;
+  --color-ars-gray-dark: #D9C9A8;
 
   /* Semantic Colors */
   --color-primary: var(--color-ars-red);
