@@ -67,9 +67,6 @@ export function ProductItem({
           )}
         </div>
         <div className="product-card-info">
-          {'vendor' in product && product.vendor && (
-            <span className="product-card-artist">{product.vendor}</span>
-          )}
           <h3 className="product-card-title">{product.title}</h3>
           <div className="product-card-price">
             <Money data={product.priceRange.minVariantPrice} />

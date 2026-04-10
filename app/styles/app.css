@@ -865,77 +865,73 @@ aside main {
   color: white;
 }
 
+/* ── Product card info — museum/gallery label style ───────────────── */
 .product-card-info {
-  text-align: left;
   padding: 0.875rem 0 0;
-  border-top: 1px solid rgba(35, 31, 32, 0.1);
+  border-top: 2px solid var(--color-ars-dark);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 }
 
-.product-card-artist {
-  font-size: 0.625rem;
-  font-weight: 700;
-  color: var(--color-ars-red);
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  margin-bottom: 0.35rem;
-}
-
+/* Title — italic like a gallery work title, block with underline-on-hover */
 .product-card-title {
-  font-size: 0.875rem;
+  display: block;
+  font-size: 0.9375rem;
   font-weight: 600;
-  margin-bottom: 0.5rem;
+  font-style: italic;
+  margin-bottom: 0.6rem;
   color: var(--color-text);
-  line-height: 1.3;
+  line-height: 1.25;
   position: relative;
-  display: inline-block;
+  /* underline-reveal via gradient */
+  background-image: linear-gradient(var(--color-ars-red), var(--color-ars-red));
+  background-size: 0% 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 0.28s ease;
+  padding-bottom: 2px;
 }
 
-.product-card-title::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: var(--color-ars-red);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.25s ease;
+.product-card:hover .product-card-title {
+  background-size: 100% 1px;
 }
 
-.product-card:hover .product-card-title::after {
-  transform: scaleX(1);
-}
-
+/* Price — small, right-aligned, muted */
 .product-card-price {
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   font-weight: 500;
+  font-style: normal;
   color: var(--color-text-muted);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
 }
 
 .product-card-price-sale {
   color: var(--color-primary);
 }
 
-/* Catalog counter — sequential numbering on product grids */
+/* Catalog counter — top-right of the card wrapper, overlapping image corner */
 .products-grid {
   counter-reset: product-counter;
 }
 
 .product-card-wrapper {
   counter-increment: product-counter;
+  position: relative;
 }
 
-.product-card-wrapper::before {
+.product-card-wrapper::after {
   content: counter(product-counter, decimal-leading-zero);
-  display: block;
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
   font-size: 0.5rem;
   font-weight: 700;
-  letter-spacing: 0.18em;
-  color: rgba(35, 31, 32, 0.22);
-  margin-bottom: 0.35rem;
-  text-align: right;
+  letter-spacing: 0.16em;
+  color: rgba(35, 31, 32, 0.3);
+  z-index: 3;
+  font-family: inherit;
+  pointer-events: none;
 }
 
 .product-card-price-original {
