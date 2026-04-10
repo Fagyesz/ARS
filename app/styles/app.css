@@ -6,27 +6,30 @@
    ============================================ */
 
 @theme {
-  /* Brand Colors */
-  --color-ars-red: #FC0004;
-  --color-ars-red-dark: #D90003;
-  --color-ars-dark: #1B1B1B;
-  --color-ars-burgundy: #451442;
-  --color-ars-white: #FFFFFF;
-  --color-ars-gray: #F5F5F5;
-  --color-ars-gray-dark: #E5E5E5;
+  /* Brand Colors — Ars Mosoris theme palette */
+  --color-ars-red: #AF2222;
+  --color-ars-red-dark: #8C1A1A;
+  --color-ars-dark: #231725;
+  --color-ars-olive: #84A045;
+  --color-ars-olive-dark: #6B8438;
+  --color-ars-cream: #F5EDD8;
+  --color-ars-cream-dark: #EDE0C4;
+  --color-ars-white: #FAFAF7;
+  --color-ars-gray: #EDE0C4;
+  --color-ars-gray-dark: #D8CDB0;
 
   /* Semantic Colors */
   --color-primary: var(--color-ars-red);
   --color-primary-hover: var(--color-ars-red-dark);
   --color-text: var(--color-ars-dark);
-  --color-text-muted: #6B7280;
-  --color-background: var(--color-ars-white);
-  --color-background-alt: var(--color-ars-gray);
+  --color-text-muted: #7A6E5F;
+  --color-background: var(--color-ars-cream);
+  --color-background-alt: var(--color-ars-cream-dark);
   --color-border: var(--color-ars-gray-dark);
 
-  /* Typography - Montserrat */
-  --font-sans: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
-  --font-heading: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
+  /* Typography - Grandstander */
+  --font-sans: 'Grandstander', ui-sans-serif, system-ui, sans-serif;
+  --font-heading: 'Grandstander', ui-sans-serif, system-ui, sans-serif;
 
   /* Spacing Scale - Gallery-like generous spacing */
   --spacing-section: 6rem;
@@ -1499,7 +1502,7 @@ aside .cart-empty {
 }
 
 .artist-card-image:empty {
-  background: linear-gradient(135deg, var(--color-ars-dark) 0%, var(--color-ars-burgundy) 100%);
+  background: linear-gradient(135deg, var(--color-ars-dark) 0%, var(--color-ars-olive) 100%);
   min-height: 280px;
 }
 
@@ -1570,7 +1573,7 @@ aside .cart-empty {
 }
 
 .artist-page-card-image:empty {
-  background: linear-gradient(135deg, var(--color-ars-dark) 0%, var(--color-ars-burgundy) 100%);
+  background: linear-gradient(135deg, var(--color-ars-dark) 0%, var(--color-ars-olive) 100%);
   min-height: 280px;
 }
 
@@ -5552,7 +5555,7 @@ button.reset {
   background: linear-gradient(
     135deg,
     var(--color-ars-dark) 0%,
-    var(--color-ars-burgundy) 60%,
+    var(--color-ars-olive) 60%,
     var(--color-ars-red) 100%
   );
 }
