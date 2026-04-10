@@ -881,7 +881,7 @@ aside main {
   border-top-color: var(--color-ars-red);
 }
 
-/* Title — italic like a gallery work title, with underline-on-hover */
+/* Title — italic like a gallery work title */
 .product-card-title {
   display: block;
   font-size: 0.9375rem;
@@ -889,18 +889,6 @@ aside main {
   font-style: italic;
   color: var(--color-text);
   line-height: 1.25;
-  position: relative;
-  /* underline-reveal via gradient */
-  background-image: linear-gradient(var(--color-ars-red), var(--color-ars-red));
-  background-size: 0% 1px;
-  background-position: 0 100%;
-  background-repeat: no-repeat;
-  transition: background-size 0.28s ease;
-  padding-bottom: 2px;
-}
-
-.product-card:hover .product-card-title {
-  background-size: 100% 1px;
 }
 
 /* Price — small, right-aligned, muted — anchored to the right of the label row */
