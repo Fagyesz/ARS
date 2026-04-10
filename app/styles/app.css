@@ -1557,19 +1557,20 @@ aside .cart-empty {
   );
 }
 
-/* Ghost monogram watermark — subtle depth */
+/* Logo watermark — ghost of the brand mark */
 .hero-background::before {
-  content: 'AM';
+  content: '';
   position: absolute;
-  right: -0.08em;
-  bottom: -0.15em;
-  font-size: clamp(14rem, 38vw, 36rem);
-  font-weight: 900;
-  font-family: var(--font-heading);
-  letter-spacing: -0.06em;
-  line-height: 1;
-  color: rgba(247, 234, 215, 0.022);
-  text-transform: uppercase;
+  right: -5%;
+  bottom: -5%;
+  width: clamp(320px, 55vw, 820px);
+  height: clamp(320px, 55vw, 820px);
+  background-image: url('/logo.svg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: bottom right;
+  opacity: 0.06;
+  filter: invert(1) brightness(1.4);
   pointer-events: none;
   z-index: 1;
   user-select: none;
@@ -1722,16 +1723,23 @@ aside .cart-empty {
 .hero-marquee {
   display: flex;
   align-items: center;
-  gap: 2rem;
   white-space: nowrap;
-  animation: hero-marquee-scroll 28s linear infinite;
+  /* 6 sets — animate to -1/6 so exactly 1 set passes per loop */
+  animation: hero-marquee-scroll 32s linear infinite;
   font-size: 0.5625rem;
   font-weight: 700;
   letter-spacing: 0.24em;
   text-transform: uppercase;
   color: var(--color-ars-sage);
-  padding: 0 1rem;
   will-change: transform;
+}
+
+.hero-marquee-set {
+  display: inline-flex;
+  align-items: center;
+  gap: 2rem;
+  padding-right: 2rem;
+  flex-shrink: 0;
 }
 
 .hero-marquee-dot {
@@ -1742,7 +1750,8 @@ aside .cart-empty {
 
 @keyframes hero-marquee-scroll {
   from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+  /* move by exactly 1/6 of total width = 1 set */
+  to   { transform: translateX(calc(-100% / 6)); }
 }
 
 /* ============================================

@@ -170,26 +170,20 @@ function HeroSection() {
       </div>
       <div className="hero-marquee-track">
         <div className="hero-marquee" aria-hidden="true">
-          <span>Kortárs Művészet</span>
-          <span className="hero-marquee-dot">◆</span>
-          <span>Magyar Design</span>
-          <span className="hero-marquee-dot">◆</span>
-          <span>Egyedi Ruházat</span>
-          <span className="hero-marquee-dot">◆</span>
-          <span>Képzőművészet</span>
-          <span className="hero-marquee-dot">◆</span>
-          <span>Kézzel Készített</span>
-          <span className="hero-marquee-dot">◆</span>
-          <span>Kortárs Művészet</span>
-          <span className="hero-marquee-dot">◆</span>
-          <span>Magyar Design</span>
-          <span className="hero-marquee-dot">◆</span>
-          <span>Egyedi Ruházat</span>
-          <span className="hero-marquee-dot">◆</span>
-          <span>Képzőművészet</span>
-          <span className="hero-marquee-dot">◆</span>
-          <span>Kézzel Készített</span>
-          <span className="hero-marquee-dot">◆</span>
+          {[0,1,2,3,4,5].map((i) => (
+            <span key={i} className="hero-marquee-set">
+              <span>Kortárs Művészet</span>
+              <span className="hero-marquee-dot">◆</span>
+              <span>Magyar Design</span>
+              <span className="hero-marquee-dot">◆</span>
+              <span>Egyedi Ruházat</span>
+              <span className="hero-marquee-dot">◆</span>
+              <span>Képzőművészet</span>
+              <span className="hero-marquee-dot">◆</span>
+              <span>Kézzel Készített</span>
+              <span className="hero-marquee-dot">◆</span>
+            </span>
+          ))}
         </div>
       </div>
     </section>
