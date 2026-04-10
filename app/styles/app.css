@@ -216,6 +216,8 @@ a:hover {
   display: flex;
   align-items: center;
   flex-shrink: 0;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .header-logo-img {
@@ -1701,6 +1703,18 @@ aside .cart-empty {
 }
 
 /* Artists Index — Editorial header */
+/* ── Non-selectable hero sections ───────────────────────────────── */
+.artists-index-hero,
+.events-hero,
+.about-hero,
+.contact-hero,
+.collections-hero,
+.collection-hero,
+.artist-hero {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
 .artists-index-page {
   padding-bottom: 5rem;
 }
@@ -1818,7 +1832,7 @@ aside .cart-empty {
 
 .artist-page-card-content {
   text-align: left;
-  padding: 1rem 0.125rem 0.75rem;
+  padding: 1rem 0.25rem 0.75rem;
   border-top: 2px solid var(--color-ars-dark);
 }
 
