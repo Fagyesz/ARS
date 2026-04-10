@@ -40,40 +40,46 @@ export default function Collections() {
 
   return (
     <div className="collections-editorial">
-      <div className="container">
-        <div className="collections-editorial-header">
-          <span className="collections-editorial-label">Ars Mosoris</span>
-          <h1>Kollekciók</h1>
+      <section className="collections-hero">
+        <div className="container">
+          <span className="collections-hero-eyebrow">Ars Mosoris</span>
+          <h1 className="collections-hero-title">Kollekciók</h1>
+          <p className="collections-hero-lead">
+            Minden kollekcióban egy-egy alkotói világ — válogatott sorozataink képzőművészeti technikákkal készült ruhadarabokból.
+          </p>
         </div>
+      </section>
+      <div className="container">
         <PaginatedResourceSection<CollectionFragment>
           connection={collections}
           resourcesClassName="collections-editorial-grid"
         >
           {({node: collection, index}) => (
-            <Link
-              key={collection.id}
-              to={`/collections/${collection.handle}`}
-              className="collection-drop-card"
-              prefetch="intent"
-            >
-              <div className="collection-drop-image">
-                {collection.image ? (
-                  <Image
-                    alt={collection.image.altText || collection.title}
-                    aspectRatio="16/9"
-                    data={collection.image}
-                    loading={index < 4 ? 'eager' : undefined}
-                    sizes="(min-width: 1024px) 50vw, 100vw"
-                  />
-                ) : (
-                  <div className="collection-drop-placeholder" />
-                )}
-              </div>
-              <div className="collection-drop-overlay">
-                <h2 className="collection-drop-title">{collection.title}</h2>
-                <span className="collection-drop-cta">Megnézem →</span>
-              </div>
-            </Link>
+            <div key={collection.id}>
+              <Link
+                to={`/collections/${collection.handle}`}
+                className="collection-drop-card"
+                prefetch="intent"
+              >
+                <div className="collection-drop-image">
+                  {collection.image ? (
+                    <Image
+                      alt={collection.image.altText || collection.title}
+                      aspectRatio="16/9"
+                      data={collection.image}
+                      loading={index < 4 ? 'eager' : undefined}
+                      sizes="(min-width: 1024px) 50vw, 100vw"
+                    />
+                  ) : (
+                    <div className="collection-drop-placeholder" />
+                  )}
+                </div>
+                <div className="collection-drop-overlay">
+                  <h2 className="collection-drop-title">{collection.title}</h2>
+                  <span className="collection-drop-cta">Megnézem →</span>
+                </div>
+              </Link>
+            </div>
           )}
         </PaginatedResourceSection>
       </div>

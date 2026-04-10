@@ -866,8 +866,9 @@ aside main {
 }
 
 .product-card-info {
-  text-align: center;
-  padding: 0.5rem 0.25rem 0;
+  text-align: left;
+  padding: 0.875rem 0 0;
+  border-top: 1px solid rgba(35, 31, 32, 0.1);
 }
 
 .product-card-artist {
@@ -880,21 +881,61 @@ aside main {
 }
 
 .product-card-title {
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   font-weight: 600;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.5rem;
   color: var(--color-text);
   line-height: 1.3;
+  position: relative;
+  display: inline-block;
+}
+
+.product-card-title::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--color-ars-red);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s ease;
+}
+
+.product-card:hover .product-card-title::after {
+  transform: scaleX(1);
 }
 
 .product-card-price {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--color-ars-dark);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  letter-spacing: 0.02em;
 }
 
 .product-card-price-sale {
   color: var(--color-primary);
+}
+
+/* Catalog counter — sequential numbering on product grids */
+.products-grid {
+  counter-reset: product-counter;
+}
+
+.product-card-wrapper {
+  counter-increment: product-counter;
+}
+
+.product-card-wrapper::before {
+  content: counter(product-counter, decimal-leading-zero);
+  display: block;
+  font-size: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: rgba(35, 31, 32, 0.22);
+  margin-bottom: 0.35rem;
+  text-align: right;
 }
 
 .product-card-price-original {
@@ -1950,6 +1991,52 @@ aside .cart-empty {
   padding-bottom: 0;
 }
 
+/* ── Events Hero ─────────────────────────────────────────────────── */
+.events-hero {
+  background: var(--color-ars-dark);
+  color: var(--color-ars-cream);
+  padding: 5rem 0 4rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.events-hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--color-ars-red);
+}
+
+.events-hero-eyebrow {
+  display: block;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--color-ars-red);
+  margin-bottom: 1rem;
+}
+
+.events-hero-title {
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--color-ars-cream);
+  margin: 0 0 1.5rem;
+}
+
+.events-hero-lead {
+  font-size: 1.0625rem;
+  color: rgba(247, 234, 215, 0.65);
+  max-width: 480px;
+  line-height: 1.7;
+}
+
 .events-upcoming-section {
   padding: var(--spacing-section-mobile) 0;
 }
@@ -1965,9 +2052,9 @@ aside .cart-empty {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.2em;
-  color: var(--color-text-muted);
+  color: var(--color-ars-red);
   margin-bottom: 2.5rem;
-  text-align: center;
+  text-align: left;
 }
 
 .events-empty {
@@ -2755,126 +2842,216 @@ aside .cart-empty {
   padding-bottom: 0;
 }
 
+/* ── About Hero — dark editorial ──────────────────────────────────── */
 .about-hero {
-  text-align: center;
-  padding: 4rem 2rem;
-  background-color: var(--color-background-alt);
-}
-
-@media (min-width: 768px) {
-  .about-hero {
-    padding: 6rem 2rem;
-  }
-}
-
-.about-hero h1 {
-  margin-bottom: 1rem;
-}
-
-.about-hero-subtitle {
-  font-size: 1.25rem;
-  color: var(--color-text-muted);
-}
-
-.about-story {
-  display: grid;
-  gap: 3rem;
-  align-items: center;
-}
-
-@media (min-width: 768px) {
-  .about-story {
-    grid-template-columns: 1fr 1fr;
-    gap: 4rem;
-  }
-}
-
-.about-story-content h2 {
-  margin-bottom: 1.5rem;
-}
-
-.about-story-content p {
-  font-size: 1.0625rem;
-  color: var(--color-text-muted);
-  line-height: 1.8;
-  margin-bottom: 1.5rem;
-}
-
-.about-story-image {
-  aspect-ratio: 4/3;
+  background: var(--color-ars-dark);
+  color: var(--color-ars-cream);
+  padding: 5rem 0 4rem;
+  position: relative;
   overflow: hidden;
 }
 
-.about-story-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.about-hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--color-ars-red);
 }
 
-.about-values-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 2rem;
+.about-hero-eyebrow {
+  display: block;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--color-ars-red);
+  margin-bottom: 1rem;
 }
 
-@media (min-width: 640px) {
-  .about-values-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.about-hero-title {
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--color-ars-cream);
+  margin: 0 0 1.5rem;
 }
 
-@media (min-width: 1024px) {
-  .about-values-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-.about-value {
-  text-align: center;
-  padding: 2rem;
-  background: var(--color-ars-cream-dark);
-}
-
-.about-value-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 64px;
-  height: 64px;
-  margin: 0 auto 1.5rem;
-  color: var(--color-primary);
-}
-
-.about-value h3 {
-  font-size: 1.125rem;
-  margin-bottom: 0.75rem;
-}
-
-.about-value p {
-  font-size: 0.9375rem;
-  color: var(--color-text-muted);
+.about-hero-lead {
+  font-size: 1.0625rem;
+  color: rgba(247, 234, 215, 0.65);
+  max-width: 480px;
   line-height: 1.7;
 }
 
-.about-team-cta {
+/* ── Manifesto ────────────────────────────────────────────────────── */
+.about-manifesto {
+  max-width: 56ch;
+  margin: 0 auto;
   text-align: center;
 }
 
+.about-manifesto-text {
+  font-size: clamp(1.0625rem, 2vw, 1.3125rem);
+  font-weight: 400;
+  line-height: 1.9;
+  color: var(--color-text);
+}
+
+/* ── Technique Callout — dark ─────────────────────────────────────── */
+.about-technique {
+  background-color: var(--color-ars-dark);
+  padding: var(--spacing-section-mobile) 0;
+  color: var(--color-ars-cream);
+}
+
+@media (min-width: 768px) {
+  .about-technique {
+    padding: var(--spacing-section) 0;
+  }
+}
+
+.about-technique-inner {
+  display: grid;
+  gap: 2.5rem;
+}
+
+@media (min-width: 768px) {
+  .about-technique-inner {
+    grid-template-columns: 1fr 1.6fr;
+    gap: 5rem;
+    align-items: start;
+  }
+}
+
+.about-technique-label {
+  display: block;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--color-ars-red);
+  margin-bottom: 1rem;
+}
+
+.about-technique h2 {
+  font-size: clamp(1.375rem, 3vw, 2rem);
+  font-weight: 700;
+  color: var(--color-ars-cream);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.about-technique-answer p {
+  font-size: 1rem;
+  line-height: 1.85;
+  color: rgba(247, 234, 215, 0.72);
+  margin: 0;
+}
+
+/* ── Personal Statement + Timeline ───────────────────────────────── */
+.about-statement {
+  max-width: 62ch;
+}
+
+.about-statement > p {
+  font-size: 1.0625rem;
+  line-height: 1.85;
+  color: var(--color-text-muted);
+  margin-bottom: 3rem;
+}
+
+.about-timeline {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+  border-top: 1px solid rgba(35, 31, 32, 0.12);
+  padding-top: 2rem;
+}
+
+.about-timeline-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.about-timeline-year {
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--color-ars-red);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin-bottom: 0.4rem;
+}
+
+.about-timeline-desc {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  line-height: 1.5;
+}
+
+.about-timeline-divider {
+  width: 1px;
+  height: 3rem;
+  background: rgba(35, 31, 32, 0.15);
+  margin-top: 0.25rem;
+  align-self: flex-start;
+}
+
+/* ── Mission Quote ────────────────────────────────────────────────── */
+.about-mission {
+  background-color: var(--color-ars-cream-dark);
+  padding: 5rem 0 6rem;
+}
+
+.about-mission-quote {
+  font-size: clamp(1.1875rem, 2.5vw, 1.625rem);
+  font-weight: 400;
+  line-height: 1.65;
+  color: var(--color-text);
+  text-align: center;
+  max-width: 44ch;
+  margin: 0 auto;
+  font-style: italic;
+  position: relative;
+  padding: 0;
+}
+
+.about-mission-quote::before {
+  content: '\201C';
+  display: block;
+  font-size: 5rem;
+  font-weight: 900;
+  color: var(--color-ars-red);
+  opacity: 0.18;
+  line-height: 0.8;
+  margin-bottom: 0.5rem;
+  font-style: normal;
+}
+
+/* ── Bottom CTA ───────────────────────────────────────────────────── */
 .about-contact-cta {
   background-color: var(--color-ars-dark);
-  color: white;
+  color: var(--color-ars-cream);
   text-align: center;
   padding: 5rem 2rem;
 }
 
 .about-contact-cta h2 {
-  margin-bottom: 0.5rem;
+  color: var(--color-ars-cream);
+  margin-bottom: 0.75rem;
 }
 
 .about-contact-cta p {
-  opacity: 0.8;
-  margin-bottom: 1.5rem;
-  max-width: 500px;
+  color: rgba(247, 234, 215, 0.65);
+  margin-bottom: 2rem;
+  max-width: 400px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -2887,24 +3064,58 @@ aside .cart-empty {
 }
 
 .contact-hero {
-  text-align: center;
-  padding: 4rem 2rem;
-  background-color: var(--color-background-alt);
+  background: var(--color-ars-dark);
+  color: var(--color-ars-cream);
+  padding: 5rem 0 4rem;
+  position: relative;
+  overflow: hidden;
 }
 
-@media (min-width: 768px) {
-  .contact-hero {
-    padding: 6rem 2rem;
-  }
+.contact-hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--color-ars-red);
 }
 
-.contact-hero h1 {
+.contact-hero-eyebrow {
+  display: block;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--color-ars-red);
   margin-bottom: 1rem;
 }
 
-.contact-hero-subtitle {
-  font-size: 1.25rem;
-  color: var(--color-text-muted);
+.contact-hero-title {
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--color-ars-cream);
+  margin: 0 0 1.5rem;
+}
+
+.contact-hero-lead {
+  font-size: 1.0625rem;
+  color: rgba(247, 234, 215, 0.65);
+  line-height: 1.7;
+}
+
+.contact-faq-section {
+  padding: var(--spacing-section-mobile) 0;
+  background-color: var(--color-ars-cream-dark);
+}
+
+@media (min-width: 768px) {
+  .contact-faq-section {
+    padding: var(--spacing-section) 0;
+  }
 }
 
 .contact-grid {
@@ -5880,44 +6091,86 @@ button.reset {
 .collections-editorial {
   background-color: var(--color-ars-dark);
   min-height: 60vh;
-  padding: var(--spacing-section-mobile) 0;
+  padding: 0 0 var(--spacing-section-mobile);
 }
 
 @media (min-width: 768px) {
   .collections-editorial {
-    padding: var(--spacing-section) 0;
+    padding-bottom: var(--spacing-section);
   }
 }
 
-.collections-editorial-header {
-  text-align: center;
-  margin-bottom: 3rem;
+/* Dark editorial hero — same pattern as artists */
+.collections-hero {
+  background: var(--color-ars-dark);
+  color: var(--color-ars-cream);
+  padding: 5rem 0 4rem;
+  margin-bottom: 3.5rem;
+  position: relative;
+  overflow: hidden;
 }
 
-.collections-editorial-label {
+.collections-hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--color-ars-red);
+}
+
+.collections-hero-eyebrow {
   display: block;
-  font-size: 0.6875rem;
+  font-size: 0.625rem;
   font-weight: 700;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.28em;
   text-transform: uppercase;
   color: var(--color-ars-red);
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
 }
 
-.collections-editorial-header h1 {
-  color: white;
-  margin: 0;
+.collections-hero-title {
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--color-ars-cream);
+  margin: 0 0 1.5rem;
 }
 
+.collections-hero-lead {
+  font-size: 1.0625rem;
+  color: rgba(247, 234, 215, 0.65);
+  max-width: 520px;
+  line-height: 1.7;
+}
+
+/* Grid with featured first card */
 .collections-editorial-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1.25rem;
+  counter-reset: collection-counter;
 }
 
 @media (min-width: 640px) {
   .collections-editorial-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* First card spans full width as featured */
+  .collections-editorial-grid > *:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .collections-editorial-grid > *:first-child .collection-drop-card {
+    aspect-ratio: 21 / 9;
+  }
+
+  .collections-editorial-grid > *:first-child .collection-drop-title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
   }
 }
 
@@ -5925,4 +6178,22 @@ button.reset {
   .collections-editorial-grid {
     gap: 1.75rem;
   }
+}
+
+/* Catalog counter on collection cards */
+.collection-drop-card {
+  counter-increment: collection-counter;
+}
+
+.collection-drop-card::before {
+  content: counter(collection-counter, decimal-leading-zero);
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: rgba(247, 234, 215, 0.45);
+  z-index: 2;
+  font-family: inherit;
 }

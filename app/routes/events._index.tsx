@@ -45,6 +45,16 @@ export default function EventsIndex() {
 
   return (
     <div className="events-page">
+      <section className="events-hero">
+        <div className="container">
+          <span className="events-hero-eyebrow">Ars Mosoris</span>
+          <h1 className="events-hero-title">Események</h1>
+          <p className="events-hero-lead">
+            Találkozz velünk személyesen — popup shopok, kiállítások, közösségi alkalmak.
+          </p>
+        </div>
+      </section>
+
       <section className="events-upcoming-section">
         <div className="container">
           <p className="events-section-label">Közelgő események</p>

@@ -7,17 +7,6 @@ export async function loader({context}: Route.LoaderArgs) {
   const {env} = context;
   return {
     contactEmail: env.CONTACT_EMAIL,
-    storeAddress: env.STORE_ADDRESS,
-    storeCity: env.STORE_CITY,
-    storePostalCode: env.STORE_POSTAL_CODE,
-    storeCountry: env.STORE_COUNTRY,
-    storeMapLat: env.STORE_MAP_LAT,
-    storeMapLng: env.STORE_MAP_LNG,
-    storeHours: {
-      weekday: env.STORE_HOURS_WEEKDAY,
-      saturday: env.STORE_HOURS_SATURDAY,
-      sunday: env.STORE_HOURS_SUNDAY,
-    },
     instagramUrl: env.INSTAGRAM_URL,
     facebookUrl: env.FACEBOOK_URL,
     tiktokUrl: env.TIKTOK_URL,
@@ -118,40 +107,26 @@ export default function Contact() {
   const navigation = useNavigation();
   const isSubmitting = navigation.state === 'submitting';
   const [submitted, setSubmitted] = useState(false);
-  const [hoursOpen, setHoursOpen] = useState(false);
 
   if (actionData?.success && !submitted) {
     setSubmitted(true);
   }
 
-  // Use env variables with fallbacks
   const contactEmail = loaderData?.contactEmail || EMAIL;
-  const storeAddress = loaderData?.storeAddress || 'Kiss Ernő u. 4';
-  const storeCity = loaderData?.storeCity || 'Budapest';
-  const storePostalCode = loaderData?.storePostalCode || '1046';
-  const storeCountry = loaderData?.storeCountry || 'Magyarország';
-  const storeMapLat = loaderData?.storeMapLat || '47.555';
-  const storeMapLng = loaderData?.storeMapLng || '19.085';
-  const storeHours = loaderData?.storeHours || {weekday: '10:00 – 16:00', saturday: '10:00 – 14:00', sunday: 'Zárva'};
   const socialLinks = {
     instagram: loaderData?.instagramUrl || SOCIAL_LINKS.instagram,
     facebook: loaderData?.facebookUrl || SOCIAL_LINKS.facebook,
     tiktok: loaderData?.tiktokUrl || SOCIAL_LINKS.tiktok,
   };
 
-  const today = new Date().getDay();
-  const todayHours = today === 0 ? storeHours.sunday : today === 6 ? storeHours.saturday : storeHours.weekday;
-  const isOpen = todayHours !== 'Zárva';
-
   return (
     <div className="contact-page">
       {/* Hero section */}
       <section className="contact-hero">
         <div className="container">
-          <h1>Kapcsolat</h1>
-          <p className="contact-hero-subtitle">
-            Szívesen hallanánk rólad
-          </p>
+          <span className="contact-hero-eyebrow">Ars Mosoris</span>
+          <h1 className="contact-hero-title">Kapcsolat</h1>
+          <p className="contact-hero-lead">Szívesen hallanánk rólad</p>
         </div>
       </section>
 
@@ -317,62 +292,8 @@ export default function Contact() {
         </div>
       </section>
 
-      {/* Physical store section */}
-      <section className="section store-section">
-        <div className="container">
-          <div className="store-content">
-            <p className="store-label">ELÉRHETŐSÉGEK</p>
-            <h2 className="store-heading">A WEBSHOPON TUDOD ELÉRNI A TERMÉKEINKET</h2>
-            <p className="store-description">
-              Nyitvatartási időben az Ars Mosoris csapatának tagjai személyesen tudnak segíteni neked az artistic clothing és a contemporary fashion világában!
-            </p>
-            <p className="store-address">{storeCity}, {storeAddress}, {storePostalCode} {storeCountry}</p>
-            <p className="store-email"><a href={`mailto:${contactEmail}`}>{contactEmail}</a></p>
-
-            <div className="store-hours">
-              <h3 className="store-hours-heading">NYITVATARTÁS</h3>
-              <button className="store-hours-toggle" onClick={() => setHoursOpen(!hoursOpen)}>
-                <span>{isOpen ? 'Open today' : 'Vasárnap'}</span>
-                {isOpen && <span className="store-hours-time">{todayHours}</span>}
-                {!isOpen && <span className="store-hours-time">Zárva</span>}
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={hoursOpen ? 'store-chevron-open' : ''}>
-                  <polyline points="6 9 12 15 18 9" />
-                </svg>
-              </button>
-              {hoursOpen && (
-                <div className="store-hours-list">
-                  <div className="store-hours-row"><span>Hétfő – Péntek</span><span>{storeHours.weekday}</span></div>
-                  <div className="store-hours-row"><span>Szombat</span><span>{storeHours.saturday}</span></div>
-                  <div className="store-hours-row store-hours-closed"><span>Vasárnap</span><span>{storeHours.sunday}</span></div>
-                </div>
-              )}
-              <p className="store-hours-note">A webshop non-stop működik!</p>
-            </div>
-
-            <a href="#contact-form" className="btn btn-primary store-cta">
-              Üzenj nekünk!
-            </a>
-          </div>
-
-          <div className="store-map">
-            <iframe
-              src={`https://www.openstreetmap.org/export/embed.html?bbox=${parseFloat(storeMapLng) - 0.01}%2C${parseFloat(storeMapLat) - 0.005}%2C${parseFloat(storeMapLng) + 0.01}%2C${parseFloat(storeMapLat) + 0.005}&layer=mapnik&marker=${storeMapLat}%2C${storeMapLng}`}
-              width="100%"
-              height="550"
-              style={{border: 0}}
-              allowFullScreen={true}
-              loading="lazy"
-              title="Ars Mosoris bolt helyszíne"
-            />
-            <p className="store-map-attribution">
-              &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors
-            </p>
-          </div>
-        </div>
-      </section>
-
       {/* FAQ section */}
-      <section className="section" style={{backgroundColor: 'var(--color-background-alt)'}}>
+      <section className="contact-faq-section">
         <div className="container">
           <div className="text-center mb-8">
             <h2>Gyakori kérdések</h2>
