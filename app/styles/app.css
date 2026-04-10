@@ -867,20 +867,26 @@ aside main {
 
 /* ── Product card info — museum/gallery label style ───────────────── */
 .product-card-info {
-  padding: 0.875rem 0 0;
+  padding: 0.75rem 0 0;
   border-top: 2px solid var(--color-ars-dark);
   display: flex;
-  flex-direction: column;
-  gap: 0;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  transition: border-top-color 0.28s ease;
 }
 
-/* Title — italic like a gallery work title, block with underline-on-hover */
+.product-card:hover .product-card-info {
+  border-top-color: var(--color-ars-red);
+}
+
+/* Title — italic like a gallery work title, with underline-on-hover */
 .product-card-title {
   display: block;
   font-size: 0.9375rem;
   font-weight: 600;
   font-style: italic;
-  margin-bottom: 0.6rem;
   color: var(--color-text);
   line-height: 1.25;
   position: relative;
@@ -897,13 +903,15 @@ aside main {
   background-size: 100% 1px;
 }
 
-/* Price — small, right-aligned, muted */
+/* Price — small, right-aligned, muted — anchored to the right of the label row */
 .product-card-price {
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   font-style: normal;
   color: var(--color-text-muted);
   letter-spacing: 0.04em;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .product-card-price-sale {
