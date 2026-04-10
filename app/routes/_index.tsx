@@ -152,15 +152,44 @@ function HeroSection() {
       <div className="hero-background" />
       <div className="hero-overlay" />
       <div className="hero-content">
-        <h1 className="hero-title">Ars Mosoris</h1>
+        
+        <h1 className="hero-title">
+          <span className="hero-title-line">Ars</span>
+          <span className="hero-title-line hero-title-line--indent">Mosoris</span>
+        </h1>
+        <div className="hero-divider" />
         <p className="hero-subtitle">Ahol a művészet viselhetővé válik</p>
         <div className="hero-cta">
           <Link to="/collections/all" className="btn btn-primary">
             Shop megtekintése
           </Link>
-          <Link to="/artists" className="btn btn-outline" style={{color: 'var(--color-ars-cream)', borderColor: 'rgba(247,234,215,0.5)'}}>
+          <Link to="/artists" className="btn btn-outline hero-btn-ghost">
             Alkotóink
           </Link>
+        </div>
+      </div>
+      <div className="hero-marquee-track">
+        <div className="hero-marquee" aria-hidden="true">
+          <span>Kortárs Művészet</span>
+          <span className="hero-marquee-dot">◆</span>
+          <span>Magyar Design</span>
+          <span className="hero-marquee-dot">◆</span>
+          <span>Egyedi Ruházat</span>
+          <span className="hero-marquee-dot">◆</span>
+          <span>Képzőművészet</span>
+          <span className="hero-marquee-dot">◆</span>
+          <span>Kézzel Készített</span>
+          <span className="hero-marquee-dot">◆</span>
+          <span>Kortárs Művészet</span>
+          <span className="hero-marquee-dot">◆</span>
+          <span>Magyar Design</span>
+          <span className="hero-marquee-dot">◆</span>
+          <span>Egyedi Ruházat</span>
+          <span className="hero-marquee-dot">◆</span>
+          <span>Képzőművészet</span>
+          <span className="hero-marquee-dot">◆</span>
+          <span>Kézzel Készített</span>
+          <span className="hero-marquee-dot">◆</span>
         </div>
       </div>
     </section>

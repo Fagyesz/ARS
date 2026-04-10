@@ -41,12 +41,20 @@ export default function Collections() {
   return (
     <div className="collections-editorial">
       <section className="collections-hero">
+        <div className="collections-hero-bg-num" aria-hidden="true">K</div>
         <div className="container">
-          <span className="collections-hero-eyebrow">Ars Mosoris</span>
-          <h1 className="collections-hero-title">Kollekciók</h1>
-          <p className="collections-hero-lead">
-            Minden kollekcióban egy-egy alkotói világ — válogatott sorozataink képzőművészeti technikákkal készült ruhadarabokból.
-          </p>
+          <div className="collections-hero-inner">
+            <div className="collections-hero-meta">
+              <span className="collections-hero-eyebrow">Ars Mosoris</span>
+              <span className="collections-hero-meta-sep" />
+              <span className="collections-hero-count">Kollekciók</span>
+            </div>
+            <h1 className="collections-hero-title">Válo&shy;gatott<br />Sorozataink</h1>
+            <div className="collections-hero-rule" />
+            <p className="collections-hero-lead">
+              Minden kollekcióban egy alkotói világ — képzőművészeti technikákkal készült, egyedi ruhadarabok.
+            </p>
+          </div>
         </div>
       </section>
       <div className="container">
