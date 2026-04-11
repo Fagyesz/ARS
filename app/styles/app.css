@@ -1962,7 +1962,7 @@ aside .cart-empty {
 
 .artist-page-card-content {
   text-align: left;
-  padding: 1.125rem 0 1rem;
+  padding: 1.125rem 1rem 1rem;
   border-top: 2px solid var(--color-ars-dark);
 }
 
