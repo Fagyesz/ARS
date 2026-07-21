@@ -12,15 +12,6 @@ declare global {
     FROM_EMAIL: string;
     CONTACT_EMAIL: string;
     STORE_NAME: string;
-    STORE_ADDRESS: string;
-    STORE_CITY: string;
-    STORE_POSTAL_CODE: string;
-    STORE_COUNTRY: string;
-    STORE_MAP_LAT: string;
-    STORE_MAP_LNG: string;
-    STORE_HOURS_WEEKDAY: string;
-    STORE_HOURS_SATURDAY: string;
-    STORE_HOURS_SUNDAY: string;
     INSTAGRAM_URL: string;
     FACEBOOK_URL: string;
     TIKTOK_URL: string;

@@ -10,12 +10,6 @@ interface FooterProps {
   env?: {
     contactEmail: string;
     storeName: string;
-    storeAddress: string;
-    storeCity: string;
-    storePostalCode: string;
-    storeCountry: string;
-    storeMapLat: string;
-    storeMapLng: string;
     instagramUrl: string;
     facebookUrl: string;
     tiktokUrl: string;
