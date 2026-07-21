@@ -240,9 +240,8 @@ export default function Product() {
                 />
                 {!selectedVariant?.availableForSale && (
                   <BackInStockForm
-                    productTitle={title}
+                    productHandle={product.handle}
                     variantTitle={selectedVariant?.title ?? ''}
-                    productUrl={canonicalUrl}
                   />
                 )}
               </div>
@@ -498,13 +497,11 @@ function RecentlyViewedStrip({items}: {items: RecentProduct[]}) {
 }
 
 function BackInStockForm({
-  productTitle,
+  productHandle,
   variantTitle,
-  productUrl,
 }: {
-  productTitle: string;
+  productHandle: string;
   variantTitle: string;
-  productUrl: string;
 }) {
   const fetcher = useFetcher<{success: boolean; error?: string}>();
   const submitted = fetcher.data?.success === true;
@@ -523,9 +520,8 @@ function BackInStockForm({
 
   return (
     <fetcher.Form method="post" action="/api/back-in-stock" className="back-in-stock-form">
-      <input type="hidden" name="productTitle" value={productTitle} />
+      <input type="hidden" name="handle" value={productHandle} />
       <input type="hidden" name="variantTitle" value={variantTitle} />
-      <input type="hidden" name="productUrl" value={productUrl} />
       <p className="back-in-stock-label">Értesítést kérek, ha ismét elérhető:</p>
       <div className="back-in-stock-row">
         <input
