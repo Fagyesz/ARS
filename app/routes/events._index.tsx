@@ -9,7 +9,7 @@ export const meta: Route.MetaFunction = () => {
     {property: 'og:type', content: 'website'},
     {property: 'og:title', content: 'Események | Ars Mosoris'},
     {property: 'og:description', content: 'Ars Mosoris események, popup shopok és kiállítások. Találkozz velünk személyesen!'},
-    {property: 'og:image', content: 'https://arsmosoris.vincze.app/og-default.png'},
+    {property: 'og:image', content: 'https://new.arsmosoris.art/og-default.png'},
     {name: 'twitter:card', content: 'summary_large_image'},
   ];
 };

@@ -172,8 +172,8 @@ export function Layout({children}: {children?: React.ReactNode}) {
               '@context': 'https://schema.org',
               '@type': 'Organization',
               name: 'Ars Mosoris',
-              url: 'https://arsmosoris.vincze.app',
-              logo: 'https://arsmosoris.vincze.app/og-default.png',
+              url: 'https://new.arsmosoris.art',
+              logo: 'https://new.arsmosoris.art/og-default.png',
             }),
           }}
         />

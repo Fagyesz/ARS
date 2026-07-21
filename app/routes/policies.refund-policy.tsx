@@ -36,7 +36,7 @@ export default function RefundPolicy() {
           <ol>
             <li>
               Küldj e-mailt a{' '}
-              <a href="mailto:arsmosoris@vincze.app">arsmosoris@vincze.app</a>{' '}
+              <a href="mailto:arsmosoris@gmail.com">arsmosoris@gmail.com</a>{' '}
               címre a megrendelésed számával és a visszaküldeni kívánt termék(ek) megjelölésével.
             </li>
             <li>
@@ -74,7 +74,7 @@ export default function RefundPolicy() {
           <h2>Hibás termék</h2>
           <p>
             Ha hibás vagy sérült terméket kaptál, kérjük, fotókkal együtt jelezd nekünk a{' '}
-            <a href="mailto:arsmosoris@vincze.app">arsmosoris@vincze.app</a>{' '}
+            <a href="mailto:arsmosoris@gmail.com">arsmosoris@gmail.com</a>{' '}
             e-mail-címen. Ilyenkor ingyenes cserét vagy teljes visszatérítést biztosítunk, és a
             postaköltséget is mi álljuk.
           </p>
@@ -91,7 +91,7 @@ export default function RefundPolicy() {
           <h3>Kérdésed van a visszaküldéssel kapcsolatban?</h3>
           <p>Írj nekünk, segítünk eligazodni!</p>
           <p>
-            <a href="mailto:arsmosoris@vincze.app">arsmosoris@vincze.app</a>
+            <a href="mailto:arsmosoris@gmail.com">arsmosoris@gmail.com</a>
           </p>
         </div>
       </div>

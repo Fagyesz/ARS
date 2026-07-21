@@ -58,7 +58,7 @@ export default function ShippingPolicy() {
             Jelenleg csak Magyarország területén szállítunk. Európai szállításra vonatkozó
             igényeket esetileg mérlegelünk – ha érdekel, kérjük, vedd fel velünk a kapcsolatot
             a{' '}
-            <a href="mailto:arsmosoris@vincze.app">arsmosoris@vincze.app</a> e-mail-címen.
+            <a href="mailto:arsmosoris@gmail.com">arsmosoris@gmail.com</a> e-mail-címen.
           </p>
 
           <h2>Csomagolás</h2>
@@ -71,7 +71,7 @@ export default function ShippingPolicy() {
           <p>
             Ha sérült csomagot kapsz, kérjük, a futár jelenlétében rögzítsd a sérülést (fotóval),
             és haladéktalanul jelezd felénk a{' '}
-            <a href="mailto:arsmosoris@vincze.app">arsmosoris@vincze.app</a> címen.
+            <a href="mailto:arsmosoris@gmail.com">arsmosoris@gmail.com</a> címen.
             Ilyenkor cseredarabot vagy visszatérítést biztosítunk.
           </p>
         </div>
@@ -80,7 +80,7 @@ export default function ShippingPolicy() {
           <h3>Kérdésed van a szállítással kapcsolatban?</h3>
           <p>Írj nekünk, szívesen segítünk!</p>
           <p>
-            <a href="mailto:arsmosoris@vincze.app">arsmosoris@vincze.app</a>
+            <a href="mailto:arsmosoris@gmail.com">arsmosoris@gmail.com</a>
           </p>
         </div>
       </div>
