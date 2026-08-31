@@ -14,5 +14,8 @@ export const SOCIAL_LINKS = {
 
 export const COLLECTION_TYPES = [
   {label: 'Pólók', value: 'polo'},
+  {label: 'Pulóverek', value: 'pulover'},
+  {label: 'Nadrágok', value: 'nadrag'},
+  {label: 'Kabátok', value: 'kabat'},
   {label: 'Táskák', value: 'taska'},
 ];
