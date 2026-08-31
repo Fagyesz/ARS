@@ -1655,7 +1655,7 @@ interface GeneratedQueryTypes {
 }
 
 interface GeneratedMutationTypes {
-  '#graphql\n  mutation customerCreate($input: CustomerCreateInput!) @inContext(language: HU) {\n    customerCreate(input: $input) {\n      customer { id }\n      customerUserErrors { code field message }\n    }\n  }\n': {
+  '#graphql\n  mutation customerCreate($input: CustomerCreateInput!) {\n    customerCreate(input: $input) {\n      customer { id }\n      customerUserErrors { code field message }\n    }\n  }\n': {
     return: CustomerCreateMutation;
     variables: CustomerCreateMutationVariables;
   };
