@@ -26,9 +26,9 @@ export default function TermsOfService() {
             <br />
             Székhely: 1046 Budapest, Kiss Ernő u. 4.
             <br />
-            E-mail: <a href="mailto:arsmosoris@vincze.app">arsmosoris@vincze.app</a>
+            E-mail: <a href="mailto:arsmosoris@gmail.com">arsmosoris@gmail.com</a>
             <br />
-            Weboldal: <a href="https://arsmosoris.vincze.app">arsmosoris.vincze.app</a>
+            Weboldal: <a href="https://new.arsmosoris.art">new.arsmosoris.art</a>
           </p>
 
           <h2>2. Az ÁSZF hatálya</h2>
@@ -90,7 +90,7 @@ export default function TermsOfService() {
             A Polgári Törvénykönyv és a 151/2003. (IX. 22.) Korm. rendelet alapján a
             termékek hibájáért kellékszavatossággal és termékszavatossággal tartozunk. Ha
             hibás terméket kaptál, kérjük, vedd fel velünk a kapcsolatot a{' '}
-            <a href="mailto:arsmosoris@vincze.app">arsmosoris@vincze.app</a>{' '}
+            <a href="mailto:arsmosoris@gmail.com">arsmosoris@gmail.com</a>{' '}
             e-mail-címen.
           </p>
 
@@ -110,7 +110,7 @@ export default function TermsOfService() {
 
           <h2>11. Panaszkezelés</h2>
           <p>
-            Panaszaidat a <a href="mailto:arsmosoris@vincze.app">arsmosoris@vincze.app</a>{' '}
+            Panaszaidat a <a href="mailto:arsmosoris@gmail.com">arsmosoris@gmail.com</a>{' '}
             e-mail-címen fogadjuk. Panaszaid kezelésére 30 napon belül reagálunk. Ha a
             panasz rendezése nem sikerül, a{' '}
             <strong>Budapesti Békéltető Testülethez</strong> fordulhatsz
@@ -129,7 +129,7 @@ export default function TermsOfService() {
           <h3>Kérdésed van az ÁSZF-fel kapcsolatban?</h3>
           <p>Írj nekünk, szívesen segítünk!</p>
           <p>
-            <a href="mailto:arsmosoris@vincze.app">arsmosoris@vincze.app</a>
+            <a href="mailto:arsmosoris@gmail.com">arsmosoris@gmail.com</a>
           </p>
         </div>
       </div>

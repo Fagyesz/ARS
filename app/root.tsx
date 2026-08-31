@@ -94,12 +94,6 @@ export async function loader(args: Route.LoaderArgs) {
     env: {
       contactEmail: env.CONTACT_EMAIL,
       storeName: env.STORE_NAME,
-      storeAddress: env.STORE_ADDRESS,
-      storeCity: env.STORE_CITY,
-      storePostalCode: env.STORE_POSTAL_CODE,
-      storeCountry: env.STORE_COUNTRY,
-      storeMapLat: env.STORE_MAP_LAT,
-      storeMapLng: env.STORE_MAP_LNG,
       instagramUrl: env.INSTAGRAM_URL,
       facebookUrl: env.FACEBOOK_URL,
       tiktokUrl: env.TIKTOK_URL,
@@ -178,8 +172,8 @@ export function Layout({children}: {children?: React.ReactNode}) {
               '@context': 'https://schema.org',
               '@type': 'Organization',
               name: 'Ars Mosoris',
-              url: 'https://arsmosoris.vincze.app',
-              logo: 'https://arsmosoris.vincze.app/og-default.png',
+              url: 'https://new.arsmosoris.art',
+              logo: 'https://new.arsmosoris.art/og-default.png',
             }),
           }}
         />

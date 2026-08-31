@@ -26,7 +26,7 @@ export default function PrivacyPolicy() {
             <br />
             Székhely: 1046 Budapest, Kiss Ernő u. 4.
             <br />
-            E-mail: <a href="mailto:arsmosoris@vincze.app">arsmosoris@vincze.app</a>
+            E-mail: <a href="mailto:arsmosoris@gmail.com">arsmosoris@gmail.com</a>
           </p>
           <p>
             Az Ars Mosoris elkötelezett az érintettek személyes adatainak védelme iránt, és
@@ -115,7 +115,7 @@ export default function PrivacyPolicy() {
             </li>
           </ul>
           <p>
-            Kéréseidet a <a href="mailto:arsmosoris@vincze.app">arsmosoris@vincze.app</a>{' '}
+            Kéréseidet a <a href="mailto:arsmosoris@gmail.com">arsmosoris@gmail.com</a>{' '}
             e-mail-címen fogadjuk, és 30 napon belül válaszolunk.
           </p>
 
@@ -138,7 +138,7 @@ export default function PrivacyPolicy() {
           <h3>Adatvédelemmel kapcsolatos megkeresések</h3>
           <p>Kérdés vagy adatigénylés esetén írj nekünk:</p>
           <p>
-            <a href="mailto:arsmosoris@vincze.app">arsmosoris@vincze.app</a>
+            <a href="mailto:arsmosoris@gmail.com">arsmosoris@gmail.com</a>
           </p>
         </div>
       </div>
