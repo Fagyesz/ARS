@@ -5607,7 +5607,8 @@ button.reset {
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: 200;
+  /* above header (50) and sticky bar (40), but below the drawers (100) so an open cart is never covered */
+  z-index: 90;
   background: var(--color-ars-dark);
   color: var(--color-background);
   padding: 1.25rem 1.5rem;
