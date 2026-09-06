@@ -189,20 +189,24 @@ type ImageRef = {image?: {url: string; width?: number | null; height?: number | 
 
 export function toArtist(node: MetaobjectNode): Artist {
   const f = fieldMap(node.fields);
+  const handle = f.slug || node.handle;
   const portraitField = node.fields.find((x) => x.key === 'portrait');
   const image = (portraitField?.reference as ImageRef | undefined)?.image;
   const sep = image?.url.includes('?') ? '&' : '?';
+  // no portrait uploaded to Shopify yet: keep the built-in photo for that artist
+  const builtIn = ARTISTS.find((a) => a.handle === handle);
   return {
-    handle: f.slug || node.handle,
+    handle,
     name: f.name || node.handle,
     fullName: f.full_name || f.name || node.handle,
     role: f.role || 'Képzőművész',
     bio: f.bio || '',
     statement: f.statement || f.bio || '',
     instagram: f.instagram,
-    collectionHandle: f.slug || node.handle,
+    collectionHandle: handle,
     vendor: f.vendor || f.name,
-    image: image?.url,
+    image: image?.url ?? builtIn?.image,
+    imageSize: image ? undefined : builtIn?.imageSize,
     portrait: image
       ? {
           src: `${image.url}${sep}width=960`,

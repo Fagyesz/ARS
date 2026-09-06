@@ -203,10 +203,12 @@ async function ensureMenu(handle, title, items) {
 (async () => {
   TOKEN = await token();
   const scopes = (await gql('{ currentAppInstallation { accessScopes { handle } } }')).currentAppInstallation.accessScopes.map((s) => s.handle);
-  const need = ['write_metaobject_definitions', 'write_metaobjects', 'write_online_store_navigation', 'write_files'];
+  const need = ['write_metaobject_definitions', 'write_metaobjects', 'write_online_store_navigation'];
   const missing = need.filter((s) => !scopes.includes(s));
-  console.log(APPLY ? 'APPLY' : 'DRY RUN', '| scopes missing:', missing.length ? missing.join(', ') : 'none');
-  console.log(`plan: ${DEFINITIONS.length} definitions + custom.size_guide metafield, 1 settings entry, ${SIZE_GUIDES.length} size guides, ${ARTISTS.length} artists (+portraits), 2 menus`);
+  // portraits are optional: without write_files the storefront keeps its built-in photos
+  const canUpload = scopes.includes('write_files');
+  console.log(APPLY ? 'APPLY' : 'DRY RUN', '| scopes missing:', missing.length ? missing.join(', ') : 'none', '| portraits:', canUpload ? 'upload' : 'skipped (no write_files)');
+  console.log(`plan: ${DEFINITIONS.length} definitions + custom.size_guide metafield, 1 settings entry, ${SIZE_GUIDES.length} size guides, ${ARTISTS.length} artists, 2 menus`);
   if (!APPLY) return;
   if (missing.length) throw new Error('add the missing scopes to the custom app first: ' + missing.join(', '));
 
@@ -229,7 +231,7 @@ async function ensureMenu(handle, title, items) {
   for (const g of SIZE_GUIDES) { const {handle, ...fields} = g; await upsert('size_guide', handle, fields); }
   for (const a of ARTISTS) {
     const {handle, ...fields} = a;
-    const portrait = await uploadPortrait(handle);
+    const portrait = canUpload ? await uploadPortrait(handle) : undefined;
     await upsert('artist', handle, {...fields, slug: handle, portrait});
   }
 
