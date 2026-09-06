@@ -2,11 +2,11 @@
 //   - metaobject definitions shop_settings / size_guide / artist (+ product metafield custom.size_guide)
 //   - one shop_settings entry, three size guides, four artists (portraits uploaded to Files)
 //   - navigation menus hydrogen-main and hydrogen-footer
-// Run from the repo root: node scripts/seed-content.js [--apply]
+// Run from the repo root: node scripts/seed-content.cjs [--apply]
 // Needs custom-app scopes: write_metaobject_definitions, write_metaobjects,
 // write_online_store_navigation, write_files (+ the existing write_products).
-//   node seed-content.js          dry run (checks scopes, prints the plan)
-//   node seed-content.js --apply  create/update everything
+//   node scripts/seed-content.cjs          dry run (checks scopes, prints the plan)
+//   node scripts/seed-content.cjs --apply  create/update everything
 const fs = require('fs');
 const APPLY = process.argv.includes('--apply');
 const shop = 'ars-mosoris-3.myshopify.com';
