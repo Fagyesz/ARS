@@ -89,6 +89,11 @@ function ProductGridSkeleton() {
   );
 }
 
+/** Ask Shopify's image CDN for a resized rendition instead of the original upload */
+function sized(url: string, width: number) {
+  return `${url}${url.includes('?') ? '&' : '?'}width=${width}`;
+}
+
 function buildSortUrl(handle: string, sort: string) {
   const params = new URLSearchParams();
   if (sort) params.set('sort', sort);
@@ -118,7 +123,11 @@ export default function Collection() {
       {collection.image ? (
         <div className="collection-hero">
           <img
-            src={collection.image.url}
+            src={sized(collection.image.url, 1600)}
+            srcSet={[800, 1200, 1600, 2000]
+              .map((w) => `${sized(collection.image!.url, w)} ${w}w`)
+              .join(', ')}
+            sizes="100vw"
             alt={collection.image.altText || collection.title}
             className="collection-hero-image"
             width={collection.image.width ?? undefined}

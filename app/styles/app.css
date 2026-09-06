@@ -652,7 +652,8 @@ aside header .close:hover {
 }
 
 .footer-bottom a {
-  color: rgba(247, 234, 215, 0.5);
+  /* 0.5 alpha was 4.5:1 short on the dark footer */
+  color: rgba(247, 234, 215, 0.72);
   transition: color 0.2s;
 }
 
@@ -6243,7 +6244,8 @@ body:has(.cookie-banner--visible) .sticky-cart-bar {
   font-weight: 700;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--color-ars-red);
+  /* sage on the dark section: the red was 3.2:1 */
+  color: var(--color-ars-sage);
   margin-bottom: 0.75rem;
 }
 
@@ -6685,8 +6687,8 @@ body:has(.cookie-banner--visible) .sticky-cart-bar {
 .announcement-bar-badge {
   display: inline-block;
   padding: 0.15rem 0.5rem;
-  background: rgba(255, 255, 255, 0.18);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: var(--color-ars-dark);
+  color: var(--color-ars-cream);
   font-size: 0.5625rem;
   font-weight: 700;
   letter-spacing: 0.16em;
