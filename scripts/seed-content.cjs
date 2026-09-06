@@ -143,10 +143,11 @@ const MENU_FOOTER = [
 // ---- helpers -----------------------------------------------------------------
 async function ensureDefinition(def) {
   const existing = (await gql('query($type: String!) { metaobjectDefinitionByType(type: $type) { id fieldDefinitions { key } } }', {type: def.type})).metaobjectDefinitionByType;
-  const access = {admin: 'MERCHANT_READ_WRITE', storefront: 'PUBLIC_READ'};
+  // merchant-owned types get admin access by default; only the Storefront exposure is set here
+  const access = {storefront: 'PUBLIC_READ'};
   if (!existing) {
     const r = await gql('mutation($d: MetaobjectDefinitionCreateInput!) { metaobjectDefinitionCreate(definition: $d) { metaobjectDefinition { id } userErrors { field message } } }',
-      {d: {type: def.type, name: def.name, displayNameField: def.displayNameField, access, fieldDefinitions: def.fieldDefinitions}});
+      {d: {type: def.type, name: def.name, displayNameKey: def.displayNameField, access, fieldDefinitions: def.fieldDefinitions}});
     if (r.metaobjectDefinitionCreate.userErrors.length) throw new Error(def.type + ': ' + JSON.stringify(r.metaobjectDefinitionCreate.userErrors));
     console.log(`  definition ${def.type} created`);
     return r.metaobjectDefinitionCreate.metaobjectDefinition.id;
@@ -185,7 +186,8 @@ async function uploadPortrait(handle) {
 }
 
 async function ensureMenu(handle, title, items) {
-  const existing = (await gql('query($handle: String!) { menu(handle: $handle) { id } }', {handle})).menu;
+  // the Admin API has no menu-by-handle lookup; scan the (short) list
+  const existing = (await gql('{ menus(first: 50) { nodes { id handle } } }')).menus.nodes.find((m) => m.handle === handle);
   const toInput = (i) => ({title: i.title, type: 'HTTP', url: i.url, items: (i.items ?? []).map(toInput)});
   if (existing) {
     const r = await gql('mutation($id: ID!, $title: String!, $handle: String!, $items: [MenuItemUpdateInput!]!) { menuUpdate(id: $id, title: $title, handle: $handle, items: $items) { userErrors { field message } } }',
