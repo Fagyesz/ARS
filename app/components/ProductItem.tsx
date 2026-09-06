@@ -1,7 +1,7 @@
 import {Link, useRouteLoaderData} from 'react-router';
 import {Image} from '@shopify/hydrogen';
 import {formatMoney} from '~/lib/money';
-import {CAMPAIGN} from '~/lib/config';
+import {eligibleCampaign} from '~/lib/campaigns';
 import type {RootLoader} from '~/root';
 import {useRef, useEffect} from 'react';
 import type {
@@ -31,8 +31,7 @@ export function ProductItem({
   const {addToast} = useToast();
   const wrapperRef = useRef<HTMLDivElement>(null);
   const rootData = useRouteLoaderData<RootLoader>('root');
-  const tags: string[] = 'tags' in product && Array.isArray(product.tags) ? product.tags : [];
-  const onCampaign = Boolean(rootData?.campaignActive) && tags.includes(CAMPAIGN.tag);
+  const campaign = eligibleCampaign(rootData?.campaigns, product.id);
 
   useEffect(() => {
     const el = wrapperRef.current;
@@ -70,8 +69,8 @@ export function ProductItem({
           )}
           {!isAvailable ? (
             <span className="product-card-badge sold-out">Elfogyott</span>
-          ) : onCampaign ? (
-            <span className="product-card-badge campaign">{CAMPAIGN.shortLabel}</span>
+          ) : campaign ? (
+            <span className="product-card-badge campaign">{campaign.copy.shortLabel}</span>
           ) : null}
         </div>
         <div className="product-card-info">

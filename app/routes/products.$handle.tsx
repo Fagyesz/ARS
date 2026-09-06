@@ -1,6 +1,7 @@
 import {Await, useLoaderData, useRouteLoaderData, Link, useFetcher} from 'react-router';
 import type {RootLoader} from '~/root';
-import {CAMPAIGN, SHIPPING} from '~/lib/config';
+import {SHIPPING} from '~/lib/config';
+import {CAMPAIGN_PATH, eligibleCampaign} from '~/lib/campaigns';
 import type {Route} from './+types/products.$handle';
 import {Suspense, memo, startTransition, useEffect, useState, useRef} from 'react';
 import {
@@ -171,8 +172,7 @@ function StickyCartBar({
 export default function Product() {
   const {product, relatedProducts, canonicalUrl, origin} = useLoaderData<typeof loader>();
   const rootData = useRouteLoaderData<RootLoader>('root');
-  const onCampaign =
-    Boolean(rootData?.campaignActive) && (product.tags ?? []).includes(CAMPAIGN.tag);
+  const campaign = eligibleCampaign(rootData?.campaigns, product.id);
 
   const selectedVariant = useOptimisticVariant(
     product.selectedOrFirstAvailableVariant,
@@ -255,14 +255,10 @@ export default function Product() {
                 price={selectedVariant?.price}
                 compareAtPrice={selectedVariant?.compareAtPrice}
               />
-              {onCampaign && (
-                <Link
-                  to={`/collections/${CAMPAIGN.collectionHandle}`}
-                  className="product-campaign"
-                  prefetch="intent"
-                >
-                  <span className="product-campaign-badge">{CAMPAIGN.shortLabel}</span>
-                  <span className="product-campaign-text">{CAMPAIGN.productNote}</span>
+              {campaign && (
+                <Link to={CAMPAIGN_PATH} className="product-campaign" prefetch="intent">
+                  <span className="product-campaign-badge">{campaign.copy.shortLabel}</span>
+                  <span className="product-campaign-text">{campaign.copy.productNote}</span>
                 </Link>
               )}
               <div ref={addToCartRef}>

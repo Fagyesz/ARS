@@ -17,6 +17,12 @@ declare global {
     TIKTOK_URL: string;
     YOUTUBE_URL: string;
     STOREFRONT_API_VERSION: string;
+    /** Custom app (client credentials) with read access to discounts + products; drives the campaign surfaces */
+    SHOPIFY_ADMIN_CLIENT_ID?: string;
+    SHOPIFY_ADMIN_CLIENT_SECRET?: string;
+    /** legacy names of the same credentials, used by the local scripts */
+    WRITE_INVENTORY_CLIENT_ID?: string;
+    WRITE_INVENTORY_SECRET?: string;
   }
 }
 export {};

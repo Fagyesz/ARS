@@ -40,29 +40,9 @@ export const SHOP_COLLECTIONS = [
   {handle: 'egyedi-darabok', label: 'Egyedi darabok'},
 ];
 
-/**
- * The running automatic discount ("Webshop_opening" in Shopify admin): buy one
- * of the tagged tees, get a second at 50 %, once per order. Products carry the
- * `akcio` tag; the banner, badges and cart nudge switch off after `endsAt`.
- */
-export const CAMPAIGN = {
-  tag: 'akcio',
-  collectionHandle: 'nyitasi-akcio',
-  /** last day of the offer (inclusive), Europe/Budapest */
-  endsAt: '2026-09-30',
-  shortLabel: '2. póló féláron',
-  bannerText: 'Nyitási akció szeptember 30-ig: vegyél egy Baseline vagy Visions pólót, a másodikat féláron adjuk.',
-  bannerCta: 'Mutasd a pólókat',
-  productNote:
-    'Tegyél két akciós pólót a kosárba (bármilyen szín és méret), és az olcsóbbat féláron kapod. Rendelésenként egy pár, szeptember 30-ig.',
-  cartNudge: 'Még egy Baseline vagy Visions póló, és a másodikat féláron adjuk.',
-  cartNudgeCta: 'Választok még egyet',
-};
-
-/** Is the campaign still running on the given day (server date)? */
-export function campaignActive(now: Date = new Date()): boolean {
-  return now.toISOString().slice(0, 10) <= CAMPAIGN.endsAt;
-}
+// Promotions are not configured here: the storefront reads the shop's active
+// automatic discounts through the Admin API (app/lib/campaigns.server.ts) and
+// derives the banner, badges, product notes and cart nudge from them.
 
 /**
  * Shipping facts shown on the product page, in the cart and in the footer.

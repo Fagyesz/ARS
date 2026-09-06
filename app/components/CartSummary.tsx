@@ -2,7 +2,8 @@ import type {CartApiQueryFragment} from 'storefrontapi.generated';
 import type {CartLayout} from '~/components/CartMain';
 import {CartForm, type OptimisticCart} from '@shopify/hydrogen';
 import {Link, useRouteLoaderData} from 'react-router';
-import {CAMPAIGN, KOSR_CHECKOUT_ENABLED, SHIPPING} from '~/lib/config';
+import {KOSR_CHECKOUT_ENABLED, SHIPPING} from '~/lib/config';
+import {CAMPAIGN_PATH, isEligible} from '~/lib/campaigns';
 import {summarizeLineDiscounts} from '~/lib/discounts';
 import {formatMoney} from '~/lib/money';
 import {useAside} from './Aside';
@@ -114,25 +115,27 @@ function FreeShippingProgress({
 }
 
 /**
- * One eligible tee in the cart means the next one would be half price:
- * say so, with a link straight to the campaign collection.
+ * A buy-X-get-Y discount with exactly the "buy" quantity of eligible items in
+ * the cart: the next one would be discounted, so say so with a link to the
+ * campaign page. Everything comes from the Shopify discount via the root loader.
  */
 function CampaignNudge({lines}: {lines: CartLines}) {
   const rootData = useRouteLoaderData<RootLoader>('root');
   const {close} = useAside();
-  if (!rootData?.campaignActive) return null;
-  const units = lines.reduce((sum, line) => {
-    const tags = line.merchandise.product.tags ?? [];
-    return tags.includes(CAMPAIGN.tag) ? sum + line.quantity : sum;
-  }, 0);
-  if (units !== 1) return null;
+  const campaign = rootData?.campaigns?.find((c) => c.kind === 'bxgy' && c.copy.cartNudge);
+  if (!campaign) return null;
+  const units = lines.reduce(
+    (sum, line) => (isEligible(campaign, line.merchandise.product.id) ? sum + line.quantity : sum),
+    0,
+  );
+  if (units !== campaign.buysQuantity) return null;
   return (
     <div className="cart-nudge">
-      <span className="cart-nudge-badge">{CAMPAIGN.shortLabel}</span>
+      <span className="cart-nudge-badge">{campaign.copy.shortLabel}</span>
       <p>
-        {CAMPAIGN.cartNudge}{' '}
-        <Link to={`/collections/${CAMPAIGN.collectionHandle}`} onClick={close} prefetch="intent">
-          {CAMPAIGN.cartNudgeCta}
+        {campaign.copy.cartNudge}{' '}
+        <Link to={CAMPAIGN_PATH} onClick={close} prefetch="intent">
+          {campaign.copy.cartNudgeCta}
         </Link>
       </p>
     </div>

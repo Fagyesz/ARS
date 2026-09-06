@@ -100,6 +100,8 @@ Learned on the way: Oxygen serves `public/` images through Shopify's CDN, which 
 - Newsletter: required consent checkbox with privacy link, "értesíted" typo fixed, the monthly-draw promise replaced by a plain value line (restore it only with published rules).
 - Footer: shipping/return/payment line. Company name and tax number are still missing (owner input).
 
+**Promotions are now read from Shopify (later the same day).** `app/lib/campaigns.server.ts` fetches the shop's active automatic discounts through the Admin API (client-credentials token from `SHOPIFY_ADMIN_CLIENT_ID` / `SHOPIFY_ADMIN_CLIENT_SECRET`, memoised for 5 minutes) and `app/lib/campaigns.ts` turns them into Hungarian copy for the announcement bar, hero link, card badges, product note, cart nudge and the `/akcio` landing page. Buy-X-get-Y, percentage/amount and free-shipping automatic discounts are supported; product and collection scopes are expanded to product ids, so no tags or config are needed. The discount's *title* is customer-facing copy (renamed to "Nyitási akció"). The tag-based campaign collection and the `akcio` tags were removed; the default `frontpage` collection was unpublished from the Hydrogen channel so it no longer appears on `/collections`. **Owner action:** add the two env vars to the Oxygen production environment (values are the custom app's client id/secret, the same as `WRITE_INVENTORY_*` in `.env`); until then the storefront shows no campaign surfaces.
+
 Still open from the audit: catalogue pagination (not needed under ~50 products), per-type measurements for hoodies, payment-method logos (which methods does kosR offer?), hero product visual, `app.css` size.
 
 ## Suggested order of work

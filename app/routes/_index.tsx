@@ -13,7 +13,8 @@ import type {RecommendedProductsQuery, HomepageCollectionsQuery} from 'storefron
 import {ARTISTS, artistPortrait} from '~/lib/artists';
 import {ProductItem} from '~/components/ProductItem';
 import {seoMeta} from '~/lib/seo';
-import {CAMPAIGN, SHOP_COLLECTIONS} from '~/lib/config';
+import {SHOP_COLLECTIONS} from '~/lib/config';
+import {CAMPAIGN_PATH, untilHu} from '~/lib/campaigns';
 import type {RootLoader} from '~/root';
 
 // The hero watermark is the largest paint on the home page; let the browser
@@ -173,20 +174,21 @@ export default function Homepage() {
 
 function HeroSection() {
   const rootData = useRouteLoaderData<RootLoader>('root');
+  const campaign = rootData?.campaigns?.[0];
+  const until = campaign ? untilHu(campaign.endsAt) : '';
   return (
     <section className="hero">
       <div className="hero-background" />
       <div className="hero-overlay" />
       <div className="hero-content">
-        {rootData?.campaignActive && (
-          <Link
-            to={`/collections/${CAMPAIGN.collectionHandle}`}
-            className="hero-meta hero-campaign"
-            prefetch="intent"
-          >
-            <span className="hero-meta-number">{CAMPAIGN.shortLabel}</span>
+        {campaign && (
+          <Link to={CAMPAIGN_PATH} className="hero-meta hero-campaign" prefetch="intent">
+            <span className="hero-meta-number">{campaign.copy.shortLabel}</span>
             <span className="hero-meta-sep" />
-            <span className="hero-meta-city">Nyitási akció szeptember 30-ig →</span>
+            <span className="hero-meta-city">
+              {campaign.title}
+              {until ? ` ${until}` : ''} →
+            </span>
           </Link>
         )}
         <h1 className="hero-title">
@@ -287,9 +289,9 @@ function CollectionsSection({
       <Await resolve={collections}>
         {(data) => {
           // Only curated, customer-facing collections: skip Shopify's default
-          // "frontpage" collection and anything without a cover image. The
-          // campaign comes first, then the categories in navigation order.
-          const order = [CAMPAIGN.collectionHandle, ...SHOP_COLLECTIONS.map((c) => c.handle)];
+          // "frontpage" collection and anything without a cover image, and show
+          // the categories in navigation order.
+          const order = SHOP_COLLECTIONS.map((c) => c.handle);
           const rank = (handle: string) => {
             const i = order.indexOf(handle);
             return i === -1 ? order.length : i;
