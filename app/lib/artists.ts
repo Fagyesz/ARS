@@ -2,12 +2,30 @@ export interface Artist {
   name: string;
   fullName: string;
   role: string;
+  /** Original portrait (JPEG) — used for share images; pages render the WebP renditions */
   image?: string;
+  /** Pixel size of the 960px WebP rendition, for layout-stable <img> tags */
+  imageSize?: [width: number, height: number];
   handle: string;
   bio: string;
   statement: string;
   instagram?: string;
   collectionHandle: string;
+}
+
+/**
+ * Responsive renditions of the portrait: `public/artists/<name>-480.webp` and
+ * `<name>-960.webp` are generated from the original JPEG.
+ */
+export function artistPortrait(artist: Artist) {
+  if (!artist.image) return null;
+  const base = artist.image.replace(/\.jpe?g$/i, '');
+  return {
+    src: `${base}-960.webp`,
+    srcSet: `${base}-480.webp 480w, ${base}-960.webp 960w`,
+    width: artist.imageSize?.[0],
+    height: artist.imageSize?.[1],
+  };
 }
 
 export const ARTISTS: Artist[] = [
@@ -16,6 +34,7 @@ export const ARTISTS: Artist[] = [
     fullName: 'Kéringer Dóri',
     role: 'Képzőművész',
     image: '/artists/dori.jpg',
+    imageSize: [900, 1600],
     handle: 'dori',
     bio: 'Dóri főleg linómetszettel dolgozik, visszatérő motívumai a bogarak. Az Ars Mosorisnál a social media és az adminisztratív háttérfeladatok tartoznak hozzá — röviden ő a bogaras lány.',
     statement:
@@ -28,6 +47,7 @@ export const ARTISTS: Artist[] = [
     fullName: 'Nagy Emese',
     role: 'Képzőművész',
     image: '/artists/emi.jpg',
+    imageSize: [960, 1440],
     handle: 'emi',
     bio: 'Emi sokféle anyaggal kísérletezik, és egy újrahasznosított, természetes irányba mozog. A Mosorisban egyfajta mindenes: felel a social mediáért, az anyagbeszerzésért és még jó sok mindenért.',
     statement:
@@ -40,6 +60,7 @@ export const ARTISTS: Artist[] = [
     fullName: 'Nagy Zorka Hanna',
     role: 'Képzőművész',
     image: '/artists/zorka.jpg',
+    imageSize: [900, 1600],
     handle: 'zorka',
     bio: 'Zorka főként linóleummal dolgozik. Szereti az aprólékos motívumokat, és figurálisan ábrázol. Az Ars Mosorisnál a kommunikációért, valamint a szervezésért és a kivitelezésért felelős.',
     statement:
@@ -52,6 +73,7 @@ export const ARTISTS: Artist[] = [
     fullName: 'Nagy Zsolt',
     role: 'Képzőművész',
     image: '/artists/zsolt.jpg',
+    imageSize: [900, 1600],
     handle: 'zsolt',
     bio: 'Zsolt a tervezőgrafikai és a magyar–angol fordítási feladatok egy részét végzi az Ars Mosorisnál. Általában tintával dolgozik, grunge-os, sokszor groteszk stílusban, és új életet lehel a használt ruhákba.',
     statement:

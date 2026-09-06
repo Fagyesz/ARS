@@ -3,13 +3,15 @@ import type {Route} from './+types/collections._index';
 import {getPaginationVariables, Image} from '@shopify/hydrogen';
 import type {CollectionFragment} from 'storefrontapi.generated';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
+import {seoMeta} from '~/lib/seo';
 
-export const meta: Route.MetaFunction = () => {
-  return [
-    {title: 'Kollekciók | Ars Mosoris'},
-    {name: 'description', content: 'Böngéssz az Ars Mosoris kollekciói között — egyedi ruházat és kiegészítők képzőművészeti alkotásokkal.'},
-  ];
-};
+export const meta: Route.MetaFunction = ({location}) =>
+  seoMeta({
+    title: 'Kollekciók',
+    description:
+      'Böngéssz az Ars Mosoris kollekciói között: egyedi ruházat és kiegészítők képzőművészeti alkotásokkal.',
+    path: location.pathname,
+  });
 
 export async function loader(args: Route.LoaderArgs) {
   const deferredData = loadDeferredData(args);

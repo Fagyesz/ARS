@@ -4,25 +4,21 @@ import {
 } from 'react-router';
 import type {Route} from './+types/policies.$handle';
 import {type Shop} from '@shopify/hydrogen/storefront-api-types';
+import {seoMeta} from '~/lib/seo';
 
 type SelectedPolicies = keyof Pick<
   Shop,
   'privacyPolicy' | 'shippingPolicy' | 'termsOfService' | 'refundPolicy'
 >;
 
-export const meta: Route.MetaFunction = ({data}) => {
-  const title = `${data?.policy.title ?? 'Szabályzat'} | Ars Mosoris`;
-  const description = data?.policy.title ?? 'Ars Mosoris szabályzat';
-  return [
-    {title},
-    {name: 'description', content: description},
-    {property: 'og:type', content: 'website'},
-    {property: 'og:title', content: title},
-    {property: 'og:description', content: description},
-    {property: 'og:image', content: 'https://new.arsmosoris.art/og-default.png'},
-    {name: 'twitter:card', content: 'summary_large_image'},
-  ];
-};
+export const meta: Route.MetaFunction = ({data, location}) =>
+  seoMeta({
+    title: data?.policy.title ?? 'Szabályzat',
+    description: data?.policy.title
+      ? `${data.policy.title}: az Ars Mosoris webshop feltételei és tájékoztatója.`
+      : undefined,
+    path: location.pathname,
+  });
 
 export async function loader({params, context}: Route.LoaderArgs) {
   if (!params.handle) {

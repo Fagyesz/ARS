@@ -1,13 +1,13 @@
 import type {Route} from './+types/[robots.txt]';
 import {parseGid} from '@shopify/hydrogen';
+import {SITE_URL} from '~/lib/config';
 
-export async function loader({request, context}: Route.LoaderArgs) {
-  const url = new URL(request.url);
-
+export async function loader({context}: Route.LoaderArgs) {
   const {shop} = await context.storefront.query(ROBOTS_QUERY);
 
   const shopId = parseGid(shop.id).id;
-  const body = robotsTxtData({url: url.origin, shopId});
+  // Always advertise the public origin, never the preview host that served the request
+  const body = robotsTxtData({url: SITE_URL, shopId});
 
   return new Response(body, {
     status: 200,
@@ -58,8 +58,10 @@ Crawl-delay: 1
 }
 
 /**
- * This function generates disallow rules that generally follow what Shopify's
- * Online Store has as defaults for their robots.txt
+ * Disallow rules adapted from Shopify's Online Store defaults to this app's
+ * URLs: our own cart/checkout hand-off, search, wishlist and API routes are
+ * blocked; the hand-written policy pages stay crawlable; sorted catalogue
+ * views (`?sort=`) are duplicates of the unsorted page.
  */
 function generalDisallowRules({
   shopId,
@@ -70,15 +72,19 @@ function generalDisallowRules({
 }) {
   return `Disallow: /admin
 Disallow: /cart
+Disallow: /cart/
 Disallow: /orders
 Disallow: /checkouts/
 Disallow: /checkout
+Disallow: /penztar
+Disallow: /discount/
+Disallow: /api/
+Disallow: /wishlist
 ${shopId ? `Disallow: /${shopId}/checkouts` : ''}
 ${shopId ? `Disallow: /${shopId}/orders` : ''}
 Disallow: /carts
 Disallow: /account
-Disallow: /collections/*sort_by*
-Disallow: /*/collections/*sort_by*
+Disallow: /*?*sort=
 Disallow: /collections/*+*
 Disallow: /collections/*%2B*
 Disallow: /collections/*%2b*
@@ -95,7 +101,6 @@ Disallow: /*/blogs/*%2b*
 Disallow: /*?*oseid=*
 Disallow: /*preview_theme_id*
 Disallow: /*preview_script_id*
-Disallow: /policies/
 Disallow: /*/*?*ls=*&ls=*
 Disallow: /*/*?*ls%3D*%3Fls%3D*
 Disallow: /*/*?*ls%3d*%3fls%3d*

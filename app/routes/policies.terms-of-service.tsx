@@ -1,9 +1,14 @@
 import {Link} from 'react-router';
 import type {Route} from './+types/policies.terms-of-service';
+import {seoMeta} from '~/lib/seo';
 
-export const meta: Route.MetaFunction = () => {
-  return [{title: 'Általános Szerződési Feltételek | Ars Mosoris'}];
-};
+export const meta: Route.MetaFunction = ({location}) =>
+  seoMeta({
+    title: 'Általános Szerződési Feltételek',
+    description:
+      'Az Ars Mosoris webshop általános szerződési feltételei: rendelés, fizetés, szállítás, elállás és jótállás.',
+    path: location.pathname,
+  });
 
 export default function TermsOfService() {
   return (

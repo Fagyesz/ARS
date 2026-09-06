@@ -3,18 +3,22 @@ import {useLoaderData, Link, useNavigation} from 'react-router';
 import {ProductItem} from '~/components/ProductItem';
 import type {CollectionItemFragment} from 'storefrontapi.generated';
 import {ARTISTS} from '~/lib/artists';
-import {COLLECTION_TYPES, SITE_URL} from '~/lib/config';
+import {COLLECTION_TYPES} from '~/lib/config';
+import {jsonLd, productListJsonLd, seoMeta} from '~/lib/seo';
 
-export const meta: Route.MetaFunction = () => {
-  return [
-    {title: 'Katalógus | Ars Mosoris'},
-    {name: 'description', content: 'Fedezd fel a teljes Ars Mosoris kollekcióját — egyedi póló és táska dizájnok magyar képzőművészektől.'},
-    {property: 'og:type', content: 'website'},
-    {property: 'og:title', content: 'Katalógus | Ars Mosoris'},
-    {property: 'og:description', content: 'Fedezd fel a teljes Ars Mosoris kollekcióját — egyedi póló és táska dizájnok magyar képzőművészektől.'},
-    {property: 'og:image', content: `${SITE_URL}/og-default.png`},
-    {name: 'twitter:card', content: 'summary_large_image'},
-  ];
+export const meta: Route.MetaFunction = ({data, location}) => {
+  const typeLabel = COLLECTION_TYPES.find((t) => t.value === data?.typeFilter)?.label;
+  const artist = data?.artistFilter;
+  const title = artist
+    ? `${artist} alkotásai${typeLabel ? `: ${typeLabel.toLowerCase()}` : ''}`
+    : typeLabel ?? 'Katalógus';
+  return seoMeta({
+    title,
+    description:
+      'Fedezd fel a teljes Ars Mosoris kínálatot: kézzel nyomott pólók, pulóverek, kabátok és egyedi darabok magyar képzőművészektől.',
+    // filters and sorting are query strings; the canonical stays /collections/all
+    path: location.pathname,
+  });
 };
 
 const TYPE_FILTERS = [{label: 'Összes', value: ''}, ...COLLECTION_TYPES];
@@ -56,10 +60,12 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
   const sortParam = (url.searchParams.get('sort') || '') as SortValue;
   const {sortKey, reverse} = parseSortKey(sortParam);
 
+  // Scope to the vendor field and the type tag; a free-text match on "Dóri"
+  // would also return anything that merely mentions her in a description.
   const queryParts: string[] = [];
-  if (artistFilter) queryParts.push(artistFilter);
-  if (typeFilter) queryParts.push(typeFilter);
-  const query = queryParts.join(' ');
+  if (artistFilter) queryParts.push(`vendor:"${artistFilter.replace(/"/g, '')}"`);
+  if (typeFilter) queryParts.push(`tag:${typeFilter.replace(/[^a-z0-9-]/gi, '')}`);
+  const query = queryParts.join(' AND ');
 
   const {products} = await storefront.query(CATALOG_QUERY, {
     variables: {query, sortKey: sortKey as any, reverse},
@@ -102,6 +108,10 @@ export default function Collection() {
 
   return (
     <div className="catalog-page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{__html: jsonLd(productListJsonLd(products.nodes))}}
+      />
       {/* Page header */}
       <div className="catalog-header container">
         <h1>Katalógus</h1>
@@ -198,6 +208,7 @@ export default function Collection() {
                 )}
               </div>
             )}
+            <h2 className="sr-only">Termékek</h2>
             <div className="products-grid">
               {products.nodes.map((product, index) => (
                 <ProductItem

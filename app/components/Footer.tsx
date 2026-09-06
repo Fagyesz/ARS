@@ -40,7 +40,16 @@ export function Footer({
               <div className="footer-grid">
                 {/* Brand Column */}
                 <div className="footer-brand">
-                  <div className="footer-logo"><img src="/logo.svg" alt="Ars Mosoris" className="footer-logo-img" /></div>
+                  <div className="footer-logo">
+                    <img
+                      src="/logo-144.png"
+                      alt="Ars Mosoris"
+                      className="footer-logo-img"
+                      width={144}
+                      height={144}
+                      loading="lazy"
+                    />
+                  </div>
                   <p className="footer-description">
                     Négy képzőművész által alapított márka, ahol a
                     mindennapi viselet és a kortárs művészet találkozik.
@@ -83,7 +92,7 @@ export function Footer({
 
                 {/* Shop Column */}
                 <div>
-                  <h4 className="footer-heading">Shop</h4>
+                  <h2 className="footer-heading">Bolt</h2>
                   <nav className="footer-links">
                     <NavLink to="/collections/all">Minden termék</NavLink>
                     {COLLECTION_TYPES.map((type) => (
@@ -95,7 +104,7 @@ export function Footer({
 
                 {/* Artists Column */}
                 <div>
-                  <h4 className="footer-heading">Alkotók</h4>
+                  <h2 className="footer-heading">Alkotók</h2>
                   <nav className="footer-links">
                     <NavLink to="/artists">Alkotóink</NavLink>
                     <NavLink to="/events">Események</NavLink>
@@ -105,7 +114,7 @@ export function Footer({
 
                 {/* Info Column */}
                 <div>
-                  <h4 className="footer-heading">Információ</h4>
+                  <h2 className="footer-heading">Információ</h2>
                   <nav className="footer-links">
                     <NavLink to="/contact">Kapcsolat</NavLink>
                     <NavLink to="/policies/shipping-policy">Szállítás</NavLink>

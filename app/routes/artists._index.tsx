@@ -1,21 +1,15 @@
 import {Link} from 'react-router';
 import type {Route} from './+types/artists._index';
-import {ARTISTS} from '~/lib/artists';
+import {ARTISTS, artistPortrait} from '~/lib/artists';
+import {seoMeta} from '~/lib/seo';
 
-export const meta: Route.MetaFunction = () => {
-  return [
-    {title: 'Alkotóink | Ars Mosoris'},
-    {
-      name: 'description',
-      content: 'Ismerd meg az Ars Mosoris alkotóit - négy tehetséges képzőművész, négy egyedi látásmód.',
-    },
-    {property: 'og:type', content: 'website'},
-    {property: 'og:title', content: 'Művészeink | Ars Mosoris'},
-    {property: 'og:description', content: 'Ismerd meg az Ars Mosoris képzőművészeit — tehetséges magyar alkotók.'},
-    {property: 'og:image', content: '/og-default.png'},
-    {name: 'twitter:card', content: 'summary_large_image'},
-  ];
-};
+export const meta: Route.MetaFunction = ({location}) =>
+  seoMeta({
+    title: 'Alkotóink',
+    description:
+      'Ismerd meg az Ars Mosoris alkotóit: Dóri, Emi, Zorka és Zsolt, négy képzőművész, négy egyedi látásmód linómetszetben, tusban és digitális nyomatban.',
+    path: location.pathname,
+  });
 
 export default function ArtistsIndex() {
   return (
@@ -34,18 +28,25 @@ export default function ArtistsIndex() {
 
       <div className="container">
         <div className="artists-page-grid">
-          {ARTISTS.map((artist) => (
+          {ARTISTS.map((artist, index) => {
+            const portrait = artistPortrait(artist);
+            return (
             <Link
               key={artist.handle}
               to={`/artists/${artist.handle}`}
               className="artist-page-card"
             >
               <div className="artist-page-card-image">
-                {artist.image && (
+                {portrait && (
                   <img
-                    src={artist.image}
+                    src={portrait.src}
+                    srcSet={portrait.srcSet}
+                    sizes="(min-width: 1024px) 45vw, 100vw"
+                    width={portrait.width}
+                    height={portrait.height}
                     alt={artist.name}
-                    loading="lazy"
+                    loading={index === 0 ? 'eager' : 'lazy'}
+                    fetchPriority={index === 0 ? 'high' : undefined}
                   />
                 )}
               </div>
@@ -69,7 +70,8 @@ export default function ArtistsIndex() {
                 </span>
               </div>
             </Link>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

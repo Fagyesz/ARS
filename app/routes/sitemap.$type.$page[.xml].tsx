@@ -1,5 +1,6 @@
 import type {Route} from './+types/sitemap.$type.$page[.xml]';
 import {getSitemap} from '@shopify/hydrogen';
+import {requestOnPublicOrigin} from '~/lib/seo';
 
 export async function loader({
   request,
@@ -8,9 +9,13 @@ export async function loader({
 }: Route.LoaderArgs) {
   const response = await getSitemap({
     storefront,
-    request,
+    request: requestOnPublicOrigin(request),
     params,
     getLink: ({type, baseUrl, handle}) => {
+      // blog and article handles live under /blogs/, everything else under its type
+      if (type === 'blogs' || type === 'articles') {
+        return `${baseUrl}/blogs/${handle}`;
+      }
       return `${baseUrl}/${type}/${handle}`;
     },
   });

@@ -1,9 +1,14 @@
 import {Link} from 'react-router';
 import type {Route} from './+types/policies.shipping-policy';
+import {seoMeta} from '~/lib/seo';
 
-export const meta: Route.MetaFunction = () => {
-  return [{title: 'Szállítási feltételek | Ars Mosoris'}];
-};
+export const meta: Route.MetaFunction = ({location}) =>
+  seoMeta({
+    title: 'Szállítási feltételek',
+    description:
+      'Szállítási módok, határidők és díjak az Ars Mosoris webshopban: Foxpost csomagpont és házhoz szállítás, ingyenes szállítási küszöb.',
+    path: location.pathname,
+  });
 
 export default function ShippingPolicy() {
   return (

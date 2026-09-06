@@ -4,22 +4,19 @@ import {Analytics} from '@shopify/hydrogen';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {ProductItem} from '~/components/ProductItem';
 import type {ProductItemFragment} from 'storefrontapi.generated';
+import {breadcrumbJsonLd, jsonLd, productListJsonLd, seoMeta} from '~/lib/seo';
 
-// eslint-disable-next-line @typescript-eslint/no-deprecated
-export const meta: Route.MetaFunction = ({data}) => {
-  const title = `${data?.collection.title ?? 'Kollekció'} | Ars Mosoris`;
-  const description = data?.collection.description || 'Ars Mosoris kollekció';
-  const image = data?.collection.image?.url ?? 'https://new.arsmosoris.art/og-default.png';
-  return [
-    {title},
-    {name: 'description', content: description},
-    {property: 'og:type', content: 'website'},
-    {property: 'og:title', content: title},
-    {property: 'og:description', content: description},
-    {property: 'og:image', content: image},
-    {name: 'twitter:card', content: 'summary_large_image'},
-  ];
-};
+export const meta: Route.MetaFunction = ({data, location}) =>
+  seoMeta({
+    title: data?.collection.seo?.title || data?.collection.title || 'Kollekció',
+    description:
+      data?.collection.seo?.description ||
+      data?.collection.description ||
+      `${data?.collection.title ?? 'Kollekció'}: egyedi darabok az Ars Mosoris alkotóitól.`,
+    // sorting is a query string; the canonical stays the collection URL
+    path: location.pathname,
+    image: data?.collection.image?.url,
+  });
 
 const SORT_OPTIONS = [
   {label: 'Legújabb', value: ''},
@@ -104,6 +101,18 @@ export default function Collection() {
 
   return (
     <div className="collection-page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLd([
+            breadcrumbJsonLd([
+              {name: 'Katalógus', path: '/collections/all'},
+              {name: collection.title},
+            ]),
+            productListJsonLd(collection.products.nodes),
+          ]),
+        }}
+      />
       {/* Hero */}
       {collection.image ? (
         <div className="collection-hero">
@@ -111,6 +120,10 @@ export default function Collection() {
             src={collection.image.url}
             alt={collection.image.altText || collection.title}
             className="collection-hero-image"
+            width={collection.image.width ?? undefined}
+            height={collection.image.height ?? undefined}
+            loading="eager"
+            fetchPriority="high"
           />
           <div className="collection-hero-overlay">
             <nav className="collection-hero-breadcrumb">
@@ -159,6 +172,7 @@ export default function Collection() {
       </div>
 
       <div className="container" style={{paddingTop: '1.5rem'}}>
+        <h2 className="sr-only">Termékek</h2>
         {isLoading ? (
           <ProductGridSkeleton />
         ) : (
@@ -228,9 +242,15 @@ const COLLECTION_QUERY = `#graphql
       handle
       title
       description
+      seo {
+        title
+        description
+      }
       image {
         url
         altText
+        width
+        height
       }
       products(
         first: 250

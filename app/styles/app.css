@@ -23,7 +23,8 @@
   --color-primary: var(--color-ars-red);
   --color-primary-hover: var(--color-ars-red-dark);
   --color-text: var(--color-ars-dark);
-  --color-text-muted: #7A6E5F;
+  /* 5:1 on the cream background (the previous #7A6E5F was 4.2:1, below AA) */
+  --color-text-muted: #6A5F51;
   --color-background: var(--color-ars-cream);
   --color-background-alt: var(--color-ars-cream-dark);
   --color-border: var(--color-ars-gray-dark);
@@ -43,6 +44,27 @@
   --grid-item-width: 320px;
 }
 
+/* Grandstander, self-hosted from public/fonts (the same variable-font files
+   Google Fonts serves), so first paint no longer waits on a third-party CSS
+   round trip. Hungarian needs both the latin and latin-ext subsets. */
+@font-face {
+  font-family: 'Grandstander';
+  font-style: normal;
+  font-weight: 300 900;
+  font-display: swap;
+  src: url('/fonts/grandstander-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Grandstander';
+  font-style: normal;
+  font-weight: 300 900;
+  font-display: swap;
+  src: url('/fonts/grandstander-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 /* Base Styles */
 html {
   scroll-behavior: smooth;
@@ -57,6 +79,16 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: clip;
+}
+
+/* One visible focus style for keyboard users everywhere; pointer clicks stay clean */
+:focus-visible {
+  outline: 2px solid var(--color-ars-red);
+  outline-offset: 3px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
 }
 
 /* Paper grain texture overlay — the soul of the atelier */
@@ -303,7 +335,8 @@ a:hover {
 
 .header-cta-icon {
   position: relative;
-  padding: 0.5rem;
+  padding: 0.625rem;
+  display: inline-flex;
   color: rgba(247, 234, 215, 0.7);
   transition: color 0.2s ease;
 }
@@ -340,7 +373,8 @@ a:hover {
 }
 
 /* Hide hamburger on mobile — bottom nav handles navigation there */
-@media (max-width: 1023px) {
+/* Phones have the bottom navigation; tablets (768–1023px) need the hamburger */
+@media (max-width: 767px) {
   .header-menu-mobile-toggle {
     display: none;
   }
@@ -365,19 +399,30 @@ a:hover {
 /* ============================================
    Mobile Menu / Aside
    ============================================ */
+/* Drawers are mounted only while open, so entrance is a keyframe, not a transition */
 .overlay {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s ease;
   z-index: 100;
+  animation: overlay-in 0.25s ease both;
 }
 
-.overlay.expanded {
-  opacity: 1;
-  visibility: visible;
+@keyframes overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes aside-in {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  aside {
+    animation: none;
+  }
 }
 
 .close-outside {
@@ -398,8 +443,7 @@ aside {
   right: 0;
   width: 100vw;
   background: var(--color-ars-cream);
-  transform: translateX(100%);
-  transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+  animation: aside-in 0.35s cubic-bezier(0.4,0,0.2,1) both;
   z-index: 101;
   display: flex;
   flex-direction: column;
@@ -422,10 +466,6 @@ aside::after {
   }
 }
 
-.overlay.expanded aside {
-  transform: translateX(0);
-}
-
 aside header {
   display: flex;
   align-items: center;
@@ -436,7 +476,8 @@ aside header {
   color: var(--color-ars-cream);
 }
 
-aside header h3 {
+aside header h2 {
+  margin: 0;
   font-size: 0.6875rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -458,7 +499,7 @@ aside header .close:hover {
   color: var(--color-primary);
 }
 
-aside main {
+.aside-body {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -536,6 +577,11 @@ aside main {
   font-size: 0.875rem;
   color: rgba(247, 234, 215, 0.6);
   line-height: 1.75;
+}
+
+.footer-bottom a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .footer-heading {
@@ -736,7 +782,6 @@ aside main {
 .shop-sort-select:hover,
 .shop-sort-select:focus {
   border-color: var(--color-ars-dark);
-  outline: none;
 }
 
 @media (max-width: 767px) {
@@ -985,7 +1030,8 @@ aside main {
 .product-artist {
   font-size: 0.75rem;
   font-weight: 500;
-  color: var(--color-primary);
+  /* small uppercase text: the darker red keeps 5:1 on cream */
+  color: var(--color-ars-red-dark);
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
@@ -1022,6 +1068,50 @@ aside main {
 .product-description {
   color: var(--color-text-muted);
   line-height: 1.8;
+}
+
+/* Admin-authored HTML: give paragraphs, lists and sub-headings their shape back */
+.product-description p {
+  margin: 0 0 0.875rem;
+}
+
+.product-description p:last-child {
+  margin-bottom: 0;
+}
+
+.product-description ul,
+.product-description ol {
+  margin: 0 0 0.875rem 1.25rem;
+  padding: 0;
+  list-style: disc;
+}
+
+.product-description ol {
+  list-style: decimal;
+}
+
+.product-description li {
+  margin-bottom: 0.25rem;
+}
+
+.product-description h2,
+.product-description h3,
+.product-description h4 {
+  margin: 1.25rem 0 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text);
+}
+
+.product-description strong {
+  color: var(--color-text);
+}
+
+.product-description a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 /* Size Selector */
@@ -1317,8 +1407,8 @@ aside .cart-empty {
 }
 
 .cart-line-quantity button {
-  width: 28px;
-  height: 28px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1346,8 +1436,8 @@ aside .cart-empty {
 }
 
 .cart-line-remove {
-  width: 28px;
-  height: 28px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1530,7 +1620,6 @@ aside .cart-empty {
 }
 
 .cart-discount-form input:focus {
-  outline: none;
   border-color: var(--color-ars-dark);
 }
 
@@ -1590,7 +1679,7 @@ aside .cart-empty {
   bottom: -5%;
   width: clamp(320px, 55vw, 820px);
   height: clamp(320px, 55vw, 820px);
-  background-image: url('/logo.svg');
+  background-image: url('/logo-820.webp');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: bottom right;
@@ -3464,7 +3553,6 @@ aside .cart-empty {
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
-  outline: none;
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(252, 0, 4, 0.12);
 }
@@ -3768,7 +3856,6 @@ aside .cart-empty {
   color: var(--color-ars-cream);
   font-size: 0.875rem;
   font-family: var(--font-sans);
-  outline: none;
   transition: border-color 0.2s, background 0.2s;
 }
 
@@ -3977,14 +4064,72 @@ button.reset {
   cursor: pointer;
 }
 
-.route-error {
+/* ============================================
+   404 / error page (rendered by the root ErrorBoundary inside the layout)
+   ============================================ */
+.not-found {
+  padding: clamp(4rem, 12vh, 8rem) 0;
+}
+
+.not-found-inner {
+  max-width: 640px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  min-height: 50vh;
-  padding: 2rem;
+  gap: 1.25rem;
   text-align: center;
+}
+
+.not-found-code {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  color: var(--color-ars-red);
+}
+
+.not-found h1 {
+  margin: 0;
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  line-height: 1.15;
+}
+
+.not-found-lead {
+  max-width: 46ch;
+  color: var(--color-text-muted);
+}
+
+.not-found-search {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 440px;
+}
+
+.not-found-search input {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  background: white;
+  font-family: inherit;
+  font-size: 0.9375rem;
+}
+
+.not-found-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.not-found-debug {
+  max-width: 100%;
+  overflow-x: auto;
+  font-size: 0.75rem;
+  text-align: left;
+  color: var(--color-text-muted);
 }
 
 /* ============================================
@@ -4116,7 +4261,6 @@ button.reset {
 }
 
 .account-form .form-group input:focus {
-  outline: none;
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(252, 0, 4, 0.12);
 }
@@ -4283,7 +4427,6 @@ button.reset {
 }
 
 .order-search-input:focus {
-  outline: none;
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(252, 0, 4, 0.12);
 }
@@ -4638,7 +4781,6 @@ button.reset {
 }
 
 .reset-form .form-group input:focus {
-  outline: none;
   border-color: var(--color-primary);
 }
 
@@ -5249,7 +5391,6 @@ button.reset {
   font-size: 0.875rem;
   border: 1px solid var(--color-border);
   background: white;
-  outline: none;
   transition: border-color 0.2s ease;
 }
 
@@ -5416,6 +5557,11 @@ button.reset {
   .sticky-cart-bar--visible {
     bottom: 64px;
   }
+}
+
+/* While the cookie banner is up it owns the bottom edge; the sticky bar waits */
+body:has(.cookie-banner--visible) .sticky-cart-bar {
+  display: none;
 }
 
 /* ============================================
@@ -5646,6 +5792,13 @@ button.reset {
 
 .cookie-banner--visible {
   transform: translateY(0);
+}
+
+/* Sit above the mobile bottom navigation instead of covering it */
+@media (max-width: 767px) {
+  .cookie-banner {
+    bottom: 64px;
+  }
 }
 
 .cookie-banner-text {
@@ -6263,7 +6416,7 @@ button.reset {
   bottom: -5%;
   width: clamp(280px, 50vw, 720px);
   height: clamp(280px, 50vw, 720px);
-  background-image: url('/logo.svg');
+  background-image: url('/logo-820.webp');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: bottom right;

@@ -1,6 +1,7 @@
 import {Link, useFetcher, type Fetcher} from 'react-router';
-import {Image, Money} from '@shopify/hydrogen';
+import {Image} from '@shopify/hydrogen';
 import React, {useRef, useEffect} from 'react';
+import {formatMoney} from '~/lib/money';
 import {
   getEmptyPredictiveSearchResult,
   urlWithTrackingParams,
@@ -89,7 +90,7 @@ function SearchResultsPredictiveArticles({
 
   return (
     <div className="predictive-search-result" key="articles">
-      <h5>Articles</h5>
+      <h3>Cikkek</h3>
       <ul>
         {articles.map((article) => {
           const articleUrl = urlWithTrackingParams({
@@ -130,7 +131,7 @@ function SearchResultsPredictiveCollections({
 
   return (
     <div className="predictive-search-result" key="collections">
-      <h5>Collections</h5>
+      <h3>Kollekciók</h3>
       <ul>
         {collections.map((collection) => {
           const collectionUrl = urlWithTrackingParams({
@@ -171,7 +172,7 @@ function SearchResultsPredictivePages({
 
   return (
     <div className="predictive-search-result" key="pages">
-      <h5>Pages</h5>
+      <h3>Oldalak</h3>
       <ul>
         {pages.map((page) => {
           const pageUrl = urlWithTrackingParams({
@@ -204,7 +205,7 @@ function SearchResultsPredictiveProducts({
 
   return (
     <div className="predictive-search-result" key="products">
-      <h5>Products</h5>
+      <h3>Termékek</h3>
       <ul>
         {products.map((product) => {
           const productUrl = urlWithTrackingParams({
@@ -228,7 +229,9 @@ function SearchResultsPredictiveProducts({
                 )}
                 <div>
                   <p>{product.title}</p>
-                  <small>{price && <Money data={price} />}</small>
+                  <small>
+                    {price && formatMoney(price.amount, price.currencyCode)}
+                  </small>
                 </div>
               </Link>
             </li>
@@ -269,7 +272,7 @@ function SearchResultsPredictiveEmpty({
 
   return (
     <p>
-      No results found for <q>{term.current}</q>
+      Nincs találat erre: <q>{term.current}</q>
     </p>
   );
 }

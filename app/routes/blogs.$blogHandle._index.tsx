@@ -7,20 +7,16 @@ import {Image, getPaginationVariables} from '@shopify/hydrogen';
 import type {ArticleItemFragment} from 'storefrontapi.generated';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
+import {seoMeta} from '~/lib/seo';
 
-export const meta: Route.MetaFunction = ({data}) => {
-  const title = `${data?.blog.title ?? 'Blog'} | Ars Mosoris`;
-  const description = data?.blog.seo?.description || 'Az Ars Mosoris blogja — hírek, történetek és inspiráció a magyar képzőművészet világából.';
-  return [
-    {title},
-    {name: 'description', content: description},
-    {property: 'og:type', content: 'website'},
-    {property: 'og:title', content: title},
-    {property: 'og:description', content: description},
-    {property: 'og:image', content: 'https://new.arsmosoris.art/og-default.png'},
-    {name: 'twitter:card', content: 'summary_large_image'},
-  ];
-};
+export const meta: Route.MetaFunction = ({data, location}) =>
+  seoMeta({
+    title: data?.blog.seo?.title || data?.blog.title || 'Blog',
+    description:
+      data?.blog.seo?.description ||
+      'Az Ars Mosoris blogja: hírek, történetek és inspiráció a magyar képzőművészet világából.',
+    path: location.pathname,
+  });
 
 export async function loader(args: Route.LoaderArgs) {
   // Start fetching non-critical data without blocking time to first byte

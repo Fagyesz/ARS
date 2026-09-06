@@ -6,20 +6,17 @@ import type {Route} from './+types/blogs._index';
 import {getPaginationVariables} from '@shopify/hydrogen';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import type {BlogsQuery} from 'storefrontapi.generated';
+import {seoMeta} from '~/lib/seo';
 
 type BlogNode = BlogsQuery['blogs']['nodes'][0];
 
-export const meta: Route.MetaFunction = () => {
-  return [
-    {title: 'Blog | Ars Mosoris'},
-    {name: 'description', content: 'Az Ars Mosoris blogja — hírek, történetek és inspiráció a magyar képzőművészet világából.'},
-    {property: 'og:type', content: 'website'},
-    {property: 'og:title', content: 'Blog | Ars Mosoris'},
-    {property: 'og:description', content: 'Az Ars Mosoris blogja — hírek, történetek és inspiráció a magyar képzőművészet világából.'},
-    {property: 'og:image', content: 'https://new.arsmosoris.art/og-default.png'},
-    {name: 'twitter:card', content: 'summary_large_image'},
-  ];
-};
+export const meta: Route.MetaFunction = ({location}) =>
+  seoMeta({
+    title: 'Blog',
+    description:
+      'Az Ars Mosoris blogja: hírek, történetek és inspiráció a magyar képzőművészet világából.',
+    path: location.pathname,
+  });
 
 export async function loader(args: Route.LoaderArgs) {
   // Start fetching non-critical data without blocking time to first byte

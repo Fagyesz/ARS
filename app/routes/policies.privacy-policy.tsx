@@ -1,9 +1,14 @@
 import {Link} from 'react-router';
 import type {Route} from './+types/policies.privacy-policy';
+import {seoMeta} from '~/lib/seo';
 
-export const meta: Route.MetaFunction = () => {
-  return [{title: 'Adatvédelmi tájékoztató | Ars Mosoris'}];
-};
+export const meta: Route.MetaFunction = ({location}) =>
+  seoMeta({
+    title: 'Adatvédelmi tájékoztató',
+    description:
+      'Hogyan kezeli az Ars Mosoris a személyes adatokat és a sütiket a webshop használata és a rendelés során.',
+    path: location.pathname,
+  });
 
 export default function PrivacyPolicy() {
   return (

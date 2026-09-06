@@ -3,22 +3,17 @@ import type {Route} from './+types/artists.$handle';
 import {getPaginationVariables} from '@shopify/hydrogen';
 import {ProductItem} from '~/components/ProductItem';
 import type {ProductItemFragment} from 'storefrontapi.generated';
-import {ARTISTS} from '~/lib/artists';
+import {ARTISTS, artistPortrait} from '~/lib/artists';
+import {breadcrumbJsonLd, jsonLd, productListJsonLd, seoMeta} from '~/lib/seo';
 
-export const meta: Route.MetaFunction = ({data}) => {
+export const meta: Route.MetaFunction = ({data, location}) => {
   const artist = data?.artist;
-  return [
-    {title: `${artist?.name ?? 'Alkotó'} | Ars Mosoris`},
-    {
-      name: 'description',
-      content: artist?.bio ?? 'Ars Mosoris alkotó',
-    },
-    {property: 'og:type', content: 'website'},
-    {property: 'og:title', content: `${artist?.name ?? 'Művész'} | Ars Mosoris`},
-    {property: 'og:description', content: artist?.bio ?? 'Magyar képzőművész — Ars Mosoris'},
-    {property: 'og:image', content: artist?.image ?? '/og-default.png'},
-    {name: 'twitter:card', content: 'summary_large_image'},
-  ];
+  return seoMeta({
+    title: artist ? `${artist.name} (${artist.fullName})` : 'Alkotó',
+    description: artist?.bio,
+    path: location.pathname,
+    image: artist?.image,
+  });
 };
 
 export async function loader({context, params, request}: Route.LoaderArgs) {
@@ -31,11 +26,13 @@ export async function loader({context, params, request}: Route.LoaderArgs) {
     throw new Response('Artist not found', {status: 404});
   }
 
-  const paginationVariables = getPaginationVariables(request, {pageBy: 8});
+  // No artist has more than a dozen pieces, so one page covers them all
+  const paginationVariables = getPaginationVariables(request, {pageBy: 50});
 
   const {products} = await storefront.query(ARTIST_PRODUCTS_QUERY, {
     variables: {
-      vendor: artist.name,
+      // scope to the vendor field, not a free-text match on the name
+      vendor: `vendor:"${artist.name.replace(/"/g, '')}"`,
       ...paginationVariables,
     },
   });
@@ -48,16 +45,38 @@ export async function loader({context, params, request}: Route.LoaderArgs) {
 
 export default function ArtistProfile() {
   const {artist, products} = useLoaderData<typeof loader>();
+  const portrait = artistPortrait(artist);
 
   return (
     <div className="artist-profile">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLd([
+            breadcrumbJsonLd([
+              {name: 'Alkotóink', path: '/artists'},
+              {name: artist.name},
+            ]),
+            productListJsonLd(products),
+          ]),
+        }}
+      />
       {/* Hero section with portrait */}
       <section className="artist-hero">
         <div className="container">
           <div className="artist-hero-grid">
             <div className="artist-hero-image">
-              {artist.image && (
-                <img src={artist.image} alt={artist.name} />
+              {portrait && (
+                <img
+                  src={portrait.src}
+                  srcSet={portrait.srcSet}
+                  sizes="(min-width: 768px) 40vw, 100vw"
+                  width={portrait.width}
+                  height={portrait.height}
+                  alt={`${artist.fullName}, ${artist.role.toLowerCase()}`}
+                  loading="eager"
+                  fetchPriority="high"
+                />
               )}
             </div>
             <div className="artist-hero-content">

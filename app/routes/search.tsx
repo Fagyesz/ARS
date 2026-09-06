@@ -11,19 +11,15 @@ import {
   getEmptyPredictiveSearchResult,
 } from '~/lib/search';
 import type {RegularSearchQuery, PredictiveSearchQuery} from 'storefrontapi.generated';
+import {seoMeta} from '~/lib/seo';
 
-export const meta: Route.MetaFunction = () => {
-  return [
-    {title: 'Keresés | Ars Mosoris'},
-    {name: 'description', content: 'Keresés az Ars Mosoris termékek és tartalmak között.'},
-    {property: 'og:type', content: 'website'},
-    {property: 'og:title', content: 'Keresés | Ars Mosoris'},
-    {property: 'og:description', content: 'Keresés az Ars Mosoris termékek és tartalmak között.'},
-    {property: 'og:image', content: 'https://new.arsmosoris.art/og-default.png'},
-    {name: 'twitter:card', content: 'summary_large_image'},
-    {name: 'robots', content: 'noindex'},
-  ];
-};
+export const meta: Route.MetaFunction = ({location}) =>
+  seoMeta({
+    title: 'Keresés',
+    description: 'Keresés az Ars Mosoris termékei és tartalmai között.',
+    path: location.pathname,
+    noindex: true,
+  });
 
 export async function loader({request, context}: Route.LoaderArgs) {
   const url = new URL(request.url);
@@ -50,19 +46,20 @@ export default function SearchPage() {
 
   return (
     <div className="search">
-      <h1>Search</h1>
+      <h1>Keresés</h1>
       <SearchForm>
         {({inputRef}) => (
           <>
             <input
               defaultValue={term}
               name="q"
-              placeholder="Search…"
+              placeholder="Mit keresel?"
+              aria-label="Keresés"
               ref={inputRef}
               type="search"
             />
             &nbsp;
-            <button type="submit">Search</button>
+            <button type="submit">Keresés</button>
           </>
         )}
       </SearchForm>
@@ -147,6 +144,9 @@ const SEARCH_ARTICLE_FRAGMENT = `#graphql
     id
     title
     trackingParameters
+    blog {
+      handle
+    }
   }
 ` as const;
 

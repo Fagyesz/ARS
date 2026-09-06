@@ -3,15 +3,15 @@ import {
 } from 'react-router';
 import type {Route} from './+types/pages.$handle';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
+import {seoMeta} from '~/lib/seo';
 
-export const meta: Route.MetaFunction = ({data}) => {
-  const seoTitle = data?.page.seo?.title || data?.page.title || '';
-  const seoDescription = data?.page.seo?.description;
-  return [
-    {title: `${seoTitle} | Ars Mosoris`},
-    ...(seoDescription ? [{name: 'description', content: seoDescription}] : []),
-  ];
-};
+export const meta: Route.MetaFunction = ({data, location}) =>
+  seoMeta({
+    title: data?.page.seo?.title || data?.page.title || 'Oldal',
+    description:
+      data?.page.seo?.description || data?.page.body?.replace(/<[^>]+>/g, ' '),
+    path: location.pathname,
+  });
 
 export async function loader(args: Route.LoaderArgs) {
   // Start fetching non-critical data without blocking time to first byte
@@ -85,7 +85,7 @@ export default function Page() {
       <header>
         <h1>{page.title}</h1>
       </header>
-      <main dangerouslySetInnerHTML={{__html: page.body}} />
+      <div className="page-body" dangerouslySetInnerHTML={{__html: page.body}} />
     </div>
   );
 }

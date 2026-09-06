@@ -1,6 +1,11 @@
 import * as serverBuild from 'virtual:react-router/server-build';
 import {createRequestHandler, storefrontRedirect} from '@shopify/hydrogen';
 import {createHydrogenRouterContext} from '~/lib/context';
+import {SITE_URL} from '~/lib/config';
+
+const PUBLIC_HOST = new URL(SITE_URL).host;
+// Utility routes that must never be indexed, whatever their meta tags say
+const NOINDEX_PATHS = /^\/(account|api|cart|discount|penztar|search|wishlist)(\/|$)/;
 
 /**
  * Export a fetch handler in module format.
@@ -29,6 +34,13 @@ export default {
       });
 
       const response = await handleRequest(request);
+
+      // Only the public origin is indexable: Oxygen preview hosts and old
+      // subdomains would otherwise be crawled as a duplicate of the whole site.
+      const url = new URL(request.url);
+      if (url.host !== PUBLIC_HOST || NOINDEX_PATHS.test(url.pathname)) {
+        response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+      }
 
       if (hydrogenContext.session.isPending) {
         response.headers.set(

@@ -9,42 +9,73 @@ type CookieConsentContextValue = {
   reject: () => void;
 };
 
+const STORAGE_KEY = 'ars-cookie-consent';
+
 const CookieConsentContext = createContext<CookieConsentContextValue>({
   choice: null,
   accept: () => {},
   reject: () => {},
 });
 
+/**
+ * Hand the visitor's choice to Shopify's Customer Privacy API, which gates the
+ * analytics/marketing pixels. The API script loads asynchronously, so retry for
+ * a few seconds instead of silently dropping the choice when it isn't there yet.
+ */
+function applyConsent(choice: ConsentChoice, attempt = 0) {
+  const privacy = window.Shopify?.customerPrivacy;
+  if (!privacy) {
+    if (attempt < 20) setTimeout(() => applyConsent(choice, attempt + 1), 500);
+    return;
+  }
+  const granted = choice === 'accepted';
+  privacy.setTrackingConsent(
+    {
+      analytics: granted,
+      marketing: granted,
+      preferences: granted,
+      sale_of_data: false,
+    },
+    () => {},
+  );
+}
+
+function readStoredChoice(): ConsentChoice | null {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored === 'accepted' || stored === 'rejected' ? stored : null;
+  } catch {
+    return null;
+  }
+}
+
 export function CookieConsentProvider({children}: {children: React.ReactNode}) {
   const [choice, setChoice] = useState<ConsentChoice | null>(null);
 
+  // Returning visitors: re-apply the stored choice on every page load, since
+  // Shopify only remembers consent for the current session/cookie lifetime.
   useEffect(() => {
-    const stored = localStorage.getItem('ars-cookie-consent');
-    if (stored === 'accepted' || stored === 'rejected') {
+    const stored = readStoredChoice();
+    if (stored) {
       setChoice(stored);
+      applyConsent(stored);
     }
   }, []);
 
-  function accept() {
-    localStorage.setItem('ars-cookie-consent', 'accepted');
-    setChoice('accepted');
-    window.Shopify?.customerPrivacy?.setTrackingConsent(
-      {analytics: true, marketing: true, preferences: true, sale_of_data: false},
-      () => {},
-    );
-  }
-
-  function reject() {
-    localStorage.setItem('ars-cookie-consent', 'rejected');
-    setChoice('rejected');
-    window.Shopify?.customerPrivacy?.setTrackingConsent(
-      {analytics: false, marketing: false, preferences: false, sale_of_data: false},
-      () => {},
-    );
+  function decide(next: ConsentChoice) {
+    try {
+      localStorage.setItem(STORAGE_KEY, next);
+    } catch {
+      // private mode: the banner will simply show again next visit
+    }
+    setChoice(next);
+    applyConsent(next);
   }
 
   return (
-    <CookieConsentContext.Provider value={{choice, accept, reject}}>
+    <CookieConsentContext.Provider
+      value={{choice, accept: () => decide('accepted'), reject: () => decide('rejected')}}
+    >
       {children}
     </CookieConsentContext.Provider>
   );
@@ -67,7 +98,7 @@ export function CookieConsentBanner() {
     <div
       className={`cookie-banner${visible ? ' cookie-banner--visible' : ''}`}
       role="dialog"
-      aria-label="Cookie hozzájárulás"
+      aria-label="Sütik használata"
       aria-live="polite"
     >
       <p className="cookie-banner-text">

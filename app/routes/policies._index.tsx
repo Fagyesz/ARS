@@ -1,17 +1,14 @@
 import {Link} from 'react-router';
 import type {Route} from './+types/policies._index';
+import {seoMeta} from '~/lib/seo';
 
-export const meta: Route.MetaFunction = () => {
-  return [
-    {title: 'Jogi feltételek | Ars Mosoris'},
-    {name: 'description', content: 'Ars Mosoris jogi feltételek — adatvédelem, szállítás, visszaküldés és általános feltételek.'},
-    {property: 'og:type', content: 'website'},
-    {property: 'og:title', content: 'Jogi feltételek | Ars Mosoris'},
-    {property: 'og:description', content: 'Ars Mosoris jogi feltételek — adatvédelem, szállítás, visszaküldés és általános feltételek.'},
-    {property: 'og:image', content: 'https://new.arsmosoris.art/og-default.png'},
-    {name: 'twitter:card', content: 'summary_large_image'},
-  ];
-};
+export const meta: Route.MetaFunction = ({location}) =>
+  seoMeta({
+    title: 'Jogi feltételek',
+    description:
+      'Az Ars Mosoris webshop jogi feltételei: adatvédelem, szállítás, visszaküldés és általános szerződési feltételek egy helyen.',
+    path: location.pathname,
+  });
 
 const POLICIES = [
   {

@@ -1,5 +1,6 @@
 import {Analytics, getShopAnalytics, useNonce} from '@shopify/hydrogen';
 import {
+  Link,
   Outlet,
   useRouteError,
   isRouteErrorResponse,
@@ -13,13 +14,38 @@ import {
 import type {Route} from './+types/root';
 import favicon from '~/assets/favicon.svg';
 import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
-import {SITE_URL} from '~/lib/config';
-import resetStyles from '~/styles/reset.css?url';
+import {SITE_URL, SOCIAL_LINKS} from '~/lib/config';
+import {jsonLd, seoMeta} from '~/lib/seo';
+import resetStyles from '~/styles/reset.css?inline';
 import appStyles from '~/styles/app.css?url';
 import {PageLayout} from './components/PageLayout';
 import {CookieConsentProvider, CookieConsentBanner} from '~/components/CookieConsent';
 
 export type RootLoader = typeof loader;
+
+/**
+ * Fallback head tags: used by routes without their own `meta` export and,
+ * more importantly, for error pages, where the failing route's meta never runs.
+ */
+export const meta: Route.MetaFunction = ({error, location}) => {
+  if (error) {
+    const status = isRouteErrorResponse(error) ? error.status : 500;
+    return seoMeta({
+      title: status === 404 ? 'Az oldal nem található' : 'Hiba történt',
+      description:
+        status === 404
+          ? 'A keresett oldal nem található az Ars Mosoris webshopban.'
+          : 'Átmeneti hiba történt az Ars Mosoris webshopban.',
+      path: location.pathname,
+      noindex: true,
+    });
+  }
+  return seoMeta({
+    title: 'Ars Mosoris | Kortárs művészet és divat',
+    rawTitle: true,
+    path: location.pathname,
+  });
+};
 
 /**
  * This is important to avoid re-fetching root queries on sub-navigations
@@ -44,26 +70,32 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({
 };
 
 /**
- * The main and reset stylesheets are added in the Layout component
- * to prevent a bug in development HMR updates.
- *
- * This avoids the "failed to execute 'insertBefore' on 'Node'" error
- * that occurs after editing and navigating to another page.
- *
- * It's a temporary fix until the issue is resolved.
+ * The main stylesheet is added in the Layout component to prevent a bug in
+ * development HMR updates ("failed to execute 'insertBefore' on 'Node'").
  * https://github.com/remix-run/remix/issues/9242
  */
 export function links() {
   return [
     {rel: 'preconnect', href: 'https://cdn.shopify.com'},
     {rel: 'preconnect', href: 'https://shop.app'},
-    {rel: 'preconnect', href: 'https://fonts.googleapis.com'},
-    {rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous'},
+    // Grandstander is self-hosted (public/fonts) so first paint no longer waits
+    // for a Google Fonts round trip; both subsets are needed for Hungarian text.
     {
-      rel: 'stylesheet',
-      href: 'https://fonts.googleapis.com/css2?family=Grandstander:wght@300;400;500;600;700&display=swap',
+      rel: 'preload',
+      as: 'font',
+      type: 'font/woff2',
+      href: '/fonts/grandstander-latin.woff2',
+      crossOrigin: 'anonymous',
+    },
+    {
+      rel: 'preload',
+      as: 'font',
+      type: 'font/woff2',
+      href: '/fonts/grandstander-latin-ext.woff2',
+      crossOrigin: 'anonymous',
     },
     {rel: 'icon', type: 'image/svg+xml', href: favicon},
+    {rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png'},
   ];
 }
 
@@ -151,16 +183,45 @@ function loadDeferredData({context}: Route.LoaderArgs) {
   };
 }
 
+const ORGANIZATION_JSON_LD = jsonLd([
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Ars Mosoris',
+    url: SITE_URL,
+    logo: `${SITE_URL}/logo-512.png`,
+    sameAs: Object.values(SOCIAL_LINKS),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Ars Mosoris',
+    url: SITE_URL,
+    inLanguage: 'hu',
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${SITE_URL}/search?q={search_term_string}`,
+      },
+      'query-input': 'required name=search_term_string',
+    },
+  },
+]);
+
 export function Layout({children}: {children?: React.ReactNode}) {
   const nonce = useNonce();
-  const siteUrl = SITE_URL;
 
   return (
     <html lang="hu">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <link rel="stylesheet" href={resetStyles}></link>
+        <meta name="theme-color" content="#231F20" />
+        <meta property="og:site_name" content="Ars Mosoris" />
+        <meta property="og:locale" content="hu_HU" />
+        {/* The reset is tiny: inlining it removes one render-blocking request */}
+        <style dangerouslySetInnerHTML={{__html: resetStyles}} />
         <link rel="stylesheet" href={appStyles}></link>
         <Meta />
         <Links />
@@ -169,15 +230,7 @@ export function Layout({children}: {children?: React.ReactNode}) {
         {children}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'Organization',
-              name: 'Ars Mosoris',
-              url: siteUrl,
-              logo: `${siteUrl}/og-default.png`,
-            }),
-          }}
+          dangerouslySetInnerHTML={{__html: ORGANIZATION_JSON_LD}}
         />
         <ScrollRestoration nonce={nonce} />
         <Scripts nonce={nonce} />
@@ -211,7 +264,9 @@ export default function App() {
 
 export function ErrorBoundary() {
   const error = useRouteError();
-  let errorMessage = 'Unknown error';
+  const data = useRouteLoaderData<RootLoader>('root');
+
+  let errorMessage = 'Ismeretlen hiba';
   let errorStatus = 500;
 
   if (isRouteErrorResponse(error)) {
@@ -221,15 +276,84 @@ export function ErrorBoundary() {
     errorMessage = error.message;
   }
 
+  const content =
+    errorStatus === 404 ? (
+      <NotFoundPage />
+    ) : (
+      <ErrorPage status={errorStatus} message={errorMessage} />
+    );
+
+  // Keep header, footer and drawers when the root loader itself succeeded
+  if (!data) return content;
+
   return (
-    <div className="route-error">
-      <h1>Oops</h1>
-      <h2>{errorStatus}</h2>
-      {errorMessage && (
-        <fieldset>
-          <pre>{errorMessage}</pre>
-        </fieldset>
-      )}
-    </div>
+    <Analytics.Provider cart={data.cart} shop={data.shop} consent={data.consent}>
+      <CookieConsentProvider>
+        <PageLayout {...data}>{content}</PageLayout>
+      </CookieConsentProvider>
+    </Analytics.Provider>
+  );
+}
+
+function NotFoundPage() {
+  return (
+    <section className="not-found">
+      <div className="container not-found-inner">
+        <span className="not-found-code">404</span>
+        <h1>Ezt az oldalt nem találjuk</h1>
+        <p className="not-found-lead">
+          Lehet, hogy a termék már elfogyott, vagy a link elírt. Nézz körül a
+          boltban, vagy keress rá arra, ami érdekel.
+        </p>
+        <form action="/search" method="get" className="not-found-search" role="search">
+          <input
+            type="search"
+            name="q"
+            placeholder="Mit keresel? Pl. póló, pulóver…"
+            aria-label="Keresés"
+          />
+          <button type="submit" className="btn btn-primary">
+            Keresés
+          </button>
+        </form>
+        <nav className="not-found-links" aria-label="Hasznos oldalak">
+          <Link to="/collections/all" className="btn btn-outline">
+            Bolt
+          </Link>
+          <Link to="/artists" className="btn btn-outline">
+            Alkotók
+          </Link>
+          <Link to="/" className="btn btn-outline">
+            Kezdőlap
+          </Link>
+        </nav>
+      </div>
+    </section>
+  );
+}
+
+function ErrorPage({status, message}: {status: number; message: string}) {
+  return (
+    <section className="not-found">
+      <div className="container not-found-inner">
+        <span className="not-found-code">{status}</span>
+        <h1>Valami hiba történt</h1>
+        <p className="not-found-lead">
+          Próbáld újra egy kicsit később. Ha a hiba nem múlik el, írj nekünk a
+          Kapcsolat oldalon.
+        </p>
+        {process.env.NODE_ENV !== 'production' && message && (
+          <pre className="not-found-debug">{message}</pre>
+        )}
+        <nav className="not-found-links" aria-label="Hasznos oldalak">
+          <Link to="/" className="btn btn-outline">
+            Kezdőlap
+          </Link>
+          <Link to="/contact" className="btn btn-outline">
+            Kapcsolat
+          </Link>
+        </nav>
+      </div>
+    </section>
   );
 }

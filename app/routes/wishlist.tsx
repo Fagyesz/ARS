@@ -3,19 +3,15 @@ import {Link, useFetcher} from 'react-router';
 import type {Route} from './+types/wishlist';
 import {useWishlist} from '~/hooks/useWishlist';
 import {ProductItem} from '~/components/ProductItem';
+import {seoMeta} from '~/lib/seo';
 
-export const meta: Route.MetaFunction = () => {
-  return [
-    {title: 'Kívánságlista | Ars Mosoris'},
-    {name: 'description', content: 'A mentett termékeim az Ars Mosoris boltban.'},
-    {property: 'og:type', content: 'website'},
-    {property: 'og:title', content: 'Kívánságlista | Ars Mosoris'},
-    {property: 'og:description', content: 'A mentett termékeim az Ars Mosoris boltban.'},
-    {property: 'og:image', content: 'https://new.arsmosoris.art/og-default.png'},
-    {name: 'twitter:card', content: 'summary_large_image'},
-    {name: 'robots', content: 'noindex'},
-  ];
-};
+export const meta: Route.MetaFunction = ({location}) =>
+  seoMeta({
+    title: 'Kívánságlista',
+    description: 'A mentett termékeid az Ars Mosoris boltban.',
+    path: location.pathname,
+    noindex: true,
+  });
 
 type WishlistProduct = {
   id: string;

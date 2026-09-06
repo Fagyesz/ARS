@@ -209,7 +209,7 @@ function MobileBottomNavInner({cart: originalCart}: {cart: CartApiQueryFragment 
           <rect x="2" y="3" width="7" height="7"/><rect x="15" y="3" width="7" height="7"/>
           <rect x="15" y="15" width="7" height="7"/><rect x="2" y="15" width="7" height="7"/>
         </svg>
-        <span>Shop</span>
+        <span>Bolt</span>
       </NavLink>
       <button
         className="mobile-nav-item"

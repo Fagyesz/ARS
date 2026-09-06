@@ -10,11 +10,12 @@ import {
   useSelectedOptionInUrlParam,
 } from '@shopify/hydrogen';
 import {ProductPrice} from '~/components/ProductPrice';
-import {ProductImage} from '~/components/ProductImage';
 import {ProductForm} from '~/components/ProductForm';
 import {AddToCartButton} from '~/components/AddToCartButton';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {SITE_URL} from '~/lib/config';
+import {formatMoney} from '~/lib/money';
+import {jsonLd, seoMeta} from '~/lib/seo';
 import type {
   ProductItemFragment,
   RecommendedProductFragment,
@@ -24,20 +25,24 @@ import {ProductItem} from '~/components/ProductItem';
 import {useRecentlyViewed, type RecentProduct} from '~/hooks/useRecentlyViewed';
 import {ImageSlider} from '~/components/ImageSlider';
 
-export const meta: Route.MetaFunction = ({data}) => {
-  return [
-    {title: `${data?.product.title ?? 'Termék'} | Ars Mosoris`},
-    {
-      name: 'description',
-      content: data?.product.description || 'Ars Mosoris termék',
-    },
-    {property: 'og:type', content: 'product'},
-    {property: 'og:title', content: data?.product.title ?? 'Termék'},
-    {property: 'og:description', content: data?.product.description || 'Ars Mosoris termék'},
-    {property: 'og:image', content: data?.product.selectedOrFirstAvailableVariant?.image?.url ?? `${SITE_URL}/og-default.png`},
-    {property: 'og:url', content: data?.canonicalUrl ?? `/products/${data?.product.handle}`},
-    {name: 'twitter:card', content: 'summary_large_image'},
-  ];
+export const meta: Route.MetaFunction = ({data, location}) => {
+  const product = data?.product;
+  const variant = product?.selectedOrFirstAvailableVariant;
+  const tags = seoMeta({
+    title: product?.seo?.title || product?.title || 'Termék',
+    description: product?.seo?.description || product?.description,
+    // canonical is the product URL without the size/colour query string
+    path: location.pathname,
+    image: variant?.image?.url,
+    type: 'product',
+  });
+  if (variant?.price) {
+    tags.push(
+      {property: 'product:price:amount', content: variant.price.amount},
+      {property: 'product:price:currency', content: variant.price.currencyCode},
+    );
+  }
+  return tags;
 };
 
 export const links: Route.LinksFunction = () => [];
@@ -147,7 +152,7 @@ function StickyCartBar({
             <span className="sticky-cart-bar-variant">{variantTitle}</span>
           )}
           <span className="sticky-cart-bar-price">
-            {parseFloat(price).toLocaleString('hu-HU')} {currencyCode}
+            {formatMoney(price, currencyCode)}
           </span>
         </div>
         <AddToCartButton lines={lines} disabled={!selectedVariant.availableForSale}>
@@ -261,7 +266,8 @@ export default function Product() {
         </div>
       </div>
 
-      {recentItems.length >= 1 && (
+      {/* one previously viewed card alone looks like a mistake; wait for two */}
+      {recentItems.length >= 2 && (
         <RecentlyViewedStrip items={recentItems} />
       )}
 
@@ -285,12 +291,16 @@ export default function Product() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
+          __html: jsonLd({
             '@context': 'https://schema.org',
             '@type': 'Product',
             name: product.title,
             description: product.description,
-            image: selectedVariant?.image?.url,
+            url: canonicalUrl,
+            image: [
+              selectedVariant?.image?.url,
+              ...((product as any).images?.nodes ?? []).map((img: {url: string}) => img.url),
+            ].filter((url, index, all) => url && all.indexOf(url) === index),
             brand: {
               '@type': 'Brand',
               name: product.vendor || 'Ars Mosoris',
@@ -300,10 +310,13 @@ export default function Product() {
               '@type': 'Offer',
               price: selectedVariant?.price.amount,
               priceCurrency: selectedVariant?.price.currencyCode,
+              priceValidUntil: `${new Date().getFullYear() + 1}-12-31`,
+              itemCondition: 'https://schema.org/NewCondition',
               availability: selectedVariant?.availableForSale
                 ? 'https://schema.org/InStock'
                 : 'https://schema.org/OutOfStock',
               url: canonicalUrl,
+              seller: {'@type': 'Organization', name: 'Ars Mosoris'},
             },
           }),
         }}
@@ -324,7 +337,7 @@ export default function Product() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
+          __html: jsonLd({
             '@context': 'https://schema.org',
             '@type': 'BreadcrumbList',
             itemListElement: [

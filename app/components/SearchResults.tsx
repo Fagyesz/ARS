@@ -1,6 +1,7 @@
 import {Link} from 'react-router';
-import {Image, Money, Pagination} from '@shopify/hydrogen';
+import {Image, Pagination} from '@shopify/hydrogen';
 import {urlWithTrackingParams, type RegularSearchReturn} from '~/lib/search';
+import {formatMoney} from '~/lib/money';
 
 type SearchItems = RegularSearchReturn['result']['items'];
 type PartialSearchResult<ItemType extends keyof SearchItems> = Pick<
@@ -40,11 +41,11 @@ function SearchResultsArticles({
 
   return (
     <div className="search-result">
-      <h2>Articles</h2>
+      <h2>Cikkek</h2>
       <div>
         {articles?.nodes?.map((article) => {
           const articleUrl = urlWithTrackingParams({
-            baseUrl: `/blogs/${article.handle}`,
+            baseUrl: `/blogs/${article.blog.handle}/${article.handle}`,
             trackingParams: article.trackingParameters,
             term,
           });
@@ -70,7 +71,7 @@ function SearchResultsPages({term, pages}: PartialSearchResult<'pages'>) {
 
   return (
     <div className="search-result">
-      <h2>Pages</h2>
+      <h2>Oldalak</h2>
       <div>
         {pages?.nodes?.map((page) => {
           const pageUrl = urlWithTrackingParams({
@@ -103,7 +104,7 @@ function SearchResultsProducts({
 
   return (
     <div className="search-result">
-      <h2>Products</h2>
+      <h2>Termékek</h2>
       <Pagination connection={products}>
         {({nodes, isLoading, NextLink, PreviousLink}) => {
           const ItemsMarkup = nodes.map((product) => {
@@ -124,7 +125,9 @@ function SearchResultsProducts({
                   )}
                   <div>
                     <p>{product.title}</p>
-                    <small>{price && <Money data={price} />}</small>
+                    <small>
+                      {price && formatMoney(price.amount, price.currencyCode)}
+                    </small>
                   </div>
                 </Link>
               </div>
@@ -135,7 +138,7 @@ function SearchResultsProducts({
             <div>
               <div>
                 <PreviousLink>
-                  {isLoading ? 'Loading...' : <span>↑ Load previous</span>}
+                  {isLoading ? 'Betöltés…' : <span>↑ Előző találatok</span>}
                 </PreviousLink>
               </div>
               <div>
@@ -144,7 +147,7 @@ function SearchResultsProducts({
               </div>
               <div>
                 <NextLink>
-                  {isLoading ? 'Loading...' : <span>Load more ↓</span>}
+                  {isLoading ? 'Betöltés…' : <span>További találatok ↓</span>}
                 </NextLink>
               </div>
             </div>
@@ -157,5 +160,5 @@ function SearchResultsProducts({
 }
 
 function SearchResultsEmpty() {
-  return <p>No results, try a different search.</p>;
+  return <p>Nincs találat. Próbálj meg egy másik kifejezést, például „póló” vagy „pulóver”.</p>;
 }

@@ -2,21 +2,18 @@ import {useLoaderData} from 'react-router';
 import type {Route} from './+types/blogs.$blogHandle.$articleHandle';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {ImageSlider, extractImagesFromHtml} from '~/components/ImageSlider';
+import {jsonLd, seoMeta} from '~/lib/seo';
 
-export const meta: Route.MetaFunction = ({data}) => {
-  const title = `${data?.article.seo?.title ?? data?.article.title ?? ''} | Ars Mosoris`;
-  const description = data?.article.seo?.description || 'Ars Mosoris blog cikk';
-  const image = data?.firstImageUrl ?? 'https://new.arsmosoris.art/og-default.png';
-  return [
-    {title},
-    {name: 'description', content: description},
-    {property: 'og:type', content: 'article'},
-    {property: 'og:title', content: title},
-    {property: 'og:description', content: description},
-    {property: 'og:image', content: image},
-    {name: 'twitter:card', content: 'summary_large_image'},
-  ];
-};
+export const meta: Route.MetaFunction = ({data, location}) =>
+  seoMeta({
+    title: data?.article.seo?.title || data?.article.title || 'Cikk',
+    description:
+      data?.article.seo?.description ||
+      data?.article.contentHtml?.replace(/<[^>]+>/g, ' '),
+    path: location.pathname,
+    image: data?.firstImageUrl,
+    type: 'article',
+  });
 
 export const links = ((args: {data?: {firstImageUrl?: string | null}}) => {
   const firstImage = args?.data?.firstImageUrl;
@@ -120,6 +117,21 @@ export default function Article() {
   return (
     <div className="section">
       <div className="container">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: jsonLd({
+              '@context': 'https://schema.org',
+              '@type': 'BlogPosting',
+              headline: title,
+              datePublished: article.publishedAt,
+              inLanguage: 'hu',
+              ...(image?.url ? {image: image.url} : {}),
+              author: {'@type': 'Person', name: author?.name || 'Ars Mosoris'},
+              publisher: {'@type': 'Organization', name: 'Ars Mosoris'},
+            }),
+          }}
+        />
         <article className="article">
           <h1 className="article-title">{title}</h1>
           <div className="article-meta">

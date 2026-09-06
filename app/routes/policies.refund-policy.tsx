@@ -1,9 +1,14 @@
 import {Link} from 'react-router';
 import type {Route} from './+types/policies.refund-policy';
+import {seoMeta} from '~/lib/seo';
 
-export const meta: Route.MetaFunction = () => {
-  return [{title: 'Visszaküldési feltételek | Ars Mosoris'}];
-};
+export const meta: Route.MetaFunction = ({location}) =>
+  seoMeta({
+    title: 'Visszaküldési feltételek',
+    description:
+      '14 napos elállási jog, a visszaküldés menete és a visszatérítés az Ars Mosoris webshopban.',
+    path: location.pathname,
+  });
 
 export default function RefundPolicy() {
   return (

@@ -1,18 +1,15 @@
 import {useLoaderData, Link} from 'react-router';
 import type {Route} from './+types/events._index';
 import {Image} from '@shopify/hydrogen';
+import {seoMeta} from '~/lib/seo';
 
-export const meta: Route.MetaFunction = () => {
-  return [
-    {title: 'Események | Ars Mosoris'},
-    {name: 'description', content: 'Ars Mosoris események, popup shopok és kiállítások. Találkozz velünk személyesen!'},
-    {property: 'og:type', content: 'website'},
-    {property: 'og:title', content: 'Események | Ars Mosoris'},
-    {property: 'og:description', content: 'Ars Mosoris események, popup shopok és kiállítások. Találkozz velünk személyesen!'},
-    {property: 'og:image', content: 'https://new.arsmosoris.art/og-default.png'},
-    {name: 'twitter:card', content: 'summary_large_image'},
-  ];
-};
+export const meta: Route.MetaFunction = ({location}) =>
+  seoMeta({
+    title: 'Események',
+    description:
+      'Ars Mosoris események, popup shopok és kiállítások Budapesten és máshol. Találkozz velünk személyesen!',
+    path: location.pathname,
+  });
 
 /** Parse event date from tag — accepts "event-date:2026-06-15" or plain "2026-06-15" */
 function getEventDate(article: {tags: string[]; publishedAt: string}): Date {
@@ -113,8 +110,10 @@ function EventFeatured({event}: {event: any}) {
           {event.image ? (
             <Image
               data={event.image}
+              alt={event.image.altText || event.title}
               aspectRatio="4/3"
               sizes="(min-width: 1024px) 55vw, 100vw"
+              loading="eager"
             />
           ) : (
             <div className="event-featured-placeholder">
@@ -157,7 +156,7 @@ function EventCard({event}: {event: any}) {
       <Link to={`/blogs/event/${event.handle}`} className="event-card-inner">
         <div className="event-card-image">
           {event.image ? (
-            <Image data={event.image} aspectRatio="16/9" sizes="(min-width: 768px) 40vw, 100vw" />
+            <Image data={event.image} alt={event.image.altText || event.title} aspectRatio="16/9" sizes="(min-width: 768px) 40vw, 100vw" />
           ) : (
             <div className="event-card-placeholder"><CalendarSvg size={36} /></div>
           )}
@@ -186,7 +185,7 @@ function PastEventCard({event, index: _index}: {event: any; index: number}) {
       <Link to={`/blogs/event/${event.handle}`} className="past-event-card-link">
         <div className="past-event-card-image">
           {event.image ? (
-            <Image data={event.image} aspectRatio="16/9" sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" />
+            <Image data={event.image} alt={event.image.altText || event.title} aspectRatio="16/9" sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" />
           ) : (
             <div className="past-event-card-placeholder"><CalendarSvg size={36} /></div>
           )}

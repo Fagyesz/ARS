@@ -5,6 +5,7 @@ import type {CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
 import {CartLineItem, type CartLine} from '~/components/CartLineItem';
 import {CartSummary} from './CartSummary';
+import {formatMoney} from '~/lib/money';
 
 export type CartLayout = 'page' | 'aside';
 
@@ -182,7 +183,10 @@ function CartEmpty({
                 <div className="cart-empty-product-info">
                   <span className="cart-empty-product-title">{p.title}</span>
                   <span className="cart-empty-product-price">
-                    {parseFloat(p.priceRange.minVariantPrice.amount).toLocaleString('hu-HU')} {p.priceRange.minVariantPrice.currencyCode}
+                    {formatMoney(
+                      p.priceRange.minVariantPrice.amount,
+                      p.priceRange.minVariantPrice.currencyCode,
+                    )}
                   </span>
                 </div>
               </Link>

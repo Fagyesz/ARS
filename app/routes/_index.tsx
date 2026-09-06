@@ -2,25 +2,18 @@ import {Await, useLoaderData, useActionData, useNavigation, Link, Form} from 're
 import type {Route} from './+types/_index';
 import {Suspense} from 'react';
 import type {RecommendedProductsQuery, HomepageCollectionsQuery} from 'storefrontapi.generated';
-import {ARTISTS} from '~/lib/artists';
+import {ARTISTS, artistPortrait} from '~/lib/artists';
 import {ProductItem} from '~/components/ProductItem';
-import {SITE_URL} from '~/lib/config';
+import {seoMeta} from '~/lib/seo';
 
-export const meta: Route.MetaFunction = () => {
-  return [
-    {title: 'Ars Mosoris | Kortárs Művészet & Divat'},
-    {
-      name: 'description',
-      content:
-        'Négy képzőművész által alapított márka, ahol a mindennapi viselet és a kortárs művészet találkozik.',
-    },
-    {property: 'og:type', content: 'website'},
-    {property: 'og:title', content: 'Ars Mosoris — Magyar Képzőművészeti Bolt'},
-    {property: 'og:description', content: 'Fedezd fel egyedi póló és táska dizájnjainkat, magyar képzőművészek alkotásaival.'},
-    {property: 'og:image', content: `${SITE_URL}/og-default.png`},
-    {name: 'twitter:card', content: 'summary_large_image'},
-  ];
-};
+export const meta: Route.MetaFunction = ({location}) =>
+  seoMeta({
+    title: 'Ars Mosoris | Kortárs művészet és divat',
+    rawTitle: true,
+    description:
+      'Négy képzőművész által alapított márka, ahol a mindennapi viselet és a kortárs művészet találkozik. Kézzel nyomott pólók, pulóverek és egyedi darabok magyar alkotóktól.',
+    path: location.pathname,
+  });
 
 export async function loader(args: Route.LoaderArgs) {
   return loadDeferredData(args);
@@ -326,16 +319,22 @@ function ArtistsPreview() {
           </p>
         </div>
         <div className="artists-grid">
-          {ARTISTS.map((artist) => (
+          {ARTISTS.map((artist) => {
+            const portrait = artistPortrait(artist);
+            return (
             <Link
               key={artist.handle}
               to={`/artists/${artist.handle}`}
               className="artist-card"
             >
               <div className="artist-card-image">
-                {artist.image && (
+                {portrait && (
                   <img
-                    src={artist.image}
+                    src={portrait.src}
+                    srcSet={portrait.srcSet}
+                    sizes="(min-width: 1024px) 25vw, 50vw"
+                    width={portrait.width}
+                    height={portrait.height}
                     alt={artist.name}
                     loading="lazy"
                   />
@@ -346,7 +345,8 @@ function ArtistsPreview() {
                 <span className="artist-card-role">{artist.role}</span>
               </div>
             </Link>
-          ))}
+            );
+          })}
         </div>
         <div className="text-center mt-8">
           <Link to="/artists" className="btn btn-outline">

@@ -27,7 +27,13 @@ export function Header({
   return (
     <header className="header">
       <NavLink prefetch="intent" to="/" className="header-logo" end>
-        <img src="/logo.svg" alt="Ars Mosoris" className="header-logo-img" />
+        <img
+          src="/logo-144.png"
+          alt="Ars Mosoris"
+          className="header-logo-img"
+          width={144}
+          height={144}
+        />
       </NavLink>
       <HeaderMenu
         menu={menu}
@@ -103,7 +109,7 @@ function HeaderCtas({
       <NavLink prefetch="intent" to="/wishlist" className="header-cta-icon header-wishlist-icon" aria-label="Kívánságlista">
         <WishlistIcon />
       </NavLink>
-      <NavLink prefetch="intent" to="/account" className="header-cta-icon">
+      <NavLink prefetch="intent" to="/account" className="header-cta-icon" aria-label="Fiókom">
         <Suspense fallback={<UserIcon />}>
           <Await resolve={isLoggedIn} errorElement={<UserIcon />}>
             {(isLoggedIn) => (isLoggedIn ? <UserIcon filled /> : <UserIcon />)}
@@ -122,7 +128,7 @@ function HeaderMenuMobileToggle() {
     <button
       className="header-menu-mobile-toggle reset"
       onClick={() => open('mobile')}
-      aria-label="Open menu"
+      aria-label="Menü megnyitása"
     >
       <MenuIcon />
     </button>
@@ -135,7 +141,7 @@ function SearchToggle() {
     <button
       className="header-cta-icon reset"
       onClick={() => open('search')}
-      aria-label="Search"
+      aria-label="Keresés"
     >
       <SearchIcon />
     </button>
@@ -150,6 +156,7 @@ function CartBadge({count}: {count: number | null}) {
     <a
       href="/cart"
       className="header-cta-icon"
+      aria-label={count ? `Kosár, ${count} termék` : 'Kosár'}
       onClick={(e) => {
         e.preventDefault();
         open('cart');
@@ -239,7 +246,7 @@ const FALLBACK_HEADER_MENU = {
       id: 'gid://shopify/MenuItem/461609500728',
       resourceId: null,
       tags: [],
-      title: 'Shop',
+      title: 'Bolt',
       type: 'HTTP',
       url: '/collections/all',
       items: [],

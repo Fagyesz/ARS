@@ -1,8 +1,10 @@
 import {
   createContext,
   type ReactNode,
+  useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 import {useLocation} from 'react-router';
@@ -15,10 +17,12 @@ type AsideContextValue = {
 };
 
 /**
- * A side bar component with Overlay
+ * A slide-in drawer with an overlay. Closed drawers are not rendered at all:
+ * a hidden dialog would still add landmarks and headings to every page for
+ * crawlers and screen readers.
  * @example
  * ```jsx
- * <Aside type="search" heading="SEARCH">
+ * <Aside type="search" heading="KERESÉS">
  *  <input type="search" />
  *  ...
  * </Aside>
@@ -31,43 +35,63 @@ export function Aside({
 }: {
   children?: React.ReactNode;
   type: AsideType;
-  heading: React.ReactNode;
+  heading: string;
 }) {
   const {type: activeType, close} = useAside();
   const expanded = type === activeType;
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const abortController = new AbortController();
+    if (!expanded) return;
 
-    if (expanded) {
-      document.addEventListener(
-        'keydown',
-        function handler(event: KeyboardEvent) {
-          if (event.key === 'Escape') {
-            close();
-          }
-        },
-        {signal: abortController.signal},
-      );
-    }
-    return () => abortController.abort();
+    // Move focus into the dialog and give it back to the opener on close
+    const opener = document.activeElement as HTMLElement | null;
+    closeButtonRef.current?.focus();
+
+    const abortController = new AbortController();
+    document.addEventListener(
+      'keydown',
+      function handler(event: KeyboardEvent) {
+        if (event.key === 'Escape') {
+          close();
+        }
+      },
+      {signal: abortController.signal},
+    );
+    return () => {
+      abortController.abort();
+      opener?.focus?.();
+    };
   }, [close, expanded]);
+
+  if (!expanded) return null;
 
   return (
     <div
-      aria-modal
-      className={`overlay ${expanded ? 'expanded' : ''}`}
+      aria-modal="true"
+      aria-label={heading}
+      className="overlay expanded"
       role="dialog"
     >
-      <button className="close-outside" onClick={close} aria-label="Close" />
+      <button
+        className="close-outside"
+        onClick={close}
+        aria-label="Bezárás"
+        tabIndex={-1}
+      />
       <aside>
         <header>
-          <h3>{heading}</h3>
-          <button className="close reset" onClick={close} aria-label="Close">
+          <h2>{heading}</h2>
+          <button
+            ref={closeButtonRef}
+            className="close reset"
+            onClick={close}
+            aria-label="Bezárás"
+          >
             &times;
           </button>
         </header>
-        <main>{children}</main>
+        <div className="aside-body">{children}</div>
       </aside>
     </div>
   );
@@ -78,6 +102,7 @@ const AsideContext = createContext<AsideContextValue | null>(null);
 Aside.Provider = function AsideProvider({children}: {children: ReactNode}) {
   const [type, setType] = useState<AsideType>('closed');
   const location = useLocation();
+  const close = useCallback(() => setType('closed'), []);
 
   useEffect(() => {
     setType('closed');
@@ -99,7 +124,7 @@ Aside.Provider = function AsideProvider({children}: {children: ReactNode}) {
       value={{
         type,
         open: setType,
-        close: () => setType('closed'),
+        close,
       }}
     >
       {children}

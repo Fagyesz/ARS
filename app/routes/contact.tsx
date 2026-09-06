@@ -2,6 +2,7 @@ import {useState} from 'react';
 import {Form, useActionData, useNavigation, useLoaderData} from 'react-router';
 import type {Route} from './+types/contact';
 import {EMAIL, SOCIAL_LINKS} from '~/lib/config';
+import {seoMeta} from '~/lib/seo';
 
 export async function loader({context}: Route.LoaderArgs) {
   const {env} = context;
@@ -21,20 +22,13 @@ const SUBJECT_LABELS: Record<string, string> = {
   other: 'Egyéb',
 };
 
-export const meta: Route.MetaFunction = () => {
-  return [
-    {title: 'Kapcsolat | Ars Mosoris'},
-    {
-      name: 'description',
-      content: 'Lépj velünk kapcsolatba! Kérdésed van termékeinkről vagy együttműködési lehetőségekről?',
-    },
-    {property: 'og:type', content: 'website'},
-    {property: 'og:title', content: 'Kapcsolat | Ars Mosoris'},
-    {property: 'og:description', content: 'Lépj kapcsolatba az Ars Mosoris csapatával.'},
-    {property: 'og:image', content: '/og-default.png'},
-    {name: 'twitter:card', content: 'summary_large_image'},
-  ];
-};
+export const meta: Route.MetaFunction = ({location}) =>
+  seoMeta({
+    title: 'Kapcsolat',
+    description:
+      'Lépj velünk kapcsolatba! Kérdésed van a termékeinkről, a rendelésedről vagy egy együttműködésről? Írj nekünk, és hamar válaszolunk.',
+    path: location.pathname,
+  });
 
 export async function action({request, context}: Route.ActionArgs) {
   const formData = await request.formData();

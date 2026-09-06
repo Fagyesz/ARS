@@ -1,20 +1,14 @@
 import {Link} from 'react-router';
 import type {Route} from './+types/about';
+import {seoMeta} from '~/lib/seo';
 
-export const meta: Route.MetaFunction = () => {
-  return [
-    {title: 'Rólunk | Ars Mosoris'},
-    {
-      name: 'description',
-      content: 'Az Ars Mosoris négy fiatal művészből álló alkotócsapat és márka, ami a tradicionális grafikai technikákat a mindennapi viselettel kapcsolja össze.',
-    },
-    {property: 'og:type', content: 'website'},
-    {property: 'og:title', content: 'Rólunk | Ars Mosoris'},
-    {property: 'og:description', content: 'Az Ars Mosoris story — képzőművészet találkozik a mindennapi divattárgyakkal.'},
-    {property: 'og:image', content: '/og-default.png'},
-    {name: 'twitter:card', content: 'summary_large_image'},
-  ];
-};
+export const meta: Route.MetaFunction = ({location}) =>
+  seoMeta({
+    title: 'Rólunk',
+    description:
+      'Az Ars Mosoris négy fiatal művészből álló alkotócsapat és márka, ami a tradicionális grafikai technikákat a mindennapi viselettel kapcsolja össze.',
+    path: location.pathname,
+  });
 
 export default function About() {
   return (
