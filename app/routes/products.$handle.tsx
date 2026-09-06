@@ -63,7 +63,7 @@ export async function loader(args: Route.LoaderArgs) {
   const relatedProducts = product.vendor
     ? storefront
         .query(RELATED_PRODUCTS_QUERY, {
-          variables: {vendor: product.vendor},
+          variables: {vendor: `vendor:"${product.vendor.replace(/"/g, '')}"`},
           cache: storefront.CacheLong(),
         })
         .then((result) =>

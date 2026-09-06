@@ -66,7 +66,12 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
     cache: storefront.CacheShort(),
   });
 
-  return {products, artistFilter, typeFilter, sortParam};
+  // Keep the chosen sort, but never open the catalog with image-less cards
+  const nodes = [...products.nodes].sort(
+    (a, b) => Number(!!b.featuredImage) - Number(!!a.featuredImage),
+  );
+
+  return {products: {...products, nodes}, artistFilter, typeFilter, sortParam};
 }
 
 function loadDeferredData(_args: Route.LoaderArgs) {

@@ -254,15 +254,6 @@ const FALLBACK_HEADER_MENU = {
       items: [],
     },
     {
-      id: 'gid://shopify/MenuItem/461609533497',
-      resourceId: null,
-      tags: [],
-      title: 'Kollekciók',
-      type: 'HTTP',
-      url: '/collections',
-      items: [],
-    },
-    {
       id: 'gid://shopify/MenuItem/461609566264',
       resourceId: null,
       tags: [],

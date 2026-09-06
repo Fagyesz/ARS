@@ -89,10 +89,9 @@ function SearchAside() {
   return (
     <Aside type="search" heading="KERESÉS">
       <div className="predictive-search">
-        <br />
         <SearchFormPredictive>
           {({fetchResults, goToSearch, inputRef}) => (
-            <>
+            <div className="flex gap-2">
               <input
                 name="q"
                 onChange={fetchResults}
@@ -101,10 +100,13 @@ function SearchAside() {
                 ref={inputRef}
                 type="search"
                 list={queriesDatalistId}
+                className="flex-1 min-w-0"
+                aria-label="Keresés"
               />
-              &nbsp;
-              <button onClick={goToSearch}>Keresés</button>
-            </>
+              <button type="button" className="btn btn-primary" onClick={goToSearch}>
+                Keresés
+              </button>
+            </div>
           )}
         </SearchFormPredictive>
 

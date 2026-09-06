@@ -26,8 +26,22 @@ export async function loader(args: Route.LoaderArgs) {
 }
 
 function loadDeferredData({context}: Route.LoaderArgs) {
-  const recommendedProducts = context.storefront
-    .query(RECOMMENDED_PRODUCTS_QUERY, {cache: context.storefront.CacheLong()})
+  const {storefront} = context;
+  // Curated picks carry the "kiemelt" tag in Shopify admin; fall back to the
+  // most recently updated products if fewer than 4 are tagged.
+  const recommendedProducts = storefront
+    .query(RECOMMENDED_PRODUCTS_QUERY, {
+      variables: {query: 'tag:kiemelt'},
+      cache: storefront.CacheLong(),
+    })
+    .then((tagged) =>
+      (tagged?.products.nodes.length ?? 0) >= 4
+        ? tagged
+        : storefront.query(RECOMMENDED_PRODUCTS_QUERY, {
+            variables: {query: null},
+            cache: storefront.CacheLong(),
+          }),
+    )
     .catch((error: Error) => {
       console.error(error);
       return null;
@@ -247,18 +261,22 @@ function CollectionsSection({
   collections: Promise<StoreCollectionsQuery | null>;
 }) {
   return (
-    <section className="collections-drops-section">
-      <div className="container">
-        <div className="collections-drops-header">
-          <span className="collections-drops-label">Kollekciók</span>
-          <h2>Válogatott sorozataink</h2>
-        </div>
-        <Suspense fallback={<div className="collections-drops-skeleton" />}>
-          <Await resolve={collections}>
-            {(data) => {
-              const nodes = data?.collections?.nodes ?? [];
-              if (!nodes.length) return null;
-              return (
+    <Suspense fallback={null}>
+      <Await resolve={collections}>
+        {(data) => {
+          // Only curated, customer-facing collections: skip Shopify's default
+          // "frontpage" collection and anything without a cover image.
+          const nodes = (data?.collections?.nodes ?? []).filter(
+            (c) => c.handle !== 'frontpage' && c.image,
+          );
+          if (!nodes.length) return null;
+          return (
+            <section className="collections-drops-section">
+              <div className="container">
+                <div className="collections-drops-header">
+                  <span className="collections-drops-label">Kollekciók</span>
+                  <h2>Válogatott sorozataink</h2>
+                </div>
                 <div className="collections-drops-grid">
                   {nodes.map((collection) => (
                     <Link
@@ -267,14 +285,10 @@ function CollectionsSection({
                       className="collection-drop-card"
                     >
                       <div className="collection-drop-image">
-                        {collection.image ? (
-                          <img
-                            src={collection.image.url}
-                            alt={collection.image.altText || collection.title}
-                          />
-                        ) : (
-                          <div className="collection-drop-placeholder" />
-                        )}
+                        <img
+                          src={collection.image!.url}
+                          alt={collection.image!.altText || collection.title}
+                        />
                       </div>
                       <div className="collection-drop-overlay">
                         <h3 className="collection-drop-title">{collection.title}</h3>
@@ -283,20 +297,20 @@ function CollectionsSection({
                     </Link>
                   ))}
                 </div>
-              );
-            }}
-          </Await>
-        </Suspense>
-        <div className="text-center collections-cta">
-          <Link
-            to="/collections"
-            className="btn btn-outline btn-outline-on-dark"
-          >
-            Összes kollekció
-          </Link>
-        </div>
-      </div>
-    </section>
+                <div className="text-center collections-cta">
+                  <Link
+                    to="/collections"
+                    className="btn btn-outline btn-outline-on-dark"
+                  >
+                    Összes kollekció
+                  </Link>
+                </div>
+              </div>
+            </section>
+          );
+        }}
+      </Await>
+    </Suspense>
   );
 }
 
@@ -406,9 +420,9 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
       height
     }
   }
-  query RecommendedProducts ($country: CountryCode, $language: LanguageCode)
+  query RecommendedProducts ($country: CountryCode, $language: LanguageCode, $query: String)
     @inContext(country: $country, language: $language) {
-    products(first: 8, sortKey: UPDATED_AT, reverse: true) {
+    products(first: 8, query: $query, sortKey: UPDATED_AT, reverse: true) {
       nodes {
         ...RecommendedProduct
       }
