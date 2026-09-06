@@ -15,6 +15,12 @@ export const CART_QUERY_FRAGMENT = `#graphql
       discountedAmount {
         ...Money
       }
+      ... on CartAutomaticDiscountAllocation {
+        title
+      }
+      ... on CartCodeDiscountAllocation {
+        code
+      }
     }
     cost {
       totalAmount {
@@ -85,6 +91,12 @@ export const CART_QUERY_FRAGMENT = `#graphql
     discountAllocations {
       discountedAmount {
         ...Money
+      }
+      ... on CartAutomaticDiscountAllocation {
+        title
+      }
+      ... on CartCodeDiscountAllocation {
+        code
       }
     }
     cost {

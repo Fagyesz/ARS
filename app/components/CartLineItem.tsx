@@ -2,6 +2,7 @@ import type {CartLineUpdateInput} from '@shopify/hydrogen/storefront-api-types';
 import type {CartLayout, LineItemChildrenMap} from '~/components/CartMain';
 import {CartForm, Image, type OptimisticCartLine} from '@shopify/hydrogen';
 import {useVariantUrl} from '~/lib/variants';
+import {discountLabel} from '~/lib/discounts';
 import {Link, useFetcher} from 'react-router';
 import {ProductPrice} from './ProductPrice';
 import {useAside} from './Aside';
@@ -102,6 +103,14 @@ export function CartLineItem({
                 };
               })()}
             />
+            {(line.discountAllocations ?? [])
+              .filter((a) => parseFloat(a.discountedAmount.amount) > 0)
+              .map((a, i) => (
+                <span className="cart-line-discount" key={i}>
+                  {discountLabel(a)} · −
+                  {parseFloat(a.discountedAmount.amount).toLocaleString('hu-HU')} Ft
+                </span>
+              ))}
           </div>
         </div>
       </div>

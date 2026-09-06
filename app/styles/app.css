@@ -1419,6 +1419,30 @@ aside .cart-empty {
   color: #16a34a;
 }
 
+/* Applied discount rows under the subtotal, and the per-line discount tag */
+.cart-discount-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: -0.25rem 0 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--color-ars-red);
+}
+
+.cart-discount-row dd {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.cart-line-discount {
+  display: block;
+  margin-top: 0.125rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--color-ars-red);
+  text-align: right;
+}
+
 .cart-shipping-note {
   font-size: 0.8125rem;
   color: var(--color-text-muted);

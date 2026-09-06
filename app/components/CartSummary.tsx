@@ -4,6 +4,8 @@ import {CartForm, Money, type OptimisticCart} from '@shopify/hydrogen';
 import {useEffect, useRef} from 'react';
 import {useFetcher} from 'react-router';
 import {KOSR_CHECKOUT_ENABLED} from '~/lib/config';
+import {summarizeLineDiscounts} from '~/lib/discounts';
+import type {CurrencyCode} from '@shopify/hydrogen/storefront-api-types';
 
 type CartSummaryProps = {
   cart: OptimisticCart<CartApiQueryFragment | null>;
@@ -51,12 +53,31 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
             )}
           </dd>
         </dl>
+        <CartDiscountRows cart={cart} />
         <p className="cart-shipping-note">Szállítási költség a pénztárnál kerül kiszámításra</p>
         <CartDiscounts discountCodes={cart?.discountCodes} />
         <CartGiftCard giftCardCodes={cart?.appliedGiftCards} />
       </div>
       <CartCheckoutActions checkoutUrl={cart?.checkoutUrl} />
     </div>
+  );
+}
+
+/** One row per applied discount (automatic or code), e.g. "Webshop_opening  −2 000 Ft" */
+function CartDiscountRows({cart}: {cart: CartSummaryProps['cart']}) {
+  const rows = summarizeLineDiscounts(cart?.lines?.nodes ?? []);
+  if (!rows.length) return null;
+  return (
+    <>
+      {rows.map((row) => (
+        <dl className="cart-discount-row" key={row.label}>
+          <dt>Kedvezmény · {row.label}</dt>
+          <dd>
+            −<Money data={{amount: String(row.amount), currencyCode: row.currencyCode as CurrencyCode}} />
+          </dd>
+        </dl>
+      ))}
+    </>
   );
 }
 
