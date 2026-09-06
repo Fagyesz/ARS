@@ -7,11 +7,13 @@ import {buildCopy, type Campaign, type CampaignKind} from './campaigns';
  * SHOPIFY_ADMIN_CLIENT_SECRET in the Oxygen environment). Without them the
  * storefront simply shows no campaign surfaces.
  *
- * Results are memoised per worker for a few minutes so the banner does not
- * cost an Admin API round trip on every request.
+ * Results are memoised per worker for a minute so the banner does not cost an
+ * Admin API round trip on every request; a discount that ends (or is ended in
+ * the admin) disappears within that minute, and one whose end date has passed
+ * is dropped on every request without waiting for the refresh.
  */
 const API_VERSION = '2025-07';
-const TTL_MS = 5 * 60 * 1000;
+const TTL_MS = 60 * 1000;
 
 type Memo = {at: number; value: Campaign[]};
 let memo: Memo | null = null;
@@ -31,17 +33,23 @@ export async function loadCampaigns(env: AdminEnv): Promise<Campaign[]> {
   const shop = env.PUBLIC_STORE_DOMAIN;
   if (!clientId || !secret || !shop) return [];
 
-  if (memo && Date.now() - memo.at < TTL_MS) return memo.value;
+  if (memo && Date.now() - memo.at < TTL_MS) return stillRunning(memo.value);
 
   try {
     const value = await fetchCampaigns({shop, clientId, secret});
     memo = {at: Date.now(), value};
-    return value;
+    return stillRunning(value);
   } catch (error) {
     console.error('[campaigns] could not load automatic discounts:', error);
     // keep showing the last good data rather than flickering the banner off
-    return memo?.value ?? [];
+    return stillRunning(memo?.value ?? []);
   }
+}
+
+/** Drops campaigns whose end date has passed since they were fetched */
+function stillRunning(campaigns: Campaign[]): Campaign[] {
+  const now = Date.now();
+  return campaigns.filter((c) => !c.endsAt || Date.parse(c.endsAt) > now);
 }
 
 async function getToken({shop, clientId, secret}: {shop: string; clientId: string; secret: string}) {
