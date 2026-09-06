@@ -45,34 +45,81 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
   const cartHasItems = cart?.totalQuantity ? cart.totalQuantity > 0 : false;
   const childrenMap = getLineItemChildrenMap(cart?.lines?.nodes ?? []);
 
+  const groups = groupCartLines(cart?.lines?.nodes ?? []);
+
   return (
     <div className={className}>
       <CartEmpty hidden={linesCount} layout={layout} />
       <div className="cart-details">
         <div aria-labelledby="cart-lines">
           <ul>
-            {(cart?.lines?.nodes ?? []).map((line) => {
-              if (
-                'parentRelationship' in line &&
-                line.parentRelationship?.parent
-              ) {
-                return null;
-              }
-              return (
-                <CartLineItem
-                  key={line.id}
-                  line={line}
-                  layout={layout}
-                  childrenMap={childrenMap}
-                />
-              );
-            })}
+            {groups.map((group) => (
+              <CartLineItem
+                key={group.line.id}
+                line={group.line}
+                lines={group.lines}
+                layout={layout}
+                childrenMap={childrenMap}
+              />
+            ))}
           </ul>
         </div>
         {cartHasItems && <CartSummary cart={cart} layout={layout} />}
       </div>
     </div>
   );
+}
+
+export type CartLineGroup = {
+  /** merged view of the group: summed quantity, cost and discounts */
+  line: CartLine;
+  /** the underlying Shopify lines, in cart order */
+  lines: CartLine[];
+};
+
+/**
+ * Buy-X-get-Y discounts make Shopify split one variant into several lines
+ * (discounted units vs. full-price units), and further adds of that variant
+ * may land on new lines. Show one row per variant; controls act on the group.
+ */
+export function groupCartLines(lines: CartLine[]): CartLineGroup[] {
+  const groups: CartLineGroup[] = [];
+  const byMerchandise = new Map<string, CartLineGroup>();
+  for (const line of lines) {
+    if ('parentRelationship' in line && line.parentRelationship?.parent) {
+      continue; // bundle components are rendered under their parent
+    }
+    const existing = byMerchandise.get(line.merchandise.id);
+    if (!existing) {
+      const group = {line, lines: [line]};
+      byMerchandise.set(line.merchandise.id, group);
+      groups.push(group);
+      continue;
+    }
+    existing.lines.push(line);
+    existing.line = mergeLines(existing.line, line);
+  }
+  return groups;
+}
+
+type Money = {amount: string; currencyCode: string};
+const addMoney = (a?: Money | null, b?: Money | null): Money | null | undefined =>
+  a && b ? {...a, amount: String(parseFloat(a.amount) + parseFloat(b.amount))} : (a ?? b);
+
+function mergeLines(a: CartLine, b: CartLine): CartLine {
+  return {
+    ...a,
+    quantity: a.quantity + b.quantity,
+    isOptimistic: Boolean(a.isOptimistic || b.isOptimistic),
+    cost: {
+      ...a.cost,
+      totalAmount: addMoney(a.cost?.totalAmount, b.cost?.totalAmount),
+    },
+    discountAllocations: [
+      ...(a.discountAllocations ?? []),
+      ...(b.discountAllocations ?? []),
+    ],
+  } as CartLine;
 }
 
 type FeaturedProduct = {

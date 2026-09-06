@@ -1,5 +1,6 @@
 import {Link} from 'react-router';
-import {Image, Money} from '@shopify/hydrogen';
+import {Image} from '@shopify/hydrogen';
+import {formatMoney} from '~/lib/money';
 import {useRef, useEffect} from 'react';
 import type {
   ProductItemFragment,
@@ -69,7 +70,10 @@ export function ProductItem({
         <div className="product-card-info">
           <h3 className="product-card-title">{product.title}</h3>
           <div className="product-card-price">
-            <Money data={product.priceRange.minVariantPrice} />
+            {formatMoney(
+              product.priceRange.minVariantPrice.amount,
+              product.priceRange.minVariantPrice.currencyCode,
+            )}
           </div>
         </div>
       </Link>

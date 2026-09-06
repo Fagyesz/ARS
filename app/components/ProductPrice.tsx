@@ -1,16 +1,5 @@
-import {Money} from '@shopify/hydrogen';
 import type {MoneyV2} from '@shopify/hydrogen/storefront-api-types';
-
-function formatMoney(data: MoneyV2) {
-  const amount = parseFloat(data.amount);
-  const formatted = new Intl.NumberFormat('hu-HU', {
-    style: 'currency',
-    currency: data.currencyCode,
-    minimumFractionDigits: data.currencyCode === 'HUF' ? 0 : 2,
-    maximumFractionDigits: data.currencyCode === 'HUF' ? 0 : 2,
-  }).format(amount);
-  return formatted;
-}
+import {formatMoney} from '~/lib/money';
 
 export function ProductPrice({
   price,
@@ -23,11 +12,11 @@ export function ProductPrice({
     <div className="product-price">
       {compareAtPrice ? (
         <div className="product-price-on-sale">
-          {price ? <span>{formatMoney(price)}</span> : null}
-          <s>{formatMoney(compareAtPrice)}</s>
+          {price ? <span>{formatMoney(price.amount, price.currencyCode)}</span> : null}
+          <s>{formatMoney(compareAtPrice.amount, compareAtPrice.currencyCode)}</s>
         </div>
       ) : price ? (
-        <span>{formatMoney(price)}</span>
+        <span>{formatMoney(price.amount, price.currencyCode)}</span>
       ) : (
         <span>&nbsp;</span>
       )}

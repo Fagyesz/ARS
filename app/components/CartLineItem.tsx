@@ -3,6 +3,7 @@ import type {CartLayout, LineItemChildrenMap} from '~/components/CartMain';
 import {CartForm, Image, type OptimisticCartLine} from '@shopify/hydrogen';
 import {useVariantUrl} from '~/lib/variants';
 import {discountLabel} from '~/lib/discounts';
+import {formatMoney} from '~/lib/money';
 import {Link, useFetcher} from 'react-router';
 import {ProductPrice} from './ProductPrice';
 import {useAside} from './Aside';
@@ -16,13 +17,17 @@ export type CartLine = OptimisticCartLine<CartApiQueryFragment>;
 export function CartLineItem({
   layout,
   line,
+  lines,
   childrenMap,
 }: {
   layout: CartLayout;
   line: CartLine;
+  /** underlying Shopify lines when several were merged into `line` */
+  lines?: CartLine[];
   childrenMap: LineItemChildrenMap;
 }) {
   const {id, merchandise} = line;
+  const groupLines = lines?.length ? lines : [line];
   const {product, title, image, selectedOptions} = merchandise;
   const lineItemUrl = useVariantUrl(product.handle, selectedOptions);
   const {close} = useAside();
@@ -76,7 +81,7 @@ export function CartLineItem({
         {/* Inline size selector */}
         {sizeOption && (
           <SizeSwapForm
-            lineId={id}
+            lineId={groupLines.map((l) => l.id).join(',')}
             quantity={line.quantity}
             currentVariantId={merchandise.id}
             selectedOptions={selectedOptions}
@@ -85,7 +90,7 @@ export function CartLineItem({
         )}
 
         <div className="cart-line-actions">
-          <CartLineQuantity line={line} />
+          <CartLineQuantity line={line} lines={groupLines} />
           <div className="cart-line-price">
             <ProductPrice
               price={line?.cost?.totalAmount}
@@ -108,7 +113,7 @@ export function CartLineItem({
               .map((a, i) => (
                 <span className="cart-line-discount" key={i}>
                   {discountLabel(a)} · −
-                  {parseFloat(a.discountedAmount.amount).toLocaleString('hu-HU')} Ft
+                  {formatMoney(a.discountedAmount.amount, a.discountedAmount.currencyCode)}
                 </span>
               ))}
           </div>
@@ -131,36 +136,63 @@ export function CartLineItem({
   );
 }
 
-function CartLineQuantity({line}: {line: CartLine}) {
+function CartLineQuantity({line, lines}: {line: CartLine; lines: CartLine[]}) {
   if (!line || typeof line?.quantity === 'undefined') return null;
-  const {id: lineId, quantity, isOptimistic} = line;
-  const prevQuantity = Number(Math.max(0, quantity - 1).toFixed(0));
-  const nextQuantity = Number((quantity + 1).toFixed(0));
+  const {quantity, isOptimistic} = line;
+  const busy = !!isOptimistic;
+
+  // "+" grows the first underlying line; Shopify re-splits discounted units itself
+  const first = lines[0];
+  const increase = [{id: first.id, quantity: first.quantity + 1}];
+
+  // "−" shrinks a line that still has more than one unit, otherwise drops a
+  // whole single-unit line; a lone single-unit line can only be removed
+  const shrinkable = lines.find((l) => l.quantity > 1);
+  const decreaseUpdate = shrinkable
+    ? [{id: shrinkable.id, quantity: shrinkable.quantity - 1}]
+    : null;
+  const decreaseRemove = !shrinkable && lines.length > 1 ? [lines[lines.length - 1].id] : null;
+  const canDecrease = quantity > 1 && (decreaseUpdate || decreaseRemove);
+
+  const decreaseButton = (
+    <button
+      aria-label="Mennyiség csökkentése"
+      disabled={!canDecrease || busy}
+      name="decrease-quantity"
+      type="submit"
+    >
+      <span>-</span>
+    </button>
+  );
 
   return (
     <div className="cart-line-quantity">
-      <CartLineUpdateButton lines={[{id: lineId, quantity: prevQuantity}]}>
-        <button
-          aria-label="Mennyiség csökkentése"
-          disabled={quantity <= 1 || !!isOptimistic}
-          name="decrease-quantity"
-          value={prevQuantity}
+      {decreaseRemove ? (
+        <CartForm
+          fetcherKey={getUpdateKey(decreaseRemove)}
+          route="/cart"
+          action={CartForm.ACTIONS.LinesRemove}
+          inputs={{lineIds: decreaseRemove}}
         >
-          <span>-</span>
-        </button>
-      </CartLineUpdateButton>
+          {decreaseButton}
+        </CartForm>
+      ) : (
+        <CartLineUpdateButton lines={decreaseUpdate ?? [{id: first.id, quantity: first.quantity}]}>
+          {decreaseButton}
+        </CartLineUpdateButton>
+      )}
       <span className="cart-line-quantity-value">{quantity}</span>
-      <CartLineUpdateButton lines={[{id: lineId, quantity: nextQuantity}]}>
+      <CartLineUpdateButton lines={increase}>
         <button
           aria-label="Mennyiség növelése"
           name="increase-quantity"
-          value={nextQuantity}
-          disabled={!!isOptimistic}
+          type="submit"
+          disabled={busy}
         >
           <span>+</span>
         </button>
       </CartLineUpdateButton>
-      <CartLineRemoveButton lineIds={[lineId]} disabled={!!isOptimistic} />
+      <CartLineRemoveButton lineIds={lines.map((l) => l.id)} disabled={busy} />
     </div>
   );
 }

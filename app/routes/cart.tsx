@@ -26,12 +26,13 @@ export async function action({request, context}: Route.ActionArgs) {
   let status = 200;
   let result: CartQueryDataReturn;
 
-  // Custom: swap variant (size change in cart)
+  // Custom: swap variant (size change in cart). Several line ids may arrive
+  // comma-separated when the UI merged discount-split lines of one variant.
   const swapLineId = formData.get('swapLineId') as string | null;
   if (swapLineId) {
     const newVariantId = formData.get('swapVariantId') as string;
     const quantity = Number(formData.get('swapQuantity'));
-    await cart.removeLines([swapLineId]);
+    await cart.removeLines(swapLineId.split(',').filter(Boolean));
     result = await cart.addLines([{merchandiseId: newVariantId, quantity}]);
   } else {
 

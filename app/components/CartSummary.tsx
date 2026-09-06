@@ -1,11 +1,11 @@
 import type {CartApiQueryFragment} from 'storefrontapi.generated';
 import type {CartLayout} from '~/components/CartMain';
-import {CartForm, Money, type OptimisticCart} from '@shopify/hydrogen';
+import {CartForm, type OptimisticCart} from '@shopify/hydrogen';
 import {useEffect, useRef} from 'react';
 import {useFetcher} from 'react-router';
 import {KOSR_CHECKOUT_ENABLED} from '~/lib/config';
 import {summarizeLineDiscounts} from '~/lib/discounts';
-import type {CurrencyCode} from '@shopify/hydrogen/storefront-api-types';
+import {formatMoney} from '~/lib/money';
 
 type CartSummaryProps = {
   cart: OptimisticCart<CartApiQueryFragment | null>;
@@ -28,22 +28,21 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
                 const totalDiscount = lines.reduce((sum: number, line: any) =>
                   sum + (line.discountAllocations ?? []).reduce((s: number, a: any) =>
                     s + parseFloat(a.discountedAmount.amount), 0), 0);
+                const {amount, currencyCode} = cart.cost.subtotalAmount;
 
                 if (totalDiscount <= 0) {
-                  return <Money data={cart.cost.subtotalAmount} />;
+                  return formatMoney(amount, currencyCode);
                 }
 
-                const currency = cart.cost.subtotalAmount.currencyCode;
-                const discountedAmount = parseFloat(cart.cost.subtotalAmount.amount);
-                const originalAmount = discountedAmount + totalDiscount;
+                const originalAmount = parseFloat(amount) + totalDiscount;
 
                 return (
                   <div className="cart-subtotal-with-discount">
                     <s className="cart-subtotal-original">
-                      <Money data={{amount: String(originalAmount), currencyCode: currency}} />
+                      {formatMoney(originalAmount, currencyCode)}
                     </s>
                     <span className="cart-subtotal-discounted">
-                      <Money data={cart.cost.subtotalAmount} />
+                      {formatMoney(amount, currencyCode)}
                     </span>
                   </div>
                 );
@@ -72,9 +71,7 @@ function CartDiscountRows({cart}: {cart: CartSummaryProps['cart']}) {
       {rows.map((row) => (
         <dl className="cart-discount-row" key={row.label}>
           <dt>Kedvezmény · {row.label}</dt>
-          <dd>
-            −<Money data={{amount: String(row.amount), currencyCode: row.currencyCode as CurrencyCode}} />
-          </dd>
+          <dd>−{formatMoney(row.amount, row.currencyCode)}</dd>
         </dl>
       ))}
     </>
@@ -194,7 +191,7 @@ function CartGiftCard({
               <RemoveGiftCardForm giftCardId={giftCard.id}>
                 <div className="cart-discount-code">
                   <code>***{giftCard.lastCharacters}</code>
-                  <span>-<Money data={giftCard.amountUsed} /></span>
+                  <span>−{formatMoney(giftCard.amountUsed.amount, giftCard.amountUsed.currencyCode)}</span>
                   <button type="submit" aria-label="Eltávolítás">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
