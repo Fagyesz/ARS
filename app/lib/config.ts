@@ -37,13 +37,14 @@ export const COLLECTION_TYPES = [
 
 /**
  * Fallback shipping facts, used only until the `shop_settings` metaobject
- * exists in Shopify. Source: the shop's own shipping/return policy pages.
+ * exists in Shopify. Source: the checkout's own delivery options (2026-09-06:
+ * a single "FoxPost csomagpont" rate, no home delivery, no free threshold).
  */
 export const SHIPPING = {
-  carrier: 'GLS',
-  parcelPointFt: 1290,
-  homeDeliveryFt: 1590,
-  freeOverFt: 30000,
+  carrier: 'FoxPost',
+  parcelPointFt: 1300,
+  homeDeliveryFt: 0, // 0 = not offered
+  freeOverFt: 0, // 0 = no free-shipping threshold
   handlingDays: '1–2 munkanap',
   transitDays: '2–3 munkanap',
   returnDays: 14,

@@ -1,6 +1,7 @@
 import type {Storefront} from '@shopify/hydrogen';
 import {EMAIL, SHIPPING, SOCIAL_LINKS} from './config';
 import {ARTISTS, type Artist} from './artists';
+import {formatMoney} from './money';
 
 /**
  * Shop-managed content. Everything here is read from Shopify through the
@@ -17,7 +18,9 @@ export type SiteSettings = {
   shipping: {
     carrier: string;
     parcelPointFt: number;
+    /** 0 = the shop does not offer home delivery */
     homeDeliveryFt: number;
+    /** 0 = no free-shipping threshold */
     freeOverFt: number;
     handlingDays: string;
     transitDays: string;
@@ -100,6 +103,30 @@ export const FALLBACK_SIZE_GUIDES: SizeGuide[] = [
     note: 'Egyetlen példányban készült darab, mérete: {sizes}. Pontos méreteket szívesen küldünk: írj nekünk a termék nevével.',
   },
 ];
+
+export type Shipping = SiteSettings['shipping'];
+
+/**
+ * The shipping facts as short phrases, in the order they are printed:
+ * "FoxPost csomagpont 1 300 Ft", then home delivery and the free-shipping
+ * threshold only when the shop offers them (a 0 in the settings hides them).
+ */
+export function shippingFacts(shipping: Shipping): string[] {
+  const facts = [`${shipping.carrier} csomagpont ${formatMoney(shipping.parcelPointFt)}`];
+  if (shipping.homeDeliveryFt > 0) facts.push(`házhoz szállítás ${formatMoney(shipping.homeDeliveryFt)}`);
+  if (shipping.freeOverFt > 0) facts.push(`${formatMoney(shipping.freeOverFt)} felett ingyenes`);
+  return facts;
+}
+
+/** "csomagpont vagy házhoz szállítás" / "csomagpont" */
+export function deliveryModes(shipping: Shipping): string {
+  return shipping.homeDeliveryFt > 0 ? 'csomagpont vagy házhoz szállítás' : 'csomagpont';
+}
+
+/** Where the parcel goes: "csomagpontra vagy házhoz" / "a választott csomagpontra" */
+export function deliveryTargets(shipping: Shipping): string {
+  return shipping.homeDeliveryFt > 0 ? 'csomagpontra vagy házhoz' : 'a választott csomagpontra';
+}
 
 type Field = {key: string; value?: string | null; reference?: unknown};
 type MetaobjectNode = {handle: string; fields: Field[]};

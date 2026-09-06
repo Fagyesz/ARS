@@ -1,6 +1,8 @@
-import {Link} from 'react-router';
+import {Link, useRouteLoaderData} from 'react-router';
 import type {Route} from './+types/policies.privacy-policy';
+import {FALLBACK_SETTINGS} from '~/lib/content';
 import {seoMeta} from '~/lib/seo';
+import type {RootLoader} from '~/root';
 
 export const meta: Route.MetaFunction = ({location}) =>
   seoMeta({
@@ -11,6 +13,9 @@ export const meta: Route.MetaFunction = ({location}) =>
   });
 
 export default function PrivacyPolicy() {
+  // the carrier is a data processor; its name comes from the shop_settings metaobject
+  const rootData = useRouteLoaderData<RootLoader>('root');
+  const {shipping} = rootData?.content?.settings ?? FALLBACK_SETTINGS;
   return (
     <div className="policy-page">
       <div className="container">
@@ -83,7 +88,7 @@ export default function PrivacyPolicy() {
               <strong>Shopify Inc.</strong> – webshop platform és fizetési rendszer (adatfeldolgozó)
             </li>
             <li>
-              <strong>GLS Hungary Kft.</strong> – szállítmányozás (szállítási adatok)
+              <strong>{shipping.carrier}</strong> – csomagkézbesítés (név, telefonszám, választott csomagpont)
             </li>
             <li>
               <strong>Resend</strong> – tranzakciós e-mailek küldése

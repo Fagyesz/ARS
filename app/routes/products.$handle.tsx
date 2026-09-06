@@ -5,6 +5,7 @@ import {
   FALLBACK_SETTINGS,
   FALLBACK_SIZE_GUIDES,
   findSizeGuide,
+  shippingFacts,
   toSizeGuide,
   type SiteSettings,
   type SizeGuide as SizeGuideData,
@@ -480,11 +481,13 @@ const TRUST_ICONS = {
 /** The four things a buyer asks before adding to cart; facts come from the shop_settings metaobject */
 function TrustStrip({settings}: {settings: SiteSettings}) {
   const {shipping, usp} = settings;
+  // "FoxPost csomagpont 1 300 Ft" + home delivery / free threshold only when offered
+  const [parcelPoint, ...moreShipping] = shippingFacts(shipping);
   const items = [
     {
       icon: TRUST_ICONS.truck,
-      title: `${shipping.carrier} csomagpont ${formatMoney(shipping.parcelPointFt)}`,
-      text: `házhoz ${formatMoney(shipping.homeDeliveryFt)}, ${formatMoney(shipping.freeOverFt)} felett ingyenes`,
+      title: parcelPoint,
+      text: moreShipping.length ? moreShipping.join(', ') : 'a csomagpontot a pénztárban választod ki',
     },
     {
       icon: TRUST_ICONS.clock,

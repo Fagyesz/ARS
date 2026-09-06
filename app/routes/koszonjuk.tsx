@@ -1,6 +1,6 @@
 import {Link, useLoaderData, useRouteLoaderData} from 'react-router';
 import type {Route} from './+types/koszonjuk';
-import {FALLBACK_SETTINGS} from '~/lib/content';
+import {FALLBACK_SETTINGS, deliveryTargets} from '~/lib/content';
 import {seoMeta} from '~/lib/seo';
 import type {RootLoader} from '~/root';
 
@@ -58,7 +58,7 @@ export default function ThankYou() {
           <li>
             <strong>Kézbesítés</strong>
             <span>
-              {shipping.transitDays} a feladástól, csomagpontra vagy házhoz.
+              {shipping.transitDays} a feladástól, {deliveryTargets(shipping)}.
             </span>
           </li>
         </ol>

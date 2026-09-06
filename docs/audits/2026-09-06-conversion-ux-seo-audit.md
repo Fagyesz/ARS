@@ -106,6 +106,8 @@ Learned on the way: Oxygen serves `public/` images through Shopify's CDN, which 
 
 Seeded the same evening: the definitions, entries and menus exist in the shop, the Admin API credentials are in Oxygen (campaign banner live). Portraits stay in `public/artists/` until the app also gets the Files write scope.
 
+**Shipping corrected to what the checkout actually offers (same evening).** The owner switched to FoxPost only. A Storefront `cartCreate` with a Budapest address shows a single delivery option, "FoxPost csomagpont" at 1 300 Ft, at any subtotal (checked at 42 000 Ft): no home delivery and no free-shipping rate exist. The `shop_settings` entry now says FoxPost / 1 300 / 0 / 0; a 0 in the home-delivery price or the free-shipping threshold means "not offered" and hides that line everywhere (cart note, checkout note, product trust strip, footer, thank-you page, shipping policy, privacy policy's carrier row). If a free-shipping rate is added in Shopify Shipping later, set the threshold in the metaobject and the progress bar returns. The shipping and privacy policy pages now read the carrier/prices/e-mail from the metaobject too.
+
 Still open from the audit: catalogue pagination (not needed under ~50 products), per-type measurements for hoodies (now a metaobject field), payment-method logos (which methods does kosR offer?), hero product visual, `app.css` size.
 
 ## Suggested order of work

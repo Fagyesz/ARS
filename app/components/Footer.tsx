@@ -1,8 +1,7 @@
 import {Suspense} from 'react';
 import {Await, NavLink, useRouteLoaderData} from 'react-router';
 import type {FooterQuery, HeaderQuery} from 'storefrontapi.generated';
-import {formatMoney} from '~/lib/money';
-import {FALLBACK_SETTINGS} from '~/lib/content';
+import {FALLBACK_SETTINGS, shippingFacts} from '~/lib/content';
 import {menuItemPath} from '~/components/Header';
 import type {RootLoader} from '~/root';
 
@@ -150,9 +149,11 @@ export function Footer({
                 </div>
 
                 <p className="footer-shipping">
-                  {shipping.carrier} csomagpont {formatMoney(shipping.parcelPointFt)} · házhoz szállítás{' '}
-                  {formatMoney(shipping.homeDeliveryFt)} · {formatMoney(shipping.freeOverFt)} felett ingyenes ·{' '}
-                  {shipping.returnDays} napos elállás · {settings.paymentMethods}
+                  {[
+                    ...shippingFacts(shipping),
+                    `${shipping.returnDays} napos elállás`,
+                    settings.paymentMethods,
+                  ].join(' · ')}
                 </p>
                 <div className="footer-bottom">
                   <p suppressHydrationWarning>

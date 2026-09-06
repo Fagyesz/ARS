@@ -4,7 +4,7 @@ import {CartForm, type OptimisticCart} from '@shopify/hydrogen';
 import {Link, useRouteLoaderData} from 'react-router';
 import {KOSR_CHECKOUT_ENABLED} from '~/lib/config';
 import {CAMPAIGN_PATH, isEligible} from '~/lib/campaigns';
-import {FALLBACK_SETTINGS, type SiteSettings} from '~/lib/content';
+import {FALLBACK_SETTINGS, deliveryModes, shippingFacts, type SiteSettings} from '~/lib/content';
 import {summarizeLineDiscounts} from '~/lib/discounts';
 import {formatMoney} from '~/lib/money';
 import {useAside} from './Aside';
@@ -69,8 +69,10 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
         </dl>
         <CartDiscountRows cart={cart} />
         <p className="cart-shipping-note">
-          Szállítás: {shipping.carrier} csomagpont {formatMoney(shipping.parcelPointFt)},
-          házhoz {formatMoney(shipping.homeDeliveryFt)}; a pénztárban választhatsz.
+          Szállítás: {shippingFacts(shipping).join(' · ')}.{' '}
+          {shipping.homeDeliveryFt > 0
+            ? 'A pénztárban választhatsz.'
+            : 'A csomagpontot a pénztárban választod ki.'}
         </p>
         <CartDiscounts discountCodes={cart?.discountCodes} />
       </div>
@@ -182,7 +184,7 @@ function CartCheckoutActions({
         Tovább a fizetéshez
       </a>
       <p className="cart-checkout-note">
-        {settings.paymentMethods} · {settings.shipping.carrier} csomagpont vagy házhoz szállítás ·{' '}
+        {settings.paymentMethods} · {settings.shipping.carrier} {deliveryModes(settings.shipping)} ·{' '}
         {settings.shipping.returnDays} napos elállás
       </p>
     </div>
