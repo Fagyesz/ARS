@@ -3,6 +3,7 @@ import {type MappedProductOptions} from '@shopify/hydrogen';
 import {AddToCartButton} from './AddToCartButton';
 import {useAside} from './Aside';
 import type {ProductFragment} from 'storefrontapi.generated';
+import {STANDARD_SIZES, isSizeOption} from '~/lib/sizes';
 
 // Hungarian translations for common option names
 const OPTION_TRANSLATIONS: Record<string, string> = {
@@ -12,13 +13,7 @@ const OPTION_TRANSLATIONS: Record<string, string> = {
   Material: 'Anyag',
 };
 
-const STANDARD_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 const DEFAULT_SIZE_RUN = ['S', 'M', 'L', 'XL'];
-
-function isSizeOption(name: string) {
-  const lower = name.toLowerCase();
-  return lower === 'size' || lower === 'méret';
-}
 
 /**
  * Letter-sized garments always show the S–XL row (plus XS/XXL when the product

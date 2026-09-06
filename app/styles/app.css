@@ -6080,6 +6080,80 @@ body:has(.cookie-banner--visible) .sticky-cart-bar {
   transform: scaleX(1);
 }
 
+/* ── Size filter row (S M L XL …, only sizes something is in stock in) ── */
+.catalog-size-row {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.6rem;
+  border-top: 1px solid rgba(35, 31, 32, 0.1);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.catalog-size-row::-webkit-scrollbar {
+  display: none;
+}
+
+.catalog-size-clear {
+  margin-left: 0.5rem;
+  font-family: var(--font-sans);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  white-space: nowrap;
+}
+
+.catalog-size-clear:hover {
+  color: var(--color-ars-dark);
+}
+
+.catalog-size-label {
+  font-family: var(--font-sans);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-right: 0.35rem;
+  white-space: nowrap;
+}
+
+.catalog-size-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 0.5rem;
+  border: 1.5px solid var(--color-text-muted);
+  border-radius: 2px;
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--color-ars-dark);
+  background: transparent;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.catalog-size-chip:hover {
+  border-color: var(--color-ars-dark);
+}
+
+.catalog-size-chip.active {
+  background: var(--color-ars-dark);
+  border-color: var(--color-ars-dark);
+  color: #fff;
+}
+
 /* Meta row */
 .catalog-meta {
   display: flex;

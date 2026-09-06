@@ -86,6 +86,7 @@ ${shopId ? `Disallow: /${shopId}/orders` : ''}
 Disallow: /carts
 Disallow: /account
 Disallow: /*?*sort=
+Disallow: /*?*size=
 Disallow: /collections/*+*
 Disallow: /collections/*%2B*
 Disallow: /collections/*%2b*

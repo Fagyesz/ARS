@@ -1,10 +1,12 @@
 import type {Route} from './+types/collections.all';
 import {useLoaderData, Link, useNavigation} from 'react-router';
 import {ProductItem} from '~/components/ProductItem';
+import {SizeFilter} from '~/components/SizeFilter';
 import type {CollectionItemFragment} from 'storefrontapi.generated';
 import {ARTISTS} from '~/lib/artists';
 import {COLLECTION_TYPES} from '~/lib/config';
 import {jsonLd, productListJsonLd, seoMeta} from '~/lib/seo';
+import {filterBySize, parseSizeParam, sizeOptions} from '~/lib/sizes';
 
 export const meta: Route.MetaFunction = ({data, location}) => {
   const typeLabel = COLLECTION_TYPES.find((t) => t.value === data?.typeFilter)?.label;
@@ -58,6 +60,7 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
   const artistFilter = url.searchParams.get('artist') || '';
   const typeFilter = url.searchParams.get('type') || '';
   const sortParam = (url.searchParams.get('sort') || '') as SortValue;
+  const sizeParam = parseSizeParam(url.searchParams.get('size'));
   const {sortKey, reverse} = parseSortKey(sortParam);
 
   // Scope to the vendor field and the type tag; a free-text match on "Dóri"
@@ -77,31 +80,55 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
     (a, b) => Number(!!b.featuredImage) - Number(!!a.featuredImage),
   );
 
-  return {products: {...products, nodes}, artistFilter, typeFilter, sortParam};
+  // Size chips list every size the (artist/type-filtered) set is in stock in,
+  // so a chosen size never hides the other choices.
+  const sizes = sizeOptions(nodes);
+
+  return {
+    products: {...products, nodes: filterBySize(nodes, sizeParam)},
+    artistFilter,
+    typeFilter,
+    sortParam,
+    sizeParam,
+    sizes,
+  };
 }
 
 function loadDeferredData(_args: Route.LoaderArgs) {
   return {};
 }
 
-function buildFilterUrl({artist, type, sort}: {artist: string; type: string; sort: string}) {
+function buildFilterUrl({
+  artist,
+  type,
+  sort,
+  size,
+}: {
+  artist: string;
+  type: string;
+  sort: string;
+  size: string;
+}) {
   const params = new URLSearchParams();
   if (artist) params.set('artist', artist);
   if (type) params.set('type', type);
   if (sort) params.set('sort', sort);
+  if (size) params.set('size', size);
   const query = params.toString();
   return `/collections/all${query ? `?${query}` : ''}`;
 }
 
 export default function Collection() {
-  const {products, artistFilter, typeFilter, sortParam} = useLoaderData<typeof loader>();
+  const {products, artistFilter, typeFilter, sortParam, sizeParam, sizes} =
+    useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const isLoading = navigation.state === 'loading';
 
-  const hasFilters = !!(artistFilter || typeFilter);
+  const hasFilters = !!(artistFilter || typeFilter || sizeParam);
   const activeFilterLabel = [
     artistFilter || null,
     typeFilter ? COLLECTION_TYPES.find((t) => t.value === typeFilter)?.label : null,
+    sizeParam ? `${sizeParam} méret` : null,
   ]
     .filter(Boolean)
     .join(' · ');
@@ -124,7 +151,7 @@ export default function Collection() {
           {/* Artist chips */}
           <div className="catalog-filter-section">
             <Link
-              to={buildFilterUrl({artist: '', type: typeFilter, sort: sortParam})}
+              to={buildFilterUrl({artist: '', type: typeFilter, sort: sortParam, size: sizeParam})}
               className={`catalog-artist-chip${!artistFilter ? ' active' : ''}`}
             >
               <span className="catalog-artist-name">Összes</span>
@@ -132,7 +159,7 @@ export default function Collection() {
             {ARTISTS.map((artist) => (
               <Link
                 key={artist.name}
-                to={buildFilterUrl({artist: artist.name, type: typeFilter, sort: sortParam})}
+                to={buildFilterUrl({artist: artist.name, type: typeFilter, sort: sortParam, size: sizeParam})}
                 className={`catalog-artist-chip${artistFilter === artist.name ? ' active' : ''}`}
               >
                 <span className="catalog-artist-initial">{artist.name[0]}</span>
@@ -140,7 +167,7 @@ export default function Collection() {
               </Link>
             ))}
             <Link
-              to={buildFilterUrl({artist: 'Ars Mosoris', type: typeFilter, sort: sortParam})}
+              to={buildFilterUrl({artist: 'Ars Mosoris', type: typeFilter, sort: sortParam, size: sizeParam})}
               className={`catalog-artist-chip${artistFilter === 'Ars Mosoris' ? ' active' : ''}`}
             >
               <span className="catalog-artist-initial">A</span>
@@ -155,7 +182,7 @@ export default function Collection() {
             {TYPE_FILTERS.map((type) => (
               <Link
                 key={type.value}
-                to={buildFilterUrl({artist: artistFilter, type: type.value, sort: sortParam})}
+                to={buildFilterUrl({artist: artistFilter, type: type.value, sort: sortParam, size: sizeParam})}
                 className={`catalog-type-chip${typeFilter === type.value ? ' active' : ''}`}
               >
                 {type.label}
@@ -170,7 +197,12 @@ export default function Collection() {
             {SORT_OPTIONS.map((opt) => (
               <Link
                 key={opt.value}
-                to={buildFilterUrl({artist: artistFilter, type: typeFilter, sort: opt.value})}
+                to={buildFilterUrl({
+                  artist: artistFilter,
+                  type: typeFilter,
+                  sort: opt.value,
+                  size: sizeParam,
+                })}
                 className={`catalog-sort-btn${sortParam === opt.value ? ' active' : ''}`}
               >
                 {opt.label}
@@ -178,6 +210,14 @@ export default function Collection() {
             ))}
           </div>
         </div>
+        {/* Size chips on their own row: only sizes something is in stock in */}
+        <SizeFilter
+          sizes={sizes}
+          active={sizeParam}
+          hrefFor={(size) =>
+            buildFilterUrl({artist: artistFilter, type: typeFilter, sort: sortParam, size})
+          }
+        />
       </div>
 
       <div className="container">
@@ -185,6 +225,7 @@ export default function Collection() {
           <div className="catalog-empty">
             <p className="catalog-empty-title">Nincs találat</p>
             <p className="catalog-empty-text">
+              {sizeParam ? `Ebben a méretben (${sizeParam}) most nincs elérhető darab. ` : ''}
               Próbálj más szűrőkombinációt, vagy böngéssz a teljes kínálatban.
             </p>
             <Link to="/collections/all" className="btn btn-outline">
@@ -272,6 +313,17 @@ const CATALOG_QUERY = `#graphql
     ) {
       nodes {
         ...CollectionItem
+        # for the size filter: which sizes are in stock (app/lib/sizes.ts);
+        # kept out of the shared card fragment so other routes stay unchanged
+        variants(first: 20) {
+          nodes {
+            availableForSale
+            selectedOptions {
+              name
+              value
+            }
+          }
+        }
       }
     }
   }

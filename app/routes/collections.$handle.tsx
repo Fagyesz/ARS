@@ -4,8 +4,10 @@ import type {Route} from './+types/collections.$handle';
 import {Analytics} from '@shopify/hydrogen';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {ProductItem} from '~/components/ProductItem';
+import {SizeFilter} from '~/components/SizeFilter';
 import type {ProductItemFragment} from 'storefrontapi.generated';
 import {breadcrumbJsonLd, jsonLd, productListJsonLd, seoMeta} from '~/lib/seo';
+import {filterBySize, parseSizeParam, sizeOptions} from '~/lib/sizes';
 
 export const meta: Route.MetaFunction = ({data, location}) =>
   seoMeta({
@@ -48,6 +50,7 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   const {storefront} = context;
   const url = new URL(request.url);
   const sortParam = (url.searchParams.get('sort') || '') as SortValue;
+  const sizeParam = parseSizeParam(url.searchParams.get('size'));
   const {sortKey, reverse} = parseSortKey(sortParam);
 
   if (!handle) {
@@ -65,7 +68,17 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
 
   redirectIfHandleIsLocalized(request, {handle, data: collection});
 
-  return {collection, sortParam};
+  // Size chips list every size the collection is in stock in; the grid keeps
+  // only the products available in the chosen one.
+  const sizes = sizeOptions(collection.products.nodes);
+  const nodes = filterBySize(collection.products.nodes, sizeParam);
+
+  return {
+    collection: {...collection, products: {...collection.products, nodes}},
+    sortParam,
+    sizeParam,
+    sizes,
+  };
 }
 
 function loadDeferredData(_args: Route.LoaderArgs) {
@@ -94,14 +107,15 @@ function sized(url: string, width: number) {
   return `${url}${url.includes('?') ? '&' : '?'}width=${width}`;
 }
 
-function buildSortUrl(handle: string, sort: string) {
+function buildSortUrl(handle: string, sort: string, size = '') {
   const params = new URLSearchParams();
   if (sort) params.set('sort', sort);
+  if (size) params.set('size', size);
   return `/collections/${handle}${params.toString() ? `?${params}` : ''}`;
 }
 
 export default function Collection() {
-  const {collection, sortParam} = useLoaderData<typeof loader>();
+  const {collection, sortParam, sizeParam, sizes} = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const isLoading = navigation.state === 'loading';
   // sibling categories = the shop's published collections (root loader)
@@ -189,7 +203,7 @@ export default function Collection() {
             {SORT_OPTIONS.map((opt) => (
               <Link
                 key={opt.value}
-                to={buildSortUrl(collection.handle, opt.value)}
+                to={buildSortUrl(collection.handle, opt.value, sizeParam)}
                 className={`catalog-sort-btn${sortParam === opt.value ? ' active' : ''}`}
               >
                 {opt.label}
@@ -197,12 +211,33 @@ export default function Collection() {
             ))}
           </div>
         </div>
+        {/* Size chips on their own row: only sizes something is in stock in */}
+        <SizeFilter
+          sizes={sizes}
+          active={sizeParam}
+          hrefFor={(size) => buildSortUrl(collection.handle, sortParam, size)}
+        />
       </div>
 
       <div className="container" style={{paddingTop: '1.5rem'}}>
         <h2 className="sr-only">Termékek</h2>
         {isLoading ? (
           <ProductGridSkeleton />
+        ) : collection.products.nodes.length === 0 ? (
+          <div className="catalog-empty">
+            <p className="catalog-empty-title">Nincs találat</p>
+            <p className="catalog-empty-text">
+              {sizeParam
+                ? `Ebben a méretben (${sizeParam}) most nincs elérhető darab.`
+                : 'Ebben a kollekcióban jelenleg nincs termék.'}
+            </p>
+            <Link
+              to={sizeParam ? buildSortUrl(collection.handle, sortParam) : '/collections/all'}
+              className="btn btn-outline"
+            >
+              {sizeParam ? 'Minden méret' : 'Összes termék'}
+            </Link>
+          </div>
         ) : (
           <div className="products-grid">
             {(collection.products.nodes as ProductItemFragment[]).map((product, index) => (
@@ -288,6 +323,17 @@ const COLLECTION_QUERY = `#graphql
       ) {
         nodes {
           ...ProductItem
+          # for the size filter: which sizes are in stock (app/lib/sizes.ts);
+          # kept out of the shared card fragment so other routes stay unchanged
+          variants(first: 20) {
+            nodes {
+              availableForSale
+              selectedOptions {
+                name
+                value
+              }
+            }
+          }
         }
       }
     }
