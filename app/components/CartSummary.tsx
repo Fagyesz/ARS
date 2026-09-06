@@ -3,6 +3,7 @@ import type {CartLayout} from '~/components/CartMain';
 import {CartForm, Money, type OptimisticCart} from '@shopify/hydrogen';
 import {useEffect, useRef} from 'react';
 import {useFetcher} from 'react-router';
+import {KOSR_CHECKOUT_ENABLED} from '~/lib/config';
 
 type CartSummaryProps = {
   cart: OptimisticCart<CartApiQueryFragment | null>;
@@ -62,8 +63,11 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
 function CartCheckoutActions({checkoutUrl}: {checkoutUrl?: string}) {
   if (!checkoutUrl) return null;
 
+  // /penztar hands the cart to kosR's Hungarian checkout (see routes/penztar.tsx)
+  const href = KOSR_CHECKOUT_ENABLED ? '/penztar' : checkoutUrl;
+
   return (
-    <a href={checkoutUrl} target="_self" className="cart-checkout-btn">
+    <a href={href} target="_self" className="cart-checkout-btn">
       Tovább a fizetéshez
     </a>
   );

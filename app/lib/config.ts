@@ -8,6 +8,12 @@ export const EMAIL = 'arsmosoris@gmail.com'; // fallback only
 // never follow the request Host (preview hosts, old subdomains) — update on domain changes.
 export const SITE_URL = 'https://arsmosoris.art';
 
+// Hungarian checkout via the kosR app (parcel points, utánvét, Billingo invoicing).
+// Its page is an Online Store app proxy on PUBLIC_CHECKOUT_DOMAIN; the /penztar route
+// rebuilds the cart there. Set to false to fall back to Shopify's native checkout.
+export const KOSR_CHECKOUT_ENABLED = true;
+export const KOSR_CHECKOUT_PATH = '/apps/checkout?lng=hu';
+
 // Social links - prefer reading from env (INSTAGRAM_URL, FACEBOOK_URL, etc.)
 export const SOCIAL_LINKS = {
   instagram: 'https://www.instagram.com/ars.mosoris/',
