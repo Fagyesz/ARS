@@ -1,6 +1,6 @@
 import {Await, useLoaderData, Link, useFetcher} from 'react-router';
 import type {Route} from './+types/products.$handle';
-import {Suspense, useEffect, useState, useRef} from 'react';
+import {Suspense, memo, startTransition, useEffect, useState, useRef} from 'react';
 import {
   getSelectedProductOptions,
   Analytics,
@@ -177,7 +177,7 @@ export default function Product() {
     const el = addToCartRef.current;
     if (!el) return;
     const observer = new IntersectionObserver(
-      ([entry]) => setStickyVisible(!entry.isIntersecting),
+      ([entry]) => startTransition(() => setStickyVisible(!entry.isIntersecting)),
       {threshold: 0},
     );
     observer.observe(el);
@@ -265,15 +265,7 @@ export default function Product() {
         <RecentlyViewedStrip items={recentItems} />
       )}
 
-      <Suspense fallback={null}>
-        <Await resolve={relatedProducts}>
-          {(products) =>
-            products && products.length > 0 ? (
-              <RelatedProducts products={products} artistName={vendor} />
-            ) : null
-          }
-        </Await>
-      </Suspense>
+      <RelatedProductsDeferred promise={relatedProducts} artistName={vendor} />
 
       <Analytics.ProductView
         data={{
@@ -370,6 +362,32 @@ export default function Product() {
     </>
   );
 }
+
+/**
+ * The related products stream in after the shell. Memoized so state changes in
+ * the product view (recently viewed, sticky bar) never re-render this Suspense
+ * boundary while it is still dehydrated — React would otherwise bail out to
+ * client rendering (error #421).
+ */
+const RelatedProductsDeferred = memo(function RelatedProductsDeferred({
+  promise,
+  artistName,
+}: {
+  promise: Promise<ProductItemFragment[]>;
+  artistName?: string | null;
+}) {
+  return (
+    <Suspense fallback={null}>
+      <Await resolve={promise}>
+        {(products) =>
+          products && products.length > 0 ? (
+            <RelatedProducts products={products} artistName={artistName} />
+          ) : null
+        }
+      </Await>
+    </Suspense>
+  );
+});
 
 function SizeGuide() {
   return (
