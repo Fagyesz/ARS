@@ -580,6 +580,7 @@ aside header .close:hover {
 }
 
 .footer-bottom a {
+  color: rgba(247, 234, 215, 0.72);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
