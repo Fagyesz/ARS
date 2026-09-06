@@ -84,6 +84,12 @@ Verified OK: the automatic discount does survive the kosR handoff (checkout show
 
 ---
 
+## Status
+
+**Batch 1 shipped 2026-09-06** (commits 2024a1d and the follow-up). Lighthouse mobile after deploy: home 63 → 80 (LCP 11.7 s → 3.9 s, 2 390 KB → 797 KB), product 63 → 88 (LCP 8.2 s → 3.1 s), accessibility 86 → 96. Remaining performance items: `app.css` (133 KB) is the only render-blocking resource; artist cards on phones could use a 320 px rendition.
+
+Learned on the way: Oxygen serves `public/` images through Shopify's CDN, which re-encodes them (WebP sources come back as PNG/JPEG, `?format=`/`?width=` are ignored) and serves `public/fonts` from `cdn.shopify.com`, so `font-src` must allow that host. The custom sitemap route file `sitemap.custom[.xml].tsx` is served at `/sitemap/custom.xml`. Meta from a route whose loader throws is not applied; error pages get their head tags from the root `meta`.
+
 ## Suggested order of work
 
 **Batch 1: technical, no decisions needed (about a day).** P1–P4, S1–S5, S7–S10, U1–U7, U9–U12, C11, C12.
