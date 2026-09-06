@@ -209,15 +209,16 @@ export default function Collection() {
               </Link>
             ))}
           </div>
+
+          {/* Size chips after the sort buttons: only sizes something is in stock in */}
+          <SizeFilter
+            sizes={sizes}
+            active={sizeParam}
+            hrefFor={(size) =>
+              buildFilterUrl({artist: artistFilter, type: typeFilter, sort: sortParam, size})
+            }
+          />
         </div>
-        {/* Size chips on their own row: only sizes something is in stock in */}
-        <SizeFilter
-          sizes={sizes}
-          active={sizeParam}
-          hrefFor={(size) =>
-            buildFilterUrl({artist: artistFilter, type: typeFilter, sort: sortParam, size})
-          }
-        />
       </div>
 
       <div className="container">

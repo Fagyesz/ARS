@@ -6080,21 +6080,10 @@ body:has(.cookie-banner--visible) .sticky-cart-bar {
   transform: scaleX(1);
 }
 
-/* ── Size filter row (S M L XL …, only sizes something is in stock in) ── */
-.catalog-size-row {
-  display: flex;
-  align-items: center;
+/* ── Size filter chips, in the bar after the sort buttons (only sizes in stock) ── */
+.catalog-size-section {
   gap: 0.3rem;
-  padding-top: 0.5rem;
-  padding-bottom: 0.6rem;
-  border-top: 1px solid rgba(35, 31, 32, 0.1);
-  overflow-x: auto;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-}
-
-.catalog-size-row::-webkit-scrollbar {
-  display: none;
+  padding: 0 0.9rem;
 }
 
 .catalog-size-clear {
