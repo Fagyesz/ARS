@@ -6658,3 +6658,421 @@ body:has(.cookie-banner--visible) .sticky-cart-bar {
 .collections-index-card--featured .collections-index-placeholder {
   aspect-ratio: 16 / 9;
 }
+
+/* ============================================
+   Campaign: announcement bar, badges, nudge
+   ============================================ */
+.announcement-bar {
+  background: var(--color-ars-red);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-align: center;
+  padding: 0.5rem 1rem;
+}
+
+.announcement-bar-text {
+  margin: 0;
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  line-height: 1.4;
+}
+
+.announcement-bar-badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  font-size: 0.5625rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.announcement-bar a {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  white-space: nowrap;
+}
+
+.product-card-badge.campaign {
+  background-color: var(--color-ars-red);
+  color: #fff;
+}
+
+.hero-campaign {
+  text-decoration: none;
+  width: fit-content;
+}
+
+.hero-campaign:hover .hero-meta-city {
+  color: var(--color-ars-cream);
+}
+
+.product-campaign {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin: 1rem 0 1.5rem;
+  padding: 0.875rem 1rem;
+  border: 1px solid rgba(196, 63, 39, 0.35);
+  background: rgba(196, 63, 39, 0.06);
+  color: var(--color-text);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  text-decoration: none;
+}
+
+.product-campaign:hover {
+  border-color: var(--color-ars-red);
+  text-decoration: none;
+}
+
+.product-campaign-badge {
+  flex-shrink: 0;
+  padding: 0.25rem 0.5rem;
+  background: var(--color-ars-red);
+  color: #fff;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.cart-nudge {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem 0.875rem;
+  background: rgba(196, 63, 39, 0.07);
+  border-left: 3px solid var(--color-ars-red);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.cart-nudge p {
+  margin: 0;
+}
+
+.cart-nudge a {
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.cart-nudge-badge {
+  flex-shrink: 0;
+  padding: 0.2rem 0.45rem;
+  background: var(--color-ars-red);
+  color: #fff;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ============================================
+   Product page: stock note, trust strip, size note
+   ============================================ */
+.stock-note {
+  margin: 0.75rem 0 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-ars-red-dark);
+}
+
+.trust-strip {
+  list-style: none;
+  margin: 1.75rem 0 0;
+  padding: 1.25rem 0 0.25rem;
+  border-top: 1px solid var(--color-border);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.875rem 1.25rem;
+}
+
+.trust-strip li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.trust-strip li strong {
+  display: block;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.trust-strip-text {
+  color: var(--color-text-muted);
+}
+
+.trust-strip-icon {
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  color: var(--color-ars-olive);
+}
+
+.trust-strip-more {
+  grid-column: 1 / -1;
+  font-size: 0.75rem;
+}
+
+.trust-strip-more a {
+  color: var(--color-text-muted);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.size-guide-note {
+  margin: 0.75rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+
+.size-guide-note a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ============================================
+   Cart: free shipping, coupon, checkout note, after-checkout notice
+   ============================================ */
+.free-shipping {
+  margin-bottom: 1rem;
+}
+
+.free-shipping-text {
+  margin: 0 0 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--color-text);
+}
+
+.free-shipping-bar {
+  height: 6px;
+  background: var(--color-border);
+  overflow: hidden;
+}
+
+.free-shipping-bar span {
+  display: block;
+  height: 100%;
+  background: var(--color-ars-olive);
+  transition: width 0.4s ease;
+}
+
+.free-shipping--reached .free-shipping-bar span {
+  background: var(--color-ars-red);
+}
+
+.cart-coupon {
+  margin-top: 0.75rem;
+}
+
+.cart-coupon summary {
+  cursor: pointer;
+  list-style: none;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 0.25rem 0;
+}
+
+.cart-coupon summary::-webkit-details-marker {
+  display: none;
+}
+
+.cart-coupon[open] summary {
+  margin-bottom: 0.5rem;
+}
+
+.cart-checkout-note {
+  margin: 0.625rem 0 0;
+  font-size: 0.6875rem;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.cart-ordered-notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin: 0 0 1rem;
+  padding: 0.75rem 0.875rem;
+  background: var(--color-background-alt);
+  border: 1px solid var(--color-border);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.cart-ordered-notice p {
+  margin: 0;
+  flex: 1 1 220px;
+}
+
+.cart-ordered-clear {
+  padding: 0.5rem 0.875rem;
+  border: 1px solid var(--color-ars-dark);
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.cart-ordered-clear:hover {
+  background: var(--color-ars-dark);
+  color: var(--color-ars-cream);
+}
+
+/* ============================================
+   Footer shipping line, newsletter consent
+   ============================================ */
+.footer-shipping {
+  margin: 2.5rem 0 0;
+  font-size: 0.6875rem;
+  line-height: 1.6;
+  letter-spacing: 0.04em;
+  color: rgba(247, 234, 215, 0.62);
+}
+
+.newsletter-consent {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.5rem;
+  max-width: 480px;
+  margin: 0.875rem auto 0;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: rgba(247, 234, 215, 0.75);
+  text-align: left;
+  cursor: pointer;
+}
+
+.newsletter-consent input {
+  margin: 0.2rem 0 0;
+  accent-color: var(--color-ars-red);
+  flex-shrink: 0;
+}
+
+.newsletter-consent a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ============================================
+   Thank-you page
+   ============================================ */
+.thank-you {
+  padding: clamp(3rem, 10vh, 6rem) 0;
+}
+
+.thank-you-inner {
+  max-width: 680px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.thank-you-eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--color-ars-red);
+}
+
+.thank-you h1 {
+  margin: 0;
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  line-height: 1.15;
+}
+
+.thank-you-lead {
+  color: var(--color-text-muted);
+  line-height: 1.7;
+}
+
+.thank-you-steps {
+  list-style: none;
+  margin: 0.5rem 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+  counter-reset: step;
+}
+
+.thank-you-steps li {
+  counter-increment: step;
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  gap: 0.25rem 0.75rem;
+  margin: 0;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--color-border);
+  font-size: 0.875rem;
+}
+
+.thank-you-steps li::before {
+  content: counter(step);
+  grid-row: 1 / 3;
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-ars-dark);
+  color: var(--color-ars-cream);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.thank-you-steps li span {
+  color: var(--color-text-muted);
+}
+
+.thank-you-note {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.thank-you-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.thank-you-help {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.thank-you-help a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

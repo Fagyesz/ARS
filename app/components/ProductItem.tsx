@@ -1,6 +1,8 @@
-import {Link} from 'react-router';
+import {Link, useRouteLoaderData} from 'react-router';
 import {Image} from '@shopify/hydrogen';
 import {formatMoney} from '~/lib/money';
+import {CAMPAIGN} from '~/lib/config';
+import type {RootLoader} from '~/root';
 import {useRef, useEffect} from 'react';
 import type {
   ProductItemFragment,
@@ -28,6 +30,9 @@ export function ProductItem({
   const wishlisted = has(product.handle);
   const {addToast} = useToast();
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const rootData = useRouteLoaderData<RootLoader>('root');
+  const tags: string[] = 'tags' in product && Array.isArray(product.tags) ? product.tags : [];
+  const onCampaign = Boolean(rootData?.campaignActive) && tags.includes(CAMPAIGN.tag);
 
   useEffect(() => {
     const el = wrapperRef.current;
@@ -63,9 +68,11 @@ export function ProductItem({
               sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 50vw"
             />
           )}
-          {!isAvailable && (
+          {!isAvailable ? (
             <span className="product-card-badge sold-out">Elfogyott</span>
-          )}
+          ) : onCampaign ? (
+            <span className="product-card-badge campaign">{CAMPAIGN.shortLabel}</span>
+          ) : null}
         </div>
         <div className="product-card-info">
           <h3 className="product-card-title">{product.title}</h3>

@@ -191,6 +191,7 @@ const ARTIST_PRODUCTS_QUERY = `#graphql
         handle
         title
         vendor
+        tags
         availableForSale
         featuredImage {
           id

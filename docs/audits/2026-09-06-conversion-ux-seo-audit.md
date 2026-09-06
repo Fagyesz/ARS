@@ -90,6 +90,18 @@ Verified OK: the automatic discount does survive the kosR handoff (checkout show
 
 Learned on the way: Oxygen serves `public/` images through Shopify's CDN, which re-encodes them (WebP sources come back as PNG/JPEG, `?format=`/`?width=` are ignored) and serves `public/fonts` from `cdn.shopify.com`, so `font-src` must allow that host. The custom sitemap route file `sitemap.custom[.xml].tsx` is served at `/sitemap/custom.xml`. Meta from a route whose loader throws is not applied; error pages get their head tags from the root `meta`.
 
+**Batches 2 and 3 shipped 2026-09-06** (same day, second push), with assumptions where owner input was missing:
+
+- Six smart collections created and published via the Admin API: `polok`, `puloverek`, `kabatok`, `nadragok-es-szoknyak`, `egyedi-darabok` (tag `second-hand`) and the campaign collection `nyitasi-akcio` (tag `akcio`, applied to Baseline and Visions). They carry cover images, descriptions and SEO fields, feed the homepage "Válogatott sorozataink" section, the footer, the collection page chips and the header "Kollekciók" item.
+- Campaign surfacing: announcement bar, hero link, card badge, product-page note, cart nudge when exactly one eligible tee is in the cart. All switch off after `CAMPAIGN.endsAt` (2026-09-30) in `app/lib/config.ts`.
+- Product page: trust strip (facts from `SHIPPING` in config.ts, taken from the shop's own policy page: GLS 1 290 / 1 590 Ft, free over 30 000 Ft, 1–2 + 2–3 workdays, 14-day return), size guide by product type (measured table only for tees; hoodies and one-offs get an honest note), "Már csak N db" scarcity line that appears once the Hydrogen channel's Storefront API gets the *read product inventory* permission, cross-sell filled by product type when an artist has fewer than four pieces.
+- Cart: free-shipping progress bar, coupon field collapsed behind "Van kuponkódod?", gift-card field removed, trust note under the checkout button, "already ordered? empty the cart" notice after a checkout hand-off (session flag set in `/penztar`, cleared by a new add or by `/koszonjuk`).
+- `/koszonjuk` thank-you page that empties the Hydrogen cart. **Owner action:** set `https://arsmosoris.art/koszonjuk` as the post-order return URL in the kosR app.
+- Newsletter: required consent checkbox with privacy link, "értesíted" typo fixed, the monthly-draw promise replaced by a plain value line (restore it only with published rules).
+- Footer: shipping/return/payment line. Company name and tax number are still missing (owner input).
+
+Still open from the audit: catalogue pagination (not needed under ~50 products), per-type measurements for hoodies, payment-method logos (which methods does kosR offer?), hero product visual, `app.css` size.
+
 ## Suggested order of work
 
 **Batch 1: technical, no decisions needed (about a day).** P1–P4, S1–S5, S7–S10, U1–U7, U9–U12, C11, C12.

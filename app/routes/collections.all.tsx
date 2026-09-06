@@ -235,6 +235,7 @@ const COLLECTION_ITEM_FRAGMENT = `#graphql
     handle
     title
     vendor
+    tags
     availableForSale
     featuredImage {
       id

@@ -45,6 +45,10 @@ export async function action({request, context}: Route.ActionArgs) {
   switch (action) {
     case CartForm.ACTIONS.LinesAdd:
       result = await cart.addLines(inputs.lines);
+      // a fresh add means the shopper is still shopping, not returning from checkout
+      if (context.session.get('checkoutStartedAt')) {
+        context.session.unset('checkoutStartedAt');
+      }
       break;
     case CartForm.ACTIONS.LinesUpdate:
       result = await cart.updateLines(inputs.lines);

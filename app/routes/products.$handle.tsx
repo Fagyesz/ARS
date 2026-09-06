@@ -1,4 +1,6 @@
-import {Await, useLoaderData, Link, useFetcher} from 'react-router';
+import {Await, useLoaderData, useRouteLoaderData, Link, useFetcher} from 'react-router';
+import type {RootLoader} from '~/root';
+import {CAMPAIGN, SHIPPING} from '~/lib/config';
 import type {Route} from './+types/products.$handle';
 import {Suspense, memo, startTransition, useEffect, useState, useRef} from 'react';
 import {
@@ -69,20 +71,23 @@ export async function loader(args: Route.LoaderArgs) {
 
   redirectIfHandleIsLocalized(request, {handle, data: product});
 
-  // Kick off related products without awaiting — streams in via Suspense
-  const relatedProducts = product.vendor
-    ? storefront
-        .query(RELATED_PRODUCTS_QUERY, {
-          variables: {vendor: `vendor:"${product.vendor.replace(/"/g, '')}"`},
-          cache: storefront.CacheLong(),
-        })
-        .then((result) =>
-          result?.products.nodes.filter(
-            (p: ProductItemFragment) => p.id !== product.id,
-          ),
-        )
-        .catch(() => [])
-    : Promise.resolve([]);
+  // Kick off related products without awaiting — streams in via Suspense.
+  // Same artist first; when an artist has only a piece or two, fill the row
+  // with the same product type so the section never shows a lone card.
+  const related = async (query: string) =>
+    ((await storefront.query(RELATED_PRODUCTS_QUERY, {
+      variables: {query},
+      cache: storefront.CacheLong(),
+    }))?.products.nodes ?? []).filter((p: ProductItemFragment) => p.id !== product.id);
+  const relatedProducts = (async () => {
+    const byArtist = product.vendor
+      ? await related(`vendor:"${product.vendor.replace(/"/g, '')}"`)
+      : [];
+    if (byArtist.length >= 4 || !product.productType) return byArtist.slice(0, 4);
+    const byType = await related(`product_type:"${product.productType.replace(/"/g, '')}"`);
+    const seen = new Set(byArtist.map((p: ProductItemFragment) => p.id));
+    return [...byArtist, ...byType.filter((p: ProductItemFragment) => !seen.has(p.id))].slice(0, 4);
+  })().catch(() => [] as ProductItemFragment[]);
 
   // Fixed public origin: canonical/OG/breadcrumb URLs must not follow the request Host
   const canonicalUrl = `${SITE_URL}/products/${product.handle}`;
@@ -165,6 +170,9 @@ function StickyCartBar({
 
 export default function Product() {
   const {product, relatedProducts, canonicalUrl, origin} = useLoaderData<typeof loader>();
+  const rootData = useRouteLoaderData<RootLoader>('root');
+  const onCampaign =
+    Boolean(rootData?.campaignActive) && (product.tags ?? []).includes(CAMPAIGN.tag);
 
   const selectedVariant = useOptimisticVariant(
     product.selectedOrFirstAvailableVariant,
@@ -209,6 +217,10 @@ export default function Product() {
   });
 
   const {title, descriptionHtml, vendor} = product;
+  const sizeValues =
+    product.options
+      .find((o) => o.name.toLowerCase() === 'méret' || o.name.toLowerCase() === 'size')
+      ?.optionValues.map((v) => v.name) ?? [];
 
   return (
     <>
@@ -243,10 +255,24 @@ export default function Product() {
                 price={selectedVariant?.price}
                 compareAtPrice={selectedVariant?.compareAtPrice}
               />
+              {onCampaign && (
+                <Link
+                  to={`/collections/${CAMPAIGN.collectionHandle}`}
+                  className="product-campaign"
+                  prefetch="intent"
+                >
+                  <span className="product-campaign-badge">{CAMPAIGN.shortLabel}</span>
+                  <span className="product-campaign-text">{CAMPAIGN.productNote}</span>
+                </Link>
+              )}
               <div ref={addToCartRef}>
                 <ProductForm
                   productOptions={productOptions}
                   selectedVariant={selectedVariant}
+                />
+                <StockNote
+                  available={selectedVariant?.availableForSale ?? false}
+                  quantity={selectedVariant?.quantityAvailable ?? null}
                 />
                 {!selectedVariant?.availableForSale && (
                   <BackInStockForm
@@ -255,12 +281,13 @@ export default function Product() {
                   />
                 )}
               </div>
+              <TrustStrip />
               {descriptionHtml && (
                 <div className="product-description">
                   <div dangerouslySetInnerHTML={{__html: descriptionHtml}} />
                 </div>
               )}
-              <SizeGuide />
+              <SizeGuide productType={product.productType} sizes={sizeValues} />
             </div>
           </div>
         </div>
@@ -402,7 +429,97 @@ const RelatedProductsDeferred = memo(function RelatedProductsDeferred({
   );
 });
 
-function SizeGuide() {
+/**
+ * "Már csak N db": only when Shopify exposes the number (needs the Storefront
+ * API "read product inventory" permission on the Hydrogen channel) and stock
+ * is low; silent otherwise, so nothing ever claims a false scarcity.
+ */
+function StockNote({available, quantity}: {available: boolean; quantity: number | null}) {
+  if (!available || quantity === null || quantity < 1 || quantity > 3) return null;
+  return (
+    <p className="stock-note" aria-live="polite">
+      {quantity === 1 ? 'Utolsó darab ebben a méretben' : `Már csak ${quantity} db ebben a méretben`}
+    </p>
+  );
+}
+
+const TRUST_ITEMS = [
+  {
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+        <rect x="1" y="3" width="15" height="13" /><path d="M16 8h4l3 3v5h-7V8z" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" />
+      </svg>
+    ),
+    title: `${SHIPPING.carrier} csomagpont ${formatMoney(SHIPPING.parcelPointFt)}`,
+    text: `házhoz ${formatMoney(SHIPPING.homeDeliveryFt)}, ${formatMoney(SHIPPING.freeOverFt)} felett ingyenes`,
+  },
+  {
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+        <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+      </svg>
+    ),
+    title: `Feladás ${SHIPPING.handlingDays} alatt`,
+    text: `kézbesítés további ${SHIPPING.transitDays}`,
+  },
+  {
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+        <polyline points="1 4 1 10 7 10" /><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+      </svg>
+    ),
+    title: `${SHIPPING.returnDays} napos elállás`,
+    text: 'indoklás nélkül visszaküldheted',
+  },
+  {
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+      </svg>
+    ),
+    title: 'Kézzel készül Budapesten',
+    text: 'kis szériás, egyedi grafika',
+  },
+];
+
+/** The four things a buyer asks before adding to cart; facts come from config.ts */
+function TrustStrip() {
+  return (
+    <ul className="trust-strip" aria-label="Szállítás és garancia">
+      {TRUST_ITEMS.map((item) => (
+        <li key={item.title}>
+          <span className="trust-strip-icon">{item.icon}</span>
+          <span>
+            <strong>{item.title}</strong>
+            <span className="trust-strip-text">{item.text}</span>
+          </span>
+        </li>
+      ))}
+      <li className="trust-strip-more">
+        <Link to="/policies/shipping-policy">Szállítási részletek</Link>
+      </li>
+    </ul>
+  );
+}
+
+const TEE_SIZES: Array<[size: string, chest: string, length: string]> = [
+  ['S', '96 cm', '68 cm'],
+  ['M', '102 cm', '71 cm'],
+  ['L', '108 cm', '74 cm'],
+  ['XL', '114 cm', '76 cm'],
+  ['XXL', '120 cm', '78 cm'],
+];
+
+/**
+ * The measured table only applies to the tee blanks. Hoodies and the one-off
+ * pieces get an honest note instead of numbers that would be wrong for them.
+ */
+function SizeGuide({productType, sizes}: {productType?: string | null; sizes: string[]}) {
+  const type = (productType ?? '').toLowerCase();
+  const isTee = type === 'póló';
+  const isSweat = type.includes('pulóver');
+  const sizeList = sizes.join(', ');
+
   return (
     <details className="size-guide">
       <summary className="size-guide-trigger">
@@ -419,45 +536,47 @@ function SizeGuide() {
           <polyline points="17 8 12 3 7 8" />
           <line x1="12" y1="3" x2="12" y2="15" />
         </svg>
-        Mérettáblázat
+        {isTee ? 'Mérettáblázat' : 'Méretek és szabás'}
       </summary>
       <div className="size-guide-content">
-        <table className="size-guide-table">
-          <thead>
-            <tr>
-              <th>Méret</th>
-              <th>Mellbőség</th>
-              <th>Hossz</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>S</td>
-              <td>96 cm</td>
-              <td>68 cm</td>
-            </tr>
-            <tr>
-              <td>M</td>
-              <td>102 cm</td>
-              <td>71 cm</td>
-            </tr>
-            <tr>
-              <td>L</td>
-              <td>108 cm</td>
-              <td>74 cm</td>
-            </tr>
-            <tr>
-              <td>XL</td>
-              <td>114 cm</td>
-              <td>76 cm</td>
-            </tr>
-            <tr>
-              <td>XXL</td>
-              <td>120 cm</td>
-              <td>78 cm</td>
-            </tr>
-          </tbody>
-        </table>
+        {isTee ? (
+          <>
+            <table className="size-guide-table">
+              <thead>
+                <tr>
+                  <th>Méret</th>
+                  <th>Mellbőség</th>
+                  <th>Hossz</th>
+                </tr>
+              </thead>
+              <tbody>
+                {TEE_SIZES.filter(([size]) => !sizes.length || sizes.includes(size)).map(
+                  ([size, chest, length]) => (
+                    <tr key={size}>
+                      <td>{size}</td>
+                      <td>{chest}</td>
+                      <td>{length}</td>
+                    </tr>
+                  ),
+                )}
+              </tbody>
+            </table>
+            <p className="size-guide-note">
+              Unisex szabás; a mellbőség a hónaljnál mért teljes körméret. Ha két méret
+              között vagy, a nagyobbat javasoljuk.
+            </p>
+          </>
+        ) : isSweat ? (
+          <p className="size-guide-note">
+            Unisex, bő szabású pulóver, elérhető méretek: {sizeList}. Ha bizonytalan vagy,{' '}
+            <Link to="/contact">írj nekünk</Link>, és lemérjük neked a konkrét darabot.
+          </p>
+        ) : (
+          <p className="size-guide-note">
+            Egyetlen példányban készült darab{sizeList ? `, mérete: ${sizeList}` : ''}. Pontos
+            méreteket szívesen küldünk: <Link to="/contact">írj nekünk</Link> a termék nevével.
+          </p>
+        )}
       </div>
     </details>
   );
@@ -470,12 +589,17 @@ function RelatedProducts({
   products: ProductItemFragment[];
   artistName?: string | null;
 }) {
+  const sameArtist = Boolean(artistName) && products.every((p) => p.vendor === artistName);
   return (
     <section className="section" style={{backgroundColor: 'var(--color-background-alt)'}}>
       <div className="container">
         <div className="text-center mb-8">
-          <h2>{artistName ? `Még ${artistName}-tól` : 'Kapcsolódó termékek'}</h2>
-          <p className="text-muted">További alkotások ugyanattól a művésztől</p>
+          <h2>{sameArtist ? `Még ${artistName}-tól` : 'Ezek is tetszhetnek'}</h2>
+          <p className="text-muted">
+            {sameArtist
+              ? 'További alkotások ugyanattól a művésztől'
+              : 'Hasonló darabok az Ars Mosoris alkotóitól'}
+          </p>
         </div>
         <div className="products-grid">
           {products.slice(0, 4).map((product) => (
@@ -520,6 +644,7 @@ function toProductCard(item: RecentProduct): RecommendedProductFragment {
     handle: item.handle,
     title: item.title,
     vendor: item.vendor,
+    tags: [],
     availableForSale: true,
     featuredImage: item.imageUrl
       ? {
@@ -592,6 +717,7 @@ function BackInStockForm({
 const PRODUCT_VARIANT_FRAGMENT = `#graphql
   fragment ProductVariant on ProductVariant {
     availableForSale
+    quantityAvailable
     compareAtPrice {
       amount
       currencyCode
@@ -632,6 +758,8 @@ const PRODUCT_FRAGMENT = `#graphql
     title
     vendor
     handle
+    productType
+    tags
     descriptionHtml
     description
     encodedVariantExistence
@@ -696,6 +824,7 @@ const RELATED_PRODUCT_FRAGMENT = `#graphql
     handle
     title
     vendor
+    tags
     availableForSale
     featuredImage {
       id
@@ -722,9 +851,9 @@ const RELATED_PRODUCTS_QUERY = `#graphql
   query RelatedProducts(
     $country: CountryCode
     $language: LanguageCode
-    $vendor: String!
+    $query: String!
   ) @inContext(country: $country, language: $language) {
-    products(first: 5, query: $vendor) {
+    products(first: 8, query: $query) {
       nodes {
         ...RelatedProduct
       }

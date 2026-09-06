@@ -1,7 +1,8 @@
 import {Suspense} from 'react';
 import {Await, NavLink} from 'react-router';
 import type {FooterQuery, HeaderQuery} from 'storefrontapi.generated';
-import {EMAIL, SOCIAL_LINKS, COLLECTION_TYPES} from '~/lib/config';
+import {EMAIL, SOCIAL_LINKS, SHOP_COLLECTIONS, SHIPPING} from '~/lib/config';
+import {formatMoney} from '~/lib/money';
 
 interface FooterProps {
   footer: Promise<FooterQuery | null>;
@@ -95,8 +96,10 @@ export function Footer({
                   <h2 className="footer-heading">Bolt</h2>
                   <nav className="footer-links">
                     <NavLink to="/collections/all">Minden termék</NavLink>
-                    {COLLECTION_TYPES.map((type) => (
-                      <NavLink key={type.value} to={`/collections/all?type=${type.value}`}>{type.label}</NavLink>
+                    {SHOP_COLLECTIONS.map((collection) => (
+                      <NavLink key={collection.handle} to={`/collections/${collection.handle}`}>
+                        {collection.label}
+                      </NavLink>
                     ))}
                     <NavLink to="/wishlist">Kívánságlista</NavLink>
                   </nav>
@@ -129,6 +132,11 @@ export function Footer({
                 </div>
               </div>
 
+              <p className="footer-shipping">
+                {SHIPPING.carrier} csomagpont {formatMoney(SHIPPING.parcelPointFt)} · házhoz szállítás{' '}
+                {formatMoney(SHIPPING.homeDeliveryFt)} · {formatMoney(SHIPPING.freeOverFt)} felett ingyenes ·{' '}
+                {SHIPPING.returnDays} napos elállás · biztonságos online fizetés
+              </p>
               <div className="footer-bottom">
                 <p suppressHydrationWarning>&copy; {new Date().getFullYear()} Ars Mosoris. Minden jog fenntartva.</p>
                 <p>

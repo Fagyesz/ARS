@@ -14,7 +14,7 @@ import {
 import type {Route} from './+types/root';
 import favicon from '~/assets/favicon.svg';
 import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
-import {SITE_URL, SOCIAL_LINKS} from '~/lib/config';
+import {SITE_URL, SOCIAL_LINKS, campaignActive} from '~/lib/config';
 import {jsonLd, seoMeta} from '~/lib/seo';
 import resetStyles from '~/styles/reset.css?inline';
 import appStyles from '~/styles/app.css?url';
@@ -106,12 +106,16 @@ export async function loader(args: Route.LoaderArgs) {
   // Await the critical data required to render initial state of the page
   const criticalData = await loadCriticalData(args);
 
-  const {storefront, env} = args.context;
+  const {storefront, env, session} = args.context;
 
   return {
     ...deferredData,
     ...criticalData,
     publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
+    // decided on the server so banner/badges never flip during hydration
+    campaignActive: campaignActive(),
+    // set by /penztar when the cart was handed to the kosR checkout
+    checkoutStartedAt: (session.get('checkoutStartedAt') as number | undefined) ?? null,
     shop: getShopAnalytics({
       storefront,
       publicStorefrontId: env.PUBLIC_STOREFRONT_ID,

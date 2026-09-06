@@ -5,7 +5,7 @@ import {SITE_URL} from '~/lib/config';
 
 const PUBLIC_HOST = new URL(SITE_URL).host;
 // Utility routes that must never be indexed, whatever their meta tags say
-const NOINDEX_PATHS = /^\/(account|api|cart|discount|penztar|search|wishlist)(\/|$)/;
+const NOINDEX_PATHS = /^\/(account|api|cart|discount|koszonjuk|penztar|search|wishlist)(\/|$)/;
 
 /**
  * Export a fetch handler in module format.

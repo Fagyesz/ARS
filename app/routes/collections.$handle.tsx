@@ -5,6 +5,7 @@ import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {ProductItem} from '~/components/ProductItem';
 import type {ProductItemFragment} from 'storefrontapi.generated';
 import {breadcrumbJsonLd, jsonLd, productListJsonLd, seoMeta} from '~/lib/seo';
+import {SHOP_COLLECTIONS} from '~/lib/config';
 
 export const meta: Route.MetaFunction = ({data, location}) =>
   seoMeta({
@@ -153,9 +154,25 @@ export default function Collection() {
         </div>
       )}
 
-      {/* Sort bar */}
+      {/* Sort bar with links to the sibling categories */}
       <div className="catalog-filters">
         <div className="catalog-filters-inner container">
+          <nav className="catalog-filter-section" aria-label="Kategóriák">
+            <Link to="/collections/all" className="catalog-type-chip">
+              Minden termék
+            </Link>
+            {SHOP_COLLECTIONS.map((c) => (
+              <Link
+                key={c.handle}
+                to={`/collections/${c.handle}`}
+                className={`catalog-type-chip${c.handle === collection.handle ? ' active' : ''}`}
+                aria-current={c.handle === collection.handle ? 'page' : undefined}
+              >
+                {c.label}
+              </Link>
+            ))}
+          </nav>
+          <span className="catalog-filter-divider" aria-hidden="true" />
           <div className="catalog-filter-section catalog-sort-section" style={{marginLeft: 'auto', paddingLeft: 0}}>
             <span className="catalog-sort-label">Rendezés:</span>
             {SORT_OPTIONS.map((opt) => (
@@ -209,6 +226,7 @@ const PRODUCT_ITEM_FRAGMENT = `#graphql
     handle
     title
     vendor
+    tags
     availableForSale
     featuredImage {
       id

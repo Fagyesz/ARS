@@ -1,5 +1,6 @@
-import {useOptimisticCart, type OptimisticCartLine} from '@shopify/hydrogen';
-import {Link, useFetcher} from 'react-router';
+import {CartForm, useOptimisticCart, type OptimisticCartLine} from '@shopify/hydrogen';
+import {Link, useFetcher, useRouteLoaderData} from 'react-router';
+import type {RootLoader} from '~/root';
 import {useEffect, useState} from 'react';
 import type {CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
@@ -52,6 +53,7 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
     <div className={className}>
       <CartEmpty hidden={linesCount} layout={layout} />
       <div className="cart-details">
+        {cartHasItems && <AlreadyOrderedNotice lineIds={(cart?.lines?.nodes ?? []).map((l) => l.id)} />}
         <div aria-labelledby="cart-lines">
           <ul>
             {groups.map((group) => (
@@ -67,6 +69,26 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
         </div>
         {cartHasItems && <CartSummary cart={cart} layout={layout} />}
       </div>
+    </div>
+  );
+}
+
+/**
+ * The kosR checkout places the order from a separate (Online Store) cart, so
+ * after a purchase this cart still lists the bought items. Once the shopper
+ * has been handed to the checkout, offer a one-click way to empty it.
+ */
+function AlreadyOrderedNotice({lineIds}: {lineIds: string[]}) {
+  const rootData = useRouteLoaderData<RootLoader>('root');
+  if (!rootData?.checkoutStartedAt || !lineIds.length) return null;
+  return (
+    <div className="cart-ordered-notice">
+      <p>Már leadtad a rendelésed a pénztárban? Akkor ezek a tételek már nem kellenek ide.</p>
+      <CartForm route="/cart" action={CartForm.ACTIONS.LinesRemove} inputs={{lineIds}}>
+        <button type="submit" className="cart-ordered-clear">
+          Kosár ürítése
+        </button>
+      </CartForm>
     </div>
   );
 }

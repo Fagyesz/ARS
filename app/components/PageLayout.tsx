@@ -16,6 +16,7 @@ import {
   SearchFormPredictive,
 } from '~/components/SearchFormPredictive';
 import {SearchResultsPredictive} from '~/components/SearchResultsPredictive';
+import {AnnouncementBar} from '~/components/AnnouncementBar';
 
 interface PageLayoutProps {
   cart: Promise<CartApiQueryFragment | null>;
@@ -23,6 +24,7 @@ interface PageLayoutProps {
   header: HeaderQuery;
   isLoggedIn: Promise<boolean>;
   publicStoreDomain: string;
+  campaignActive?: boolean;
   children?: React.ReactNode;
   env?: {
     contactEmail: string;
@@ -41,6 +43,7 @@ export function PageLayout({
   header,
   isLoggedIn,
   publicStoreDomain,
+  campaignActive = false,
   env,
 }: PageLayoutProps) {
   return (
@@ -49,6 +52,7 @@ export function PageLayout({
         <CartAside cart={cart} />
         <SearchAside />
         <MobileMenuAside header={header} publicStoreDomain={publicStoreDomain} />
+        <AnnouncementBar active={campaignActive} />
         {header && (
           <Header
             header={header}

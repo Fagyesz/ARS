@@ -16,6 +16,11 @@ export async function loader({context}: Route.LoaderArgs) {
   const host = context.env.PUBLIC_CHECKOUT_DOMAIN;
   if (!KOSR_CHECKOUT_ENABLED || !host) return redirect(cart.checkoutUrl);
 
+  // The order will be placed in the Online Store cart, so this cart cannot know
+  // it was bought. Remember the hand-off; the cart drawer offers a one-click
+  // "already ordered? empty the cart" until new items are added.
+  context.session.set('checkoutStartedAt', Date.now());
+
   const url = buildKosrCheckoutUrl({
     host,
     path: KOSR_CHECKOUT_PATH,

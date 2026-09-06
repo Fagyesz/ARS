@@ -1,10 +1,20 @@
-import {Await, useLoaderData, useActionData, useNavigation, Link, Form} from 'react-router';
+import {
+  Await,
+  useLoaderData,
+  useActionData,
+  useNavigation,
+  useRouteLoaderData,
+  Link,
+  Form,
+} from 'react-router';
 import type {Route} from './+types/_index';
 import {Suspense} from 'react';
 import type {RecommendedProductsQuery, HomepageCollectionsQuery} from 'storefrontapi.generated';
 import {ARTISTS, artistPortrait} from '~/lib/artists';
 import {ProductItem} from '~/components/ProductItem';
 import {seoMeta} from '~/lib/seo';
+import {CAMPAIGN, SHOP_COLLECTIONS} from '~/lib/config';
+import type {RootLoader} from '~/root';
 
 // The hero watermark is the largest paint on the home page; let the browser
 // fetch it before it discovers the CSS background rule.
@@ -73,7 +83,8 @@ export async function action({request, context}: Route.ActionArgs) {
   const formData = await request.formData();
   const email = formData.get('email') as string;
 
-  if (!email) return {success: false};
+  // marketing consent must be an active choice (GDPR): the checkbox is required
+  if (!email || formData.get('consent') !== 'on') return {success: false};
 
   try {
     // 1. Create customer in Shopify with marketing consent
@@ -161,12 +172,23 @@ export default function Homepage() {
 }
 
 function HeroSection() {
+  const rootData = useRouteLoaderData<RootLoader>('root');
   return (
     <section className="hero">
       <div className="hero-background" />
       <div className="hero-overlay" />
       <div className="hero-content">
-        
+        {rootData?.campaignActive && (
+          <Link
+            to={`/collections/${CAMPAIGN.collectionHandle}`}
+            className="hero-meta hero-campaign"
+            prefetch="intent"
+          >
+            <span className="hero-meta-number">{CAMPAIGN.shortLabel}</span>
+            <span className="hero-meta-sep" />
+            <span className="hero-meta-city">Nyitási akció szeptember 30-ig →</span>
+          </Link>
+        )}
         <h1 className="hero-title">
           <span className="hero-title-line">Ars</span>
           <span className="hero-title-line hero-title-line--indent">Mosoris</span>
@@ -175,7 +197,7 @@ function HeroSection() {
         <p className="hero-subtitle">Ahol a művészet viselhetővé válik</p>
         <div className="hero-cta">
           <Link to="/collections/all" className="btn btn-primary">
-            Shop megtekintése
+            Irány a bolt
           </Link>
           <Link to="/artists" className="btn btn-outline hero-btn-ghost">
             Alkotóink
@@ -265,10 +287,16 @@ function CollectionsSection({
       <Await resolve={collections}>
         {(data) => {
           // Only curated, customer-facing collections: skip Shopify's default
-          // "frontpage" collection and anything without a cover image.
-          const nodes = (data?.collections?.nodes ?? []).filter(
-            (c) => c.handle !== 'frontpage' && c.image,
-          );
+          // "frontpage" collection and anything without a cover image. The
+          // campaign comes first, then the categories in navigation order.
+          const order = [CAMPAIGN.collectionHandle, ...SHOP_COLLECTIONS.map((c) => c.handle)];
+          const rank = (handle: string) => {
+            const i = order.indexOf(handle);
+            return i === -1 ? order.length : i;
+          };
+          const nodes = (data?.collections?.nodes ?? [])
+            .filter((c) => c.handle !== 'frontpage' && c.image)
+            .sort((a, b) => rank(a.handle) - rank(b.handle));
           if (!nodes.length) return null;
           return (
             <section className="collections-drops-section">
@@ -286,8 +314,15 @@ function CollectionsSection({
                     >
                       <div className="collection-drop-image">
                         <img
-                          src={collection.image!.url}
+                          src={`${collection.image!.url}${collection.image!.url.includes('?') ? '&' : '?'}width=800`}
+                          srcSet={[400, 800, 1200]
+                            .map((w) => `${collection.image!.url}${collection.image!.url.includes('?') ? '&' : '?'}width=${w} ${w}w`)
+                            .join(', ')}
+                          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                          width={collection.image!.width ?? undefined}
+                          height={collection.image!.height ?? undefined}
                           alt={collection.image!.altText || collection.title}
+                          loading="lazy"
                         />
                       </div>
                       <div className="collection-drop-overlay">
@@ -371,27 +406,27 @@ function NewsletterSection() {
 
   if (actionData?.success) {
     return (
-      <section className="newsletter">
+      <section className="newsletter" id="newsletter">
         <h2 className="newsletter-title">Köszönjük!</h2>
         <p className="newsletter-subtitle">
-          Feliratkoztál a hírlevelünkre. Hamarosan értesíted lesz az akciókról!
+          Feliratkoztál a hírlevelünkre. Az új darabokról és az akciókról elsőként értesítünk.
         </p>
       </section>
     );
   }
 
   return (
-    <section className="newsletter">
-      <h2 className="newsletter-title">Nyerj havonta ingyenes ruhát!</h2>
+    <section className="newsletter" id="newsletter">
+      <h2 className="newsletter-title">Első kézből az új darabokról</h2>
       <p className="newsletter-subtitle">
-        Iratkozz fel hírlevelünkre és vegyél részt havi sorsolásunkon + exkluzív
-        akciók, új termékek
+        Új kollekciók, események és akciók, havonta legfeljebb egyszer. Nincs spam.
       </p>
-      <Form method="post" className="newsletter-form">
+      <Form method="post" className="newsletter-form" id="newsletter-form-id">
         <input
           type="email"
           name="email"
           placeholder="E-mail címed"
+          aria-label="E-mail cím"
           className="newsletter-input"
           required
         />
@@ -399,8 +434,17 @@ function NewsletterSection() {
           {isSubmitting ? 'Feldolgozás...' : 'Feliratkozás'}
         </button>
       </Form>
+      <label className="newsletter-consent">
+        <input type="checkbox" name="consent" form="newsletter-form-id" required />
+        <span>
+          Kérem a hírlevelet, és elfogadom az{' '}
+          <Link to="/policies/privacy-policy">adatkezelési tájékoztatót</Link>.
+        </span>
+      </label>
       {actionData && !actionData.success && (
-        <p className="newsletter-error">Valami hiba történt. Próbáld újra!</p>
+        <p className="newsletter-error">
+          Nem sikerült a feliratkozás. Ellenőrizd az e-mail címet és a hozzájárulást, majd próbáld újra!
+        </p>
       )}
     </section>
   );
@@ -412,6 +456,7 @@ const RECOMMENDED_PRODUCTS_QUERY = `#graphql
     title
     handle
     vendor
+    tags
     availableForSale
     priceRange {
       minVariantPrice {
@@ -445,11 +490,13 @@ const HOMEPAGE_COLLECTIONS_QUERY = `#graphql
     image {
       url
       altText
+      width
+      height
     }
   }
   query HomepageCollections($country: CountryCode, $language: LanguageCode)
     @inContext(country: $country, language: $language) {
-    collections(first: 6, sortKey: UPDATED_AT) {
+    collections(first: 10, sortKey: UPDATED_AT) {
       nodes {
         ...HomepageCollection
       }

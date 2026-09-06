@@ -58,6 +58,7 @@ export const CART_QUERY_FRAGMENT = `#graphql
           title
           id
           vendor
+          tags
           variants(first: 20) {
             nodes {
               id
@@ -134,6 +135,7 @@ export const CART_QUERY_FRAGMENT = `#graphql
           title
           id
           vendor
+          tags
           variants(first: 20) {
             nodes {
               id

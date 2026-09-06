@@ -77,6 +77,7 @@ Disallow: /orders
 Disallow: /checkouts/
 Disallow: /checkout
 Disallow: /penztar
+Disallow: /koszonjuk
 Disallow: /discount/
 Disallow: /api/
 Disallow: /wishlist
