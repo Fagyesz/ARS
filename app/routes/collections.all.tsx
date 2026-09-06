@@ -5,14 +5,14 @@ import type {CollectionItemFragment} from 'storefrontapi.generated';
 import {ARTISTS} from '~/lib/artists';
 import {COLLECTION_TYPES} from '~/lib/config';
 
-export const meta: Route.MetaFunction = () => {
+export const meta: Route.MetaFunction = ({data}) => {
   return [
     {title: 'Katalógus | Ars Mosoris'},
     {name: 'description', content: 'Fedezd fel a teljes Ars Mosoris kollekcióját — egyedi póló és táska dizájnok magyar képzőművészektől.'},
     {property: 'og:type', content: 'website'},
     {property: 'og:title', content: 'Katalógus | Ars Mosoris'},
     {property: 'og:description', content: 'Fedezd fel a teljes Ars Mosoris kollekcióját — egyedi póló és táska dizájnok magyar képzőművészektől.'},
-    {property: 'og:image', content: 'https://new.arsmosoris.art/og-default.png'},
+    {property: 'og:image', content: `${data?.origin ?? ''}/og-default.png`},
     {name: 'twitter:card', content: 'summary_large_image'},
   ];
 };
@@ -71,7 +71,13 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
     (a, b) => Number(!!b.featuredImage) - Number(!!a.featuredImage),
   );
 
-  return {products: {...products, nodes}, artistFilter, typeFilter, sortParam};
+  return {
+    products: {...products, nodes},
+    artistFilter,
+    typeFilter,
+    sortParam,
+    origin: url.origin,
+  };
 }
 
 function loadDeferredData(_args: Route.LoaderArgs) {

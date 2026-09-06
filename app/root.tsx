@@ -152,6 +152,9 @@ function loadDeferredData({context}: Route.LoaderArgs) {
 
 export function Layout({children}: {children?: React.ReactNode}) {
   const nonce = useNonce();
+  const data = useRouteLoaderData<RootLoader>('root');
+  const siteUrl =
+    data?.header?.shop?.primaryDomain?.url ?? 'https://arsmosoris.art';
 
   return (
     <html lang="hu">
@@ -172,8 +175,8 @@ export function Layout({children}: {children?: React.ReactNode}) {
               '@context': 'https://schema.org',
               '@type': 'Organization',
               name: 'Ars Mosoris',
-              url: 'https://new.arsmosoris.art',
-              logo: 'https://new.arsmosoris.art/og-default.png',
+              url: siteUrl,
+              logo: `${siteUrl}/og-default.png`,
             }),
           }}
         />
