@@ -30,23 +30,14 @@ export const COLLECTION_TYPES = [
   {label: 'Kabátok', value: 'kabat'},
 ];
 
-// Real Shopify collections (smart collections by product type / tag); these are
-// the crawlable category pages linked from the navigation and footer.
-export const SHOP_COLLECTIONS = [
-  {handle: 'polok', label: 'Pólók'},
-  {handle: 'puloverek', label: 'Pulóverek'},
-  {handle: 'kabatok', label: 'Kabátok és blézerek'},
-  {handle: 'nadragok-es-szoknyak', label: 'Nadrágok és szoknyák'},
-  {handle: 'egyedi-darabok', label: 'Egyedi darabok'},
-];
-
-// Promotions are not configured here: the storefront reads the shop's active
-// automatic discounts through the Admin API (app/lib/campaigns.server.ts) and
-// derives the banner, badges, product notes and cart nudge from them.
+// Categories, promotions and shop facts are not configured here:
+// - categories are the published Shopify collections (app/lib/content.ts)
+// - promotions are the shop's active automatic discounts (app/lib/campaigns.server.ts)
+// - shipping/company facts come from the `shop_settings` metaobject (app/lib/content.ts)
 
 /**
- * Shipping facts shown on the product page, in the cart and in the footer.
- * Source: the shop's own shipping/return policy pages; keep them in sync.
+ * Fallback shipping facts, used only until the `shop_settings` metaobject
+ * exists in Shopify. Source: the shop's own shipping/return policy pages.
  */
 export const SHIPPING = {
   carrier: 'GLS',

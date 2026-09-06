@@ -39,7 +39,7 @@
 
   /* Layout */
   --header-height: 80px;
-  --aside-width: 420px;
+  --aside-width: 480px;
   --max-width: 1400px;
   --grid-item-width: 320px;
 }
@@ -1349,7 +1349,6 @@ aside .cart-empty {
   flex-direction: column;
   gap: 0.25rem;
   min-width: 0;
-  padding-right: 1rem;
 }
 
 .cart-line-title {
@@ -1399,7 +1398,7 @@ aside .cart-empty {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1.5rem;
+  gap: 0.75rem;
   margin-top: 0.5rem;
 }
 
@@ -1459,6 +1458,10 @@ aside .cart-empty {
 .cart-line-price {
   font-weight: 600;
   font-size: 0.9375rem;
+  /* "14 000 Ft" must stay on one line next to the 3 controls */
+  flex-shrink: 0;
+  white-space: nowrap;
+  text-align: right;
 }
 
 /* Cart Summary */

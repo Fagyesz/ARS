@@ -17,6 +17,7 @@ import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
 import {SITE_URL, SOCIAL_LINKS} from '~/lib/config';
 import {jsonLd, seoMeta} from '~/lib/seo';
 import {loadCampaigns} from '~/lib/campaigns.server';
+import {loadSiteContent} from '~/lib/content';
 import resetStyles from '~/styles/reset.css?inline';
 import appStyles from '~/styles/app.css?url';
 import {PageLayout} from './components/PageLayout';
@@ -115,6 +116,8 @@ export async function loader(args: Route.LoaderArgs) {
     publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
     // active automatic discounts from Shopify (memoised); drives banner, badges, nudges
     campaigns: await loadCampaigns(env),
+    // shop-managed content: settings, size guides, artists, categories (cached long)
+    content: await loadSiteContent(storefront),
     // set by /penztar when the cart was handed to the kosR checkout
     checkoutStartedAt: (session.get('checkoutStartedAt') as number | undefined) ?? null,
     shop: getShopAnalytics({
@@ -151,7 +154,8 @@ async function loadCriticalData({context}: Route.LoaderArgs) {
     storefront.query(HEADER_QUERY, {
       cache: storefront.CacheLong(),
       variables: {
-        headerMenuHandle: 'main-menu', // Adjust to your header menu handle
+        // Online Store → Navigation → "hydrogen-main"; the built-in list is the fallback
+        headerMenuHandle: 'hydrogen-main',
       },
     }),
     // Add other queries here, so that they are loaded in parallel
@@ -173,7 +177,8 @@ function loadDeferredData({context}: Route.LoaderArgs) {
     .query(FOOTER_QUERY, {
       cache: storefront.CacheLong(),
       variables: {
-        footerMenuHandle: 'footer', // Adjust to your footer menu handle
+        // Online Store → Navigation → "hydrogen-footer" (top-level items = columns)
+        footerMenuHandle: 'hydrogen-footer',
       },
     })
     .catch((error: Error) => {

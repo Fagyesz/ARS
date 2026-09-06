@@ -3,6 +3,45 @@
 /* eslint-disable */
 import type * as StorefrontAPI from '@shopify/hydrogen/storefront-api-types';
 
+export type SiteContentQueryVariables = StorefrontAPI.Exact<{
+  country?: StorefrontAPI.InputMaybe<StorefrontAPI.CountryCode>;
+  language?: StorefrontAPI.InputMaybe<StorefrontAPI.LanguageCode>;
+}>;
+
+export type SiteContentQuery = {
+  settings?: StorefrontAPI.Maybe<{
+    fields: Array<Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>>;
+  }>;
+  sizeGuides: {
+    nodes: Array<
+      Pick<StorefrontAPI.Metaobject, 'handle'> & {
+        fields: Array<Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>>;
+      }
+    >;
+  };
+  artists: {
+    nodes: Array<
+      Pick<StorefrontAPI.Metaobject, 'handle'> & {
+        fields: Array<
+          Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'> & {
+            reference?: StorefrontAPI.Maybe<{
+              image?: StorefrontAPI.Maybe<
+                Pick<
+                  StorefrontAPI.Image,
+                  'url' | 'width' | 'height' | 'altText'
+                >
+              >;
+            }>;
+          }
+        >;
+      }
+    >;
+  };
+  collections: {
+    nodes: Array<Pick<StorefrontAPI.Collection, 'handle' | 'title'>>;
+  };
+};
+
 export type MoneyFragment = Pick<
   StorefrontAPI.MoneyV2,
   'currencyCode' | 'amount'
@@ -1346,6 +1385,13 @@ export type ProductFragment = Pick<
     }
   >;
   seo: Pick<StorefrontAPI.Seo, 'description' | 'title'>;
+  sizeGuide?: StorefrontAPI.Maybe<{
+    reference?: StorefrontAPI.Maybe<
+      Pick<StorefrontAPI.Metaobject, 'handle'> & {
+        fields: Array<Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>>;
+      }
+    >;
+  }>;
   images: {
     nodes: Array<
       Pick<StorefrontAPI.Image, 'id' | 'url' | 'altText' | 'width' | 'height'>
@@ -1471,6 +1517,13 @@ export type ProductQuery = {
         }
       >;
       seo: Pick<StorefrontAPI.Seo, 'description' | 'title'>;
+      sizeGuide?: StorefrontAPI.Maybe<{
+        reference?: StorefrontAPI.Maybe<
+          Pick<StorefrontAPI.Metaobject, 'handle'> & {
+            fields: Array<Pick<StorefrontAPI.MetaobjectField, 'key' | 'value'>>;
+          }
+        >;
+      }>;
       images: {
         nodes: Array<
           Pick<
@@ -1749,6 +1802,10 @@ export type PredictiveSearchQuery = {
 };
 
 interface GeneratedQueryTypes {
+  '#graphql\n  query SiteContent($country: CountryCode, $language: LanguageCode)\n    @inContext(country: $country, language: $language) {\n    settings: metaobject(handle: {type: "shop_settings", handle: "default"}) {\n      fields {\n        key\n        value\n      }\n    }\n    sizeGuides: metaobjects(type: "size_guide", first: 20) {\n      nodes {\n        handle\n        fields {\n          key\n          value\n        }\n      }\n    }\n    artists: metaobjects(type: "artist", first: 20, sortKey: "sort") {\n      nodes {\n        handle\n        fields {\n          key\n          value\n          reference {\n            ... on MediaImage {\n              image {\n                url\n                width\n                height\n                altText\n              }\n            }\n          }\n        }\n      }\n    }\n    collections(first: 20) {\n      nodes {\n        handle\n        title\n      }\n    }\n  }\n': {
+    return: SiteContentQuery;
+    variables: SiteContentQueryVariables;
+  };
   '#graphql\n  fragment Shop on Shop {\n    id\n    name\n    description\n    primaryDomain {\n      url\n    }\n    brand {\n      logo {\n        image {\n          url\n        }\n      }\n    }\n  }\n  query Header(\n    $country: CountryCode\n    $headerMenuHandle: String!\n    $language: LanguageCode\n  ) @inContext(language: $language, country: $country) {\n    shop {\n      ...Shop\n    }\n    menu(handle: $headerMenuHandle) {\n      ...Menu\n    }\n  }\n  #graphql\n  fragment MenuItem on MenuItem {\n    id\n    resourceId\n    tags\n    title\n    type\n    url\n  }\n  fragment ChildMenuItem on MenuItem {\n    ...MenuItem\n  }\n  fragment ParentMenuItem on MenuItem {\n    ...MenuItem\n    items {\n      ...ChildMenuItem\n    }\n  }\n  fragment Menu on Menu {\n    id\n    items {\n      ...ParentMenuItem\n    }\n  }\n\n': {
     return: HeaderQuery;
     variables: HeaderQueryVariables;
@@ -1825,7 +1882,7 @@ interface GeneratedQueryTypes {
     return: PolicyQuery;
     variables: PolicyQueryVariables;
   };
-  '#graphql\n  query Product(\n    $country: CountryCode\n    $handle: String!\n    $language: LanguageCode\n    $selectedOptions: [SelectedOptionInput!]!\n  ) @inContext(country: $country, language: $language) {\n    product(handle: $handle) {\n      ...Product\n    }\n  }\n  #graphql\n  fragment Product on Product {\n    id\n    title\n    vendor\n    handle\n    productType\n    tags\n    descriptionHtml\n    description\n    encodedVariantExistence\n    encodedVariantAvailability\n    options {\n      name\n      optionValues {\n        name\n        firstSelectableVariant {\n          ...ProductVariant\n        }\n        swatch {\n          color\n          image {\n            previewImage {\n              url\n            }\n          }\n        }\n      }\n    }\n    selectedOrFirstAvailableVariant(selectedOptions: $selectedOptions, ignoreUnknownOptions: true, caseInsensitiveMatch: true) {\n      ...ProductVariant\n    }\n    adjacentVariants (selectedOptions: $selectedOptions) {\n      ...ProductVariant\n    }\n    seo {\n      description\n      title\n    }\n    images(first: 10) {\n      nodes {\n        id\n        url\n        altText\n        width\n        height\n      }\n    }\n  }\n  #graphql\n  fragment ProductVariant on ProductVariant {\n    availableForSale\n    quantityAvailable\n    compareAtPrice {\n      amount\n      currencyCode\n    }\n    id\n    image {\n      __typename\n      id\n      url\n      altText\n      width\n      height\n    }\n    price {\n      amount\n      currencyCode\n    }\n    product {\n      title\n      handle\n    }\n    selectedOptions {\n      name\n      value\n    }\n    sku\n    title\n    unitPrice {\n      amount\n      currencyCode\n    }\n  }\n\n\n': {
+  '#graphql\n  query Product(\n    $country: CountryCode\n    $handle: String!\n    $language: LanguageCode\n    $selectedOptions: [SelectedOptionInput!]!\n  ) @inContext(country: $country, language: $language) {\n    product(handle: $handle) {\n      ...Product\n    }\n  }\n  #graphql\n  fragment Product on Product {\n    id\n    title\n    vendor\n    handle\n    productType\n    tags\n    descriptionHtml\n    description\n    encodedVariantExistence\n    encodedVariantAvailability\n    options {\n      name\n      optionValues {\n        name\n        firstSelectableVariant {\n          ...ProductVariant\n        }\n        swatch {\n          color\n          image {\n            previewImage {\n              url\n            }\n          }\n        }\n      }\n    }\n    selectedOrFirstAvailableVariant(selectedOptions: $selectedOptions, ignoreUnknownOptions: true, caseInsensitiveMatch: true) {\n      ...ProductVariant\n    }\n    adjacentVariants (selectedOptions: $selectedOptions) {\n      ...ProductVariant\n    }\n    seo {\n      description\n      title\n    }\n    sizeGuide: metafield(namespace: "custom", key: "size_guide") {\n      reference {\n        ... on Metaobject {\n          handle\n          fields {\n            key\n            value\n          }\n        }\n      }\n    }\n    images(first: 10) {\n      nodes {\n        id\n        url\n        altText\n        width\n        height\n      }\n    }\n  }\n  #graphql\n  fragment ProductVariant on ProductVariant {\n    availableForSale\n    quantityAvailable\n    compareAtPrice {\n      amount\n      currencyCode\n    }\n    id\n    image {\n      __typename\n      id\n      url\n      altText\n      width\n      height\n    }\n    price {\n      amount\n      currencyCode\n    }\n    product {\n      title\n      handle\n    }\n    selectedOptions {\n      name\n      value\n    }\n    sku\n    title\n    unitPrice {\n      amount\n      currencyCode\n    }\n  }\n\n\n': {
     return: ProductQuery;
     variables: ProductQueryVariables;
   };

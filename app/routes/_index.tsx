@@ -13,7 +13,6 @@ import type {RecommendedProductsQuery, HomepageCollectionsQuery} from 'storefron
 import {ARTISTS, artistPortrait} from '~/lib/artists';
 import {ProductItem} from '~/components/ProductItem';
 import {seoMeta} from '~/lib/seo';
-import {SHOP_COLLECTIONS} from '~/lib/config';
 import {CAMPAIGN_PATH, untilHu} from '~/lib/campaigns';
 import type {RootLoader} from '~/root';
 
@@ -288,17 +287,11 @@ function CollectionsSection({
     <Suspense fallback={null}>
       <Await resolve={collections}>
         {(data) => {
-          // Only curated, customer-facing collections: skip Shopify's default
-          // "frontpage" collection and anything without a cover image, and show
-          // the categories in navigation order.
-          const order = SHOP_COLLECTIONS.map((c) => c.handle);
-          const rank = (handle: string) => {
-            const i = order.indexOf(handle);
-            return i === -1 ? order.length : i;
-          };
-          const nodes = (data?.collections?.nodes ?? [])
-            .filter((c) => c.handle !== 'frontpage' && c.image)
-            .sort((a, b) => rank(a.handle) - rank(b.handle));
+          // Only customer-facing collections with a cover image, in the order
+          // Shopify lists them (skip the theme's default "frontpage" collection)
+          const nodes = (data?.collections?.nodes ?? []).filter(
+            (c) => c.handle !== 'frontpage' && c.image,
+          );
           if (!nodes.length) return null;
           return (
             <section className="collections-drops-section">
@@ -352,17 +345,18 @@ function CollectionsSection({
 }
 
 function ArtistsPreview() {
+  const artists = useRouteLoaderData<RootLoader>('root')?.content?.artists ?? ARTISTS;
   return (
     <section className="section section-alt">
       <div className="container">
         <div className="text-center mb-8">
           <h2>Alkotóink</h2>
           <p className="text-muted">
-            Négy tehetséges művész, négy egyedi látásmód
+            {artists.length} tehetséges művész, {artists.length} egyedi látásmód
           </p>
         </div>
         <div className="artists-grid">
-          {ARTISTS.map((artist) => {
+          {artists.map((artist) => {
             const portrait = artistPortrait(artist);
             return (
             <Link

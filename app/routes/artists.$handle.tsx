@@ -3,7 +3,8 @@ import type {Route} from './+types/artists.$handle';
 import {getPaginationVariables} from '@shopify/hydrogen';
 import {ProductItem} from '~/components/ProductItem';
 import type {ProductItemFragment} from 'storefrontapi.generated';
-import {ARTISTS, artistPortrait} from '~/lib/artists';
+import {artistPortrait} from '~/lib/artists';
+import {loadSiteContent} from '~/lib/content';
 import {breadcrumbJsonLd, jsonLd, productListJsonLd, seoMeta} from '~/lib/seo';
 
 export const meta: Route.MetaFunction = ({data, location}) => {
@@ -20,7 +21,9 @@ export async function loader({context, params, request}: Route.LoaderArgs) {
   const {handle} = params;
   const {storefront} = context;
 
-  const artist = handle ? ARTISTS.find((a) => a.handle === handle) : undefined;
+  // artists live in Shopify (artist metaobjects), with the built-in list as fallback
+  const {artists} = await loadSiteContent(storefront);
+  const artist = handle ? artists.find((a) => a.handle === handle) : undefined;
 
   if (!artist) {
     throw new Response('Artist not found', {status: 404});
@@ -32,7 +35,7 @@ export async function loader({context, params, request}: Route.LoaderArgs) {
   const {products} = await storefront.query(ARTIST_PRODUCTS_QUERY, {
     variables: {
       // scope to the vendor field, not a free-text match on the name
-      vendor: `vendor:"${artist.name.replace(/"/g, '')}"`,
+      vendor: `vendor:"${(artist.vendor ?? artist.name).replace(/"/g, '')}"`,
       ...paginationVariables,
     },
   });

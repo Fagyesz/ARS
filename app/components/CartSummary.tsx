@@ -2,8 +2,9 @@ import type {CartApiQueryFragment} from 'storefrontapi.generated';
 import type {CartLayout} from '~/components/CartMain';
 import {CartForm, type OptimisticCart} from '@shopify/hydrogen';
 import {Link, useRouteLoaderData} from 'react-router';
-import {KOSR_CHECKOUT_ENABLED, SHIPPING} from '~/lib/config';
+import {KOSR_CHECKOUT_ENABLED} from '~/lib/config';
 import {CAMPAIGN_PATH, isEligible} from '~/lib/campaigns';
+import {FALLBACK_SETTINGS, type SiteSettings} from '~/lib/content';
 import {summarizeLineDiscounts} from '~/lib/discounts';
 import {formatMoney} from '~/lib/money';
 import {useAside} from './Aside';
@@ -22,11 +23,14 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
   const lines = (cart?.lines?.nodes ?? []) as CartLines;
   const subtotal = parseFloat(cart?.cost?.subtotalAmount?.amount ?? '0');
   const currencyCode = cart?.cost?.subtotalAmount?.currencyCode ?? 'HUF';
+  const rootData = useRouteLoaderData<RootLoader>('root');
+  const settings = rootData?.content?.settings ?? FALLBACK_SETTINGS;
+  const {shipping} = settings;
 
   return (
     <div aria-labelledby="cart-summary" className={className}>
       <div className="cart-summary-content">
-        <FreeShippingProgress subtotal={subtotal} currencyCode={currencyCode} />
+        <FreeShippingProgress subtotal={subtotal} currencyCode={currencyCode} threshold={shipping.freeOverFt} />
         <CampaignNudge lines={lines} />
         <dl className="cart-subtotal">
           <dt>Részösszeg</dt>
@@ -65,12 +69,12 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
         </dl>
         <CartDiscountRows cart={cart} />
         <p className="cart-shipping-note">
-          Szállítás: {SHIPPING.carrier} csomagpont {formatMoney(SHIPPING.parcelPointFt)},
-          házhoz {formatMoney(SHIPPING.homeDeliveryFt)}; a pénztárban választhatsz.
+          Szállítás: {shipping.carrier} csomagpont {formatMoney(shipping.parcelPointFt)},
+          házhoz {formatMoney(shipping.homeDeliveryFt)}; a pénztárban választhatsz.
         </p>
         <CartDiscounts discountCodes={cart?.discountCodes} />
       </div>
-      <CartCheckoutActions checkoutUrl={cart?.checkoutUrl} />
+      <CartCheckoutActions checkoutUrl={cart?.checkoutUrl} settings={settings} />
     </div>
   );
 }
@@ -79,11 +83,13 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
 function FreeShippingProgress({
   subtotal,
   currencyCode,
+  threshold,
 }: {
   subtotal: number;
   currencyCode: string;
+  threshold: number;
 }) {
-  const threshold = SHIPPING.freeOverFt;
+  if (!threshold) return null;
   const remaining = Math.max(0, threshold - subtotal);
   const pct = Math.min(100, Math.round((subtotal / threshold) * 100));
   const reached = remaining === 0;
@@ -158,7 +164,13 @@ function CartDiscountRows({cart}: {cart: CartSummaryProps['cart']}) {
   );
 }
 
-function CartCheckoutActions({checkoutUrl}: {checkoutUrl?: string}) {
+function CartCheckoutActions({
+  checkoutUrl,
+  settings,
+}: {
+  checkoutUrl?: string;
+  settings: SiteSettings;
+}) {
   if (!checkoutUrl) return null;
 
   // /penztar hands the cart to kosR's Hungarian checkout (see routes/penztar.tsx)
@@ -170,8 +182,8 @@ function CartCheckoutActions({checkoutUrl}: {checkoutUrl?: string}) {
         Tovább a fizetéshez
       </a>
       <p className="cart-checkout-note">
-        Biztonságos online fizetés · {SHIPPING.carrier} csomagpont vagy házhoz szállítás ·{' '}
-        {SHIPPING.returnDays} napos elállás
+        {settings.paymentMethods} · {settings.shipping.carrier} csomagpont vagy házhoz szállítás ·{' '}
+        {settings.shipping.returnDays} napos elállás
       </p>
     </div>
   );

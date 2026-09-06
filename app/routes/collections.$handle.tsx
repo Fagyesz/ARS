@@ -1,11 +1,11 @@
-import {redirect, useLoaderData, Link, useNavigation} from 'react-router';
+import {redirect, useLoaderData, useRouteLoaderData, Link, useNavigation} from 'react-router';
+import type {RootLoader} from '~/root';
 import type {Route} from './+types/collections.$handle';
 import {Analytics} from '@shopify/hydrogen';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {ProductItem} from '~/components/ProductItem';
 import type {ProductItemFragment} from 'storefrontapi.generated';
 import {breadcrumbJsonLd, jsonLd, productListJsonLd, seoMeta} from '~/lib/seo';
-import {SHOP_COLLECTIONS} from '~/lib/config';
 
 export const meta: Route.MetaFunction = ({data, location}) =>
   seoMeta({
@@ -104,6 +104,8 @@ export default function Collection() {
   const {collection, sortParam} = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const isLoading = navigation.state === 'loading';
+  // sibling categories = the shop's published collections (root loader)
+  const siblings = useRouteLoaderData<RootLoader>('root')?.content?.collections ?? [];
 
   return (
     <div className="collection-page">
@@ -170,14 +172,14 @@ export default function Collection() {
             <Link to="/collections/all" className="catalog-type-chip">
               Minden termék
             </Link>
-            {SHOP_COLLECTIONS.map((c) => (
+            {siblings.map((c) => (
               <Link
                 key={c.handle}
                 to={`/collections/${c.handle}`}
                 className={`catalog-type-chip${c.handle === collection.handle ? ' active' : ''}`}
                 aria-current={c.handle === collection.handle ? 'page' : undefined}
               >
-                {c.label}
+                {c.title}
               </Link>
             ))}
           </nav>

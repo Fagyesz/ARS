@@ -1,8 +1,10 @@
 import {Suspense} from 'react';
-import {Await, NavLink} from 'react-router';
+import {Await, NavLink, useRouteLoaderData} from 'react-router';
 import type {FooterQuery, HeaderQuery} from 'storefrontapi.generated';
-import {EMAIL, SOCIAL_LINKS, SHOP_COLLECTIONS, SHIPPING} from '~/lib/config';
 import {formatMoney} from '~/lib/money';
+import {FALLBACK_SETTINGS} from '~/lib/content';
+import {menuItemPath} from '~/components/Header';
+import type {RootLoader} from '~/root';
 
 interface FooterProps {
   footer: Promise<FooterQuery | null>;
@@ -18,136 +20,154 @@ interface FooterProps {
   };
 }
 
+type MenuItem = {id: string; title: string; url?: string | null; items?: MenuItem[]};
+
 export function Footer({
   footer: footerPromise,
   header,
   publicStoreDomain,
   env,
 }: FooterProps) {
-  // Use env variables with fallbacks to config constants
-  const contactEmail = env?.contactEmail || EMAIL;
+  const rootData = useRouteLoaderData<RootLoader>('root');
+  const content = rootData?.content;
+  const settings = content?.settings ?? FALLBACK_SETTINGS;
+  const collections = content?.collections ?? [];
+  // the shop_settings metaobject wins; environment variables are the older fallback
+  const contactEmail = settings.contactEmail || env?.contactEmail || FALLBACK_SETTINGS.contactEmail;
   const socialLinks = {
-    instagram: env?.instagramUrl || SOCIAL_LINKS.instagram,
-    facebook: env?.facebookUrl || SOCIAL_LINKS.facebook,
-    tiktok: env?.tiktokUrl || SOCIAL_LINKS.tiktok,
-    youtube: env?.youtubeUrl || SOCIAL_LINKS.youtube,
+    instagram: settings.social.instagram || env?.instagramUrl,
+    facebook: settings.social.facebook || env?.facebookUrl,
+    tiktok: settings.social.tiktok || env?.tiktokUrl,
+    youtube: settings.social.youtube || env?.youtubeUrl,
   };
+  const hosts = [publicStoreDomain, header?.shop?.primaryDomain?.url];
+  const {shipping} = settings;
+
   return (
     <Suspense fallback={null}>
       <Await resolve={footerPromise}>
-        {(footer) => (
-          <footer className="footer">
-            <div className="container">
-              <div className="footer-grid">
-                {/* Brand Column */}
-                <div className="footer-brand">
-                  <div className="footer-logo">
-                    <img
-                      src="/logo-144.png"
-                      alt="Ars Mosoris"
-                      className="footer-logo-img"
-                      width={144}
-                      height={144}
-                      loading="lazy"
-                    />
+        {(footer) => {
+          // "hydrogen-footer" menu: top-level items are columns, children the links
+          const columns = (footer?.menu?.items as MenuItem[] | undefined)?.filter(
+            (item) => item.items && item.items.length > 0,
+          );
+          return (
+            <footer className="footer">
+              <div className="container">
+                <div className="footer-grid">
+                  {/* Brand Column */}
+                  <div className="footer-brand">
+                    <div className="footer-logo">
+                      <img
+                        src="/logo-144.png"
+                        alt="Ars Mosoris"
+                        className="footer-logo-img"
+                        width={144}
+                        height={144}
+                        loading="lazy"
+                      />
+                    </div>
+                    <p className="footer-description">{settings.tagline}</p>
+                    <div className="footer-social">
+                      {socialLinks.instagram && (
+                        <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                          <InstagramIcon />
+                        </a>
+                      )}
+                      {socialLinks.facebook && (
+                        <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                          <FacebookIcon />
+                        </a>
+                      )}
+                      {socialLinks.tiktok && (
+                        <a href={socialLinks.tiktok} target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+                          <TikTokIcon />
+                        </a>
+                      )}
+                      {socialLinks.youtube && (
+                        <a href={socialLinks.youtube} target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+                          <YouTubeIcon />
+                        </a>
+                      )}
+                    </div>
                   </div>
-                  <p className="footer-description">
-                    Négy képzőművész által alapított márka, ahol a
-                    mindennapi viselet és a kortárs művészet találkozik.
-                  </p>
-                  <div className="footer-social">
-                    <a
-                      href={socialLinks.instagram}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="Instagram"
-                    >
-                      <InstagramIcon />
-                    </a>
-                    <a
-                      href={socialLinks.facebook}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="Facebook"
-                    >
-                      <FacebookIcon />
-                    </a>
-                    <a
-                      href={socialLinks.tiktok}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="TikTok"
-                    >
-                      <TikTokIcon />
-                    </a>
-                    <a
-                      href={socialLinks.youtube}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="YouTube"
-                    >
-                      <YouTubeIcon />
-                    </a>
-                  </div>
+
+                  {columns?.length ? (
+                    columns.map((column) => (
+                      <div key={column.id}>
+                        <h2 className="footer-heading">{column.title}</h2>
+                        <nav className="footer-links">
+                          {column.items!.map((item) => {
+                            const url = menuItemPath(item.url ?? '/', hosts);
+                            return /^https?:\/\//.test(url) ? (
+                              <a key={item.id} href={url} target="_blank" rel="noopener noreferrer">
+                                {item.title}
+                              </a>
+                            ) : (
+                              <NavLink key={item.id} to={url}>
+                                {item.title}
+                              </NavLink>
+                            );
+                          })}
+                        </nav>
+                      </div>
+                    ))
+                  ) : (
+                    <>
+                      {/* Built-in columns until the "hydrogen-footer" menu exists */}
+                      <div>
+                        <h2 className="footer-heading">Bolt</h2>
+                        <nav className="footer-links">
+                          <NavLink to="/collections/all">Minden termék</NavLink>
+                          {collections.map((collection) => (
+                            <NavLink key={collection.handle} to={`/collections/${collection.handle}`}>
+                              {collection.title}
+                            </NavLink>
+                          ))}
+                          <NavLink to="/wishlist">Kívánságlista</NavLink>
+                        </nav>
+                      </div>
+                      <div>
+                        <h2 className="footer-heading">Alkotók</h2>
+                        <nav className="footer-links">
+                          <NavLink to="/artists">Alkotóink</NavLink>
+                          <NavLink to="/events">Események</NavLink>
+                          <NavLink to="/about">Rólunk</NavLink>
+                        </nav>
+                      </div>
+                      <div>
+                        <h2 className="footer-heading">Információ</h2>
+                        <nav className="footer-links">
+                          <NavLink to="/contact">Kapcsolat</NavLink>
+                          <NavLink to="/policies/shipping-policy">Szállítás</NavLink>
+                          <NavLink to="/policies/refund-policy">Visszaküldés</NavLink>
+                          <NavLink to="/policies/privacy-policy">Adatvédelem</NavLink>
+                          <NavLink to="/policies/terms-of-service">ÁSZF</NavLink>
+                        </nav>
+                      </div>
+                    </>
+                  )}
                 </div>
 
-                {/* Shop Column */}
-                <div>
-                  <h2 className="footer-heading">Bolt</h2>
-                  <nav className="footer-links">
-                    <NavLink to="/collections/all">Minden termék</NavLink>
-                    {SHOP_COLLECTIONS.map((collection) => (
-                      <NavLink key={collection.handle} to={`/collections/${collection.handle}`}>
-                        {collection.label}
-                      </NavLink>
-                    ))}
-                    <NavLink to="/wishlist">Kívánságlista</NavLink>
-                  </nav>
-                </div>
-
-                {/* Artists Column */}
-                <div>
-                  <h2 className="footer-heading">Alkotók</h2>
-                  <nav className="footer-links">
-                    <NavLink to="/artists">Alkotóink</NavLink>
-                    <NavLink to="/events">Események</NavLink>
-                    <NavLink to="/about">Rólunk</NavLink>
-                  </nav>
-                </div>
-
-                {/* Info Column */}
-                <div>
-                  <h2 className="footer-heading">Információ</h2>
-                  <nav className="footer-links">
-                    <NavLink to="/contact">Kapcsolat</NavLink>
-                    <NavLink to="/policies/shipping-policy">Szállítás</NavLink>
-                    <NavLink to="/policies/refund-policy">
-                      Visszaküldés
-                    </NavLink>
-                    <NavLink to="/policies/privacy-policy">
-                      Adatvédelem
-                    </NavLink>
-                    <NavLink to="/policies/terms-of-service">ÁSZF</NavLink>
-                  </nav>
-                </div>
-              </div>
-
-              <p className="footer-shipping">
-                {SHIPPING.carrier} csomagpont {formatMoney(SHIPPING.parcelPointFt)} · házhoz szállítás{' '}
-                {formatMoney(SHIPPING.homeDeliveryFt)} · {formatMoney(SHIPPING.freeOverFt)} felett ingyenes ·{' '}
-                {SHIPPING.returnDays} napos elállás · biztonságos online fizetés
-              </p>
-              <div className="footer-bottom">
-                <p suppressHydrationWarning>&copy; {new Date().getFullYear()} Ars Mosoris. Minden jog fenntartva.</p>
-                <p>
-                  <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
-                  {' · '}
-                  Budapest, Magyarország
+                <p className="footer-shipping">
+                  {shipping.carrier} csomagpont {formatMoney(shipping.parcelPointFt)} · házhoz szállítás{' '}
+                  {formatMoney(shipping.homeDeliveryFt)} · {formatMoney(shipping.freeOverFt)} felett ingyenes ·{' '}
+                  {shipping.returnDays} napos elállás · {settings.paymentMethods}
                 </p>
+                <div className="footer-bottom">
+                  <p suppressHydrationWarning>
+                    &copy; {new Date().getFullYear()} {settings.company.name || 'Ars Mosoris'}. Minden jog fenntartva.
+                    {settings.company.taxNumber ? ` · Adószám: ${settings.company.taxNumber}` : ''}
+                  </p>
+                  <p>
+                    <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
+                    {settings.company.address ? ` · ${settings.company.address}` : ''}
+                  </p>
+                </div>
               </div>
-            </div>
-          </footer>
-        )}
+            </footer>
+          );
+        }}
       </Await>
     </Suspense>
   );

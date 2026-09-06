@@ -6,19 +6,25 @@ export interface Artist {
   image?: string;
   /** Pixel size of the 960px rendition, for layout-stable <img> tags */
   imageSize?: [width: number, height: number];
+  /** Portrait served from Shopify Files (artist metaobject); wins over `image` */
+  portrait?: {src: string; srcSet: string; width?: number; height?: number};
   handle: string;
   bio: string;
   statement: string;
   instagram?: string;
   collectionHandle: string;
+  /** product vendor name the artist's pieces carry in Shopify */
+  vendor?: string;
 }
 
 /**
- * Responsive renditions of the portrait: `public/artists/<name>-480.jpg` and
- * `<name>-960.jpg` are resized from the original. (JPEG on purpose: Shopify's
- * CDN re-encodes static images itself, so WebP sources gain nothing here.)
+ * Responsive renditions of the portrait: from Shopify Files when the artist
+ * comes from a metaobject, otherwise `public/artists/<name>-480.jpg` and
+ * `<name>-960.jpg` resized from the original. (JPEG on purpose: Shopify's CDN
+ * re-encodes static images itself, so WebP sources gain nothing here.)
  */
 export function artistPortrait(artist: Artist) {
+  if (artist.portrait) return artist.portrait;
   if (!artist.image) return null;
   const base = artist.image.replace(/\.jpe?g$/i, '');
   return {

@@ -1,4 +1,5 @@
-import {ARTISTS} from '~/lib/artists';
+import type {Route} from './+types/sitemap.custom[.xml]';
+import {loadSiteContent} from '~/lib/content';
 import {absoluteUrl} from '~/lib/seo';
 
 /**
@@ -6,11 +7,13 @@ import {absoluteUrl} from '~/lib/seo';
  * Hydrogen's generated sitemaps never list them. Served at /sitemap/custom.xml
  * and registered from the sitemap index in routes/[sitemap.xml].tsx.
  */
-export async function loader() {
+export async function loader({context}: Route.LoaderArgs) {
+  const {artists} = await loadSiteContent(context.storefront);
   const urls: Array<{path: string; changefreq: string; priority: string}> = [
     {path: '/collections/all', changefreq: 'weekly', priority: '0.9'},
+    {path: '/akcio', changefreq: 'weekly', priority: '0.6'},
     {path: '/artists', changefreq: 'monthly', priority: '0.7'},
-    ...ARTISTS.map((artist) => ({
+    ...artists.map((artist) => ({
       path: `/artists/${artist.handle}`,
       changefreq: 'weekly',
       priority: '0.7',

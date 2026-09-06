@@ -7,6 +7,25 @@ import {
 } from '@shopify/hydrogen';
 import type {HeaderQuery, CartApiQueryFragment} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
+import {SITE_URL} from '~/lib/config';
+
+/**
+ * Menu item URLs come from Shopify as absolute links on the Online Store
+ * domain; turn anything on one of our own hosts into a site-relative path.
+ */
+export function menuItemPath(
+  url: string,
+  hosts: Array<string | null | undefined>,
+): string {
+  if (!/^https?:\/\//.test(url)) return url;
+  try {
+    const parsed = new URL(url);
+    const own = [new URL(SITE_URL).host, ...hosts.map((h) => (h ? new URL(h.includes('://') ? h : `https://${h}`).host : null))];
+    return own.includes(parsed.host) ? `${parsed.pathname}${parsed.search}` : url;
+  } catch {
+    return url;
+  }
+}
 
 interface HeaderProps {
   header: HeaderQuery;
@@ -59,6 +78,8 @@ export function HeaderMenu({
 }) {
   const className = `header-menu-${viewport}`;
   const {close} = useAside();
+  // the Shopify "hydrogen-main" menu when it exists, otherwise the built-in list
+  const items = menu?.items?.length ? menu.items : FALLBACK_HEADER_MENU.items;
 
   return (
     <nav className={className} role="navigation">
@@ -73,16 +94,21 @@ export function HeaderMenu({
           Kezdőlap
         </NavLink>
       )}
-      {FALLBACK_HEADER_MENU.items.map((item) => {
+      {items.map((item) => {
         if (!item.url) return null;
-
-        const url =
-          item.url.includes('myshopify.com') ||
-          item.url.includes(publicStoreDomain) ||
-          item.url.includes(primaryDomainUrl)
-            ? new URL(item.url).pathname
-            : item.url;
-        return (
+        const url = menuItemPath(item.url, [publicStoreDomain, primaryDomainUrl]);
+        const external = /^https?:\/\//.test(url);
+        return external ? (
+          <a
+            className="header-menu-item"
+            key={item.id}
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {item.title}
+          </a>
+        ) : (
           <NavLink
             className="header-menu-item"
             end

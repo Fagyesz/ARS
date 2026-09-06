@@ -1,7 +1,8 @@
-import {Link, useLoaderData} from 'react-router';
+import {Link, useLoaderData, useRouteLoaderData} from 'react-router';
 import type {Route} from './+types/koszonjuk';
-import {SHIPPING, SOCIAL_LINKS} from '~/lib/config';
+import {FALLBACK_SETTINGS} from '~/lib/content';
 import {seoMeta} from '~/lib/seo';
+import type {RootLoader} from '~/root';
 
 export const meta: Route.MetaFunction = ({location}) =>
   seoMeta({
@@ -30,6 +31,10 @@ export async function loader({context}: Route.LoaderArgs) {
 
 export default function ThankYou() {
   const {cleared} = useLoaderData<typeof loader>();
+  const rootData = useRouteLoaderData<RootLoader>('root');
+  const settings = rootData?.content?.settings ?? FALLBACK_SETTINGS;
+  const {shipping, social} = settings;
+
   return (
     <section className="thank-you">
       <div className="container thank-you-inner">
@@ -37,8 +42,8 @@ export default function ThankYou() {
         <h1>Köszönjük, hogy tőlünk vásároltál!</h1>
         <p className="thank-you-lead">
           A rendelésed megérkezett hozzánk. A visszaigazolást és a számlát
-          e-mailben küldjük, a csomagot pedig {SHIPPING.handlingDays}on belül
-          adjuk fel {SHIPPING.carrier} futárral. A feladásról követési számot
+          e-mailben küldjük, a csomagot pedig {shipping.handlingDays}on belül
+          adjuk fel {shipping.carrier} futárral. A feladásról követési számot
           kapsz.
         </p>
         <ol className="thank-you-steps">
@@ -48,12 +53,12 @@ export default function ThankYou() {
           </li>
           <li>
             <strong>Csomagolás</strong>
-            <span>Kézzel csomagolunk, {SHIPPING.handlingDays} alatt.</span>
+            <span>Kézzel csomagolunk, {shipping.handlingDays} alatt.</span>
           </li>
           <li>
             <strong>Kézbesítés</strong>
             <span>
-              {SHIPPING.transitDays} a feladástól, csomagpontra vagy házhoz.
+              {shipping.transitDays} a feladástól, csomagpontra vagy házhoz.
             </span>
           </li>
         </ol>
@@ -64,14 +69,16 @@ export default function ThankYou() {
           <Link to="/collections/all" className="btn btn-primary">
             Vissza a bolthoz
           </Link>
-          <a
-            href={SOCIAL_LINKS.instagram}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn btn-outline"
-          >
-            Kövess Instagramon
-          </a>
+          {social.instagram && (
+            <a
+              href={social.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-outline"
+            >
+              Kövess Instagramon
+            </a>
+          )}
         </div>
         <p className="thank-you-help">
           Kérdésed van a rendeléssel kapcsolatban?{' '}

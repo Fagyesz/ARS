@@ -1,7 +1,8 @@
-import {Link} from 'react-router';
+import {Link, useRouteLoaderData} from 'react-router';
 import type {Route} from './+types/artists._index';
 import {ARTISTS, artistPortrait} from '~/lib/artists';
 import {seoMeta} from '~/lib/seo';
+import type {RootLoader} from '~/root';
 
 export const meta: Route.MetaFunction = ({location}) =>
   seoMeta({
@@ -12,6 +13,7 @@ export const meta: Route.MetaFunction = ({location}) =>
   });
 
 export default function ArtistsIndex() {
+  const artists = useRouteLoaderData<RootLoader>('root')?.content?.artists ?? ARTISTS;
   return (
     <div className="artists-index-page">
       {/* Editorial dark header */}
@@ -28,7 +30,7 @@ export default function ArtistsIndex() {
 
       <div className="container">
         <div className="artists-page-grid">
-          {ARTISTS.map((artist, index) => {
+          {artists.map((artist, index) => {
             const portrait = artistPortrait(artist);
             return (
             <Link

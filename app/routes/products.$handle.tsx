@@ -1,7 +1,14 @@
 import {Await, useLoaderData, useRouteLoaderData, Link, useFetcher} from 'react-router';
 import type {RootLoader} from '~/root';
-import {SHIPPING} from '~/lib/config';
 import {CAMPAIGN_PATH, eligibleCampaign} from '~/lib/campaigns';
+import {
+  FALLBACK_SETTINGS,
+  FALLBACK_SIZE_GUIDES,
+  findSizeGuide,
+  toSizeGuide,
+  type SiteSettings,
+  type SizeGuide as SizeGuideData,
+} from '~/lib/content';
 import type {Route} from './+types/products.$handle';
 import {Suspense, memo, startTransition, useEffect, useState, useRef} from 'react';
 import {
@@ -173,6 +180,14 @@ export default function Product() {
   const {product, relatedProducts, canonicalUrl, origin} = useLoaderData<typeof loader>();
   const rootData = useRouteLoaderData<RootLoader>('root');
   const campaign = eligibleCampaign(rootData?.campaigns, product.id);
+  const settings = rootData?.content?.settings ?? FALLBACK_SETTINGS;
+  // size guide: the product's own (custom.size_guide metafield) or the one for its type
+  const override = (product as any).sizeGuide?.reference;
+  const sizeGuide = findSizeGuide(
+    rootData?.content?.sizeGuides ?? FALLBACK_SIZE_GUIDES,
+    product.productType,
+    override?.fields ? toSizeGuide(override) : null,
+  );
 
   const selectedVariant = useOptimisticVariant(
     product.selectedOrFirstAvailableVariant,
@@ -277,13 +292,13 @@ export default function Product() {
                   />
                 )}
               </div>
-              <TrustStrip />
+              <TrustStrip settings={settings} />
               {descriptionHtml && (
                 <div className="product-description">
                   <div dangerouslySetInnerHTML={{__html: descriptionHtml}} />
                 </div>
               )}
-              <SizeGuide productType={product.productType} sizes={sizeValues} />
+              <SizeGuide guide={sizeGuide} sizes={sizeValues} />
             </div>
           </div>
         </div>
@@ -439,50 +454,53 @@ function StockNote({available, quantity}: {available: boolean; quantity: number 
   );
 }
 
-const TRUST_ITEMS = [
-  {
-    icon: (
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-        <rect x="1" y="3" width="15" height="13" /><path d="M16 8h4l3 3v5h-7V8z" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" />
-      </svg>
-    ),
-    title: `${SHIPPING.carrier} csomagpont ${formatMoney(SHIPPING.parcelPointFt)}`,
-    text: `házhoz ${formatMoney(SHIPPING.homeDeliveryFt)}, ${formatMoney(SHIPPING.freeOverFt)} felett ingyenes`,
-  },
-  {
-    icon: (
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-        <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
-      </svg>
-    ),
-    title: `Feladás ${SHIPPING.handlingDays} alatt`,
-    text: `kézbesítés további ${SHIPPING.transitDays}`,
-  },
-  {
-    icon: (
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-        <polyline points="1 4 1 10 7 10" /><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
-      </svg>
-    ),
-    title: `${SHIPPING.returnDays} napos elállás`,
-    text: 'indoklás nélkül visszaküldheted',
-  },
-  {
-    icon: (
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-      </svg>
-    ),
-    title: 'Kézzel készül Budapesten',
-    text: 'kis szériás, egyedi grafika',
-  },
-];
+const TRUST_ICONS = {
+  truck: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+      <rect x="1" y="3" width="15" height="13" /><path d="M16 8h4l3 3v5h-7V8z" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" />
+    </svg>
+  ),
+  clock: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+    </svg>
+  ),
+  undo: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+      <polyline points="1 4 1 10 7 10" /><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+    </svg>
+  ),
+  shield: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    </svg>
+  ),
+};
 
-/** The four things a buyer asks before adding to cart; facts come from config.ts */
-function TrustStrip() {
+/** The four things a buyer asks before adding to cart; facts come from the shop_settings metaobject */
+function TrustStrip({settings}: {settings: SiteSettings}) {
+  const {shipping, usp} = settings;
+  const items = [
+    {
+      icon: TRUST_ICONS.truck,
+      title: `${shipping.carrier} csomagpont ${formatMoney(shipping.parcelPointFt)}`,
+      text: `házhoz ${formatMoney(shipping.homeDeliveryFt)}, ${formatMoney(shipping.freeOverFt)} felett ingyenes`,
+    },
+    {
+      icon: TRUST_ICONS.clock,
+      title: `Feladás ${shipping.handlingDays} alatt`,
+      text: `kézbesítés további ${shipping.transitDays}`,
+    },
+    {
+      icon: TRUST_ICONS.undo,
+      title: `${shipping.returnDays} napos elállás`,
+      text: 'indoklás nélkül visszaküldheted',
+    },
+    {icon: TRUST_ICONS.shield, title: usp.title, text: usp.text},
+  ];
   return (
     <ul className="trust-strip" aria-label="Szállítás és garancia">
-      {TRUST_ITEMS.map((item) => (
+      {items.map((item) => (
         <li key={item.title}>
           <span className="trust-strip-icon">{item.icon}</span>
           <span>
@@ -498,23 +516,18 @@ function TrustStrip() {
   );
 }
 
-const TEE_SIZES: Array<[size: string, chest: string, length: string]> = [
-  ['S', '96 cm', '68 cm'],
-  ['M', '102 cm', '71 cm'],
-  ['L', '108 cm', '74 cm'],
-  ['XL', '114 cm', '76 cm'],
-  ['XXL', '120 cm', '78 cm'],
-];
-
 /**
- * The measured table only applies to the tee blanks. Hoodies and the one-off
- * pieces get an honest note instead of numbers that would be wrong for them.
+ * Size guide from the `size_guide` metaobject matched to the product (own
+ * metafield first, then by product type). A table is shown when the guide has
+ * rows; the note may contain {sizes}, replaced with the product's real sizes.
+ * "írj nekünk" in the note becomes a contact link.
  */
-function SizeGuide({productType, sizes}: {productType?: string | null; sizes: string[]}) {
-  const type = (productType ?? '').toLowerCase();
-  const isTee = type === 'póló';
-  const isSweat = type.includes('pulóver');
+function SizeGuide({guide, sizes}: {guide: SizeGuideData | null; sizes: string[]}) {
+  if (!guide) return null;
   const sizeList = sizes.join(', ');
+  const rows = guide.rows.filter(([size]) => !sizes.length || sizes.includes(size));
+  const note = guide.note.replace('{sizes}', sizeList || 'egy méret');
+  const [before, after] = note.split('írj nekünk');
 
   return (
     <details className="size-guide">
@@ -532,45 +545,40 @@ function SizeGuide({productType, sizes}: {productType?: string | null; sizes: st
           <polyline points="17 8 12 3 7 8" />
           <line x1="12" y1="3" x2="12" y2="15" />
         </svg>
-        {isTee ? 'Mérettáblázat' : 'Méretek és szabás'}
+        {guide.title}
       </summary>
       <div className="size-guide-content">
-        {isTee ? (
-          <>
-            <table className="size-guide-table">
+        {rows.length > 0 && (
+          <table className="size-guide-table">
+            {guide.columns.length > 0 && (
               <thead>
                 <tr>
-                  <th>Méret</th>
-                  <th>Mellbőség</th>
-                  <th>Hossz</th>
+                  {guide.columns.map((column) => (
+                    <th key={column}>{column}</th>
+                  ))}
                 </tr>
               </thead>
-              <tbody>
-                {TEE_SIZES.filter(([size]) => !sizes.length || sizes.includes(size)).map(
-                  ([size, chest, length]) => (
-                    <tr key={size}>
-                      <td>{size}</td>
-                      <td>{chest}</td>
-                      <td>{length}</td>
-                    </tr>
-                  ),
-                )}
-              </tbody>
-            </table>
-            <p className="size-guide-note">
-              Unisex szabás; a mellbőség a hónaljnál mért teljes körméret. Ha két méret
-              között vagy, a nagyobbat javasoljuk.
-            </p>
-          </>
-        ) : isSweat ? (
+            )}
+            <tbody>
+              {rows.map((cells) => (
+                <tr key={cells[0]}>
+                  {cells.map((cell, i) => (
+                    <td key={i}>{cell}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+        {note && (
           <p className="size-guide-note">
-            Unisex, bő szabású pulóver, elérhető méretek: {sizeList}. Ha bizonytalan vagy,{' '}
-            <Link to="/contact">írj nekünk</Link>, és lemérjük neked a konkrét darabot.
-          </p>
-        ) : (
-          <p className="size-guide-note">
-            Egyetlen példányban készült darab{sizeList ? `, mérete: ${sizeList}` : ''}. Pontos
-            méreteket szívesen küldünk: <Link to="/contact">írj nekünk</Link> a termék nevével.
+            {before}
+            {after !== undefined && (
+              <>
+                <Link to="/contact">írj nekünk</Link>
+                {after}
+              </>
+            )}
           </p>
         )}
       </div>
@@ -786,6 +794,17 @@ const PRODUCT_FRAGMENT = `#graphql
     seo {
       description
       title
+    }
+    sizeGuide: metafield(namespace: "custom", key: "size_guide") {
+      reference {
+        ... on Metaobject {
+          handle
+          fields {
+            key
+            value
+          }
+        }
+      }
     }
     images(first: 10) {
       nodes {
