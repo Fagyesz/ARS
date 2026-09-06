@@ -104,6 +104,8 @@ Learned on the way: Oxygen serves `public/` images through Shopify's CDN, which 
 
 **All shop content moved to Shopify data (later still).** `app/lib/content.ts` reads, through the Storefront API: the `shop_settings` metaobject (shipping prices/times, return days, payment text, contact e-mail, socials, tagline, product-page USP, company name/address/tax number), `size_guide` metaobjects (matched by product type, or per product via the `custom.size_guide` metafield; table rows plus a note with a `{sizes}` placeholder), `artist` metaobjects (portraits in Shopify Files), the published collections (category chips, footer, home ordering) and the `hydrogen-main` / `hydrogen-footer` menus. The constants in `config.ts` / `artists.ts` are fallbacks only. `scripts/seed-content.cjs` creates the definitions, entries and menus; it needs the custom app to get the scopes `write_metaobject_definitions`, `write_metaobjects`, `write_online_store_navigation`, `write_files`. After that, everything is edited in the admin under Content → Metaobjects and Online Store → Navigation.
 
+Seeded the same evening: the definitions, entries and menus exist in the shop, the Admin API credentials are in Oxygen (campaign banner live). Portraits stay in `public/artists/` until the app also gets the Files write scope.
+
 Still open from the audit: catalogue pagination (not needed under ~50 products), per-type measurements for hoodies (now a metaobject field), payment-method logos (which methods does kosR offer?), hero product visual, `app.css` size.
 
 ## Suggested order of work
