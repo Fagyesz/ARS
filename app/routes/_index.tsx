@@ -1,7 +1,7 @@
 import {Await, useLoaderData, useActionData, useNavigation, Link, Form} from 'react-router';
 import type {Route} from './+types/_index';
 import {Suspense} from 'react';
-import type {RecommendedProductsQuery, StoreCollectionsQuery} from 'storefrontapi.generated';
+import type {RecommendedProductsQuery, HomepageCollectionsQuery} from 'storefrontapi.generated';
 import {ARTISTS} from '~/lib/artists';
 import {ProductItem} from '~/components/ProductItem';
 import {SITE_URL} from '~/lib/config';
@@ -259,7 +259,7 @@ function ProductGridSkeleton() {
 function CollectionsSection({
   collections,
 }: {
-  collections: Promise<StoreCollectionsQuery | null>;
+  collections: Promise<HomepageCollectionsQuery | null>;
 }) {
   return (
     <Suspense fallback={null}>
