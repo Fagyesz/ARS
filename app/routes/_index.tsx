@@ -6,6 +6,12 @@ import {ARTISTS, artistPortrait} from '~/lib/artists';
 import {ProductItem} from '~/components/ProductItem';
 import {seoMeta} from '~/lib/seo';
 
+// The hero watermark is the largest paint on the home page; let the browser
+// fetch it before it discovers the CSS background rule.
+export const links: Route.LinksFunction = () => [
+  {rel: 'preload', as: 'image', href: '/logo-820.png'},
+];
+
 export const meta: Route.MetaFunction = ({location}) =>
   seoMeta({
     title: 'Ars Mosoris | Kortárs művészet és divat',

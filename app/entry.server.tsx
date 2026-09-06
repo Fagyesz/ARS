@@ -19,13 +19,9 @@ export default async function handleRequest(
       checkoutDomain: context.env.PUBLIC_CHECKOUT_DOMAIN,
       storeDomain: context.env.PUBLIC_STORE_DOMAIN,
     },
-    styleSrc: [
-      "'self'",
-      "'unsafe-inline'",
-      'https://cdn.shopify.com',
-      'https://fonts.googleapis.com',
-    ],
-    fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+    styleSrc: ["'self'", "'unsafe-inline'", 'https://cdn.shopify.com'],
+    // Oxygen serves public/fonts from cdn.shopify.com, not from the page origin
+    fontSrc: ["'self'", 'https://cdn.shopify.com', 'data:'],
     imgSrc: ["'self'", 'https://cdn.shopify.com', 'https://images.unsplash.com', 'data:'],
     frameSrc: ["'self'", 'https://www.openstreetmap.org'],
   });

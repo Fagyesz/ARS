@@ -2,9 +2,9 @@ export interface Artist {
   name: string;
   fullName: string;
   role: string;
-  /** Original portrait (JPEG) — used for share images; pages render the WebP renditions */
+  /** Original portrait (JPEG) — used for share images; pages render the resized renditions */
   image?: string;
-  /** Pixel size of the 960px WebP rendition, for layout-stable <img> tags */
+  /** Pixel size of the 960px rendition, for layout-stable <img> tags */
   imageSize?: [width: number, height: number];
   handle: string;
   bio: string;
@@ -14,15 +14,16 @@ export interface Artist {
 }
 
 /**
- * Responsive renditions of the portrait: `public/artists/<name>-480.webp` and
- * `<name>-960.webp` are generated from the original JPEG.
+ * Responsive renditions of the portrait: `public/artists/<name>-480.jpg` and
+ * `<name>-960.jpg` are resized from the original. (JPEG on purpose: Shopify's
+ * CDN re-encodes static images itself, so WebP sources gain nothing here.)
  */
 export function artistPortrait(artist: Artist) {
   if (!artist.image) return null;
   const base = artist.image.replace(/\.jpe?g$/i, '');
   return {
-    src: `${base}-960.webp`,
-    srcSet: `${base}-480.webp 480w, ${base}-960.webp 960w`,
+    src: `${base}-960.jpg`,
+    srcSet: `${base}-480.jpg 480w, ${base}-960.jpg 960w`,
     width: artist.imageSize?.[0],
     height: artist.imageSize?.[1],
   };
