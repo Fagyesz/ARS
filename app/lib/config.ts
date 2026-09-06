@@ -4,6 +4,10 @@
 // Email configuration - prefer context.env.FROM_EMAIL and context.env.CONTACT_EMAIL
 export const EMAIL = 'arsmosoris@gmail.com'; // fallback only
 
+// Canonical public origin of the storefront. Used for canonical/og/schema URLs so they
+// never follow the request Host (preview hosts, old subdomains) — update on domain changes.
+export const SITE_URL = 'https://arsmosoris.art';
+
 // Social links - prefer reading from env (INSTAGRAM_URL, FACEBOOK_URL, etc.)
 export const SOCIAL_LINKS = {
   instagram: 'https://www.instagram.com/ars.mosoris/',

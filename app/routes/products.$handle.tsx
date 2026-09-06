@@ -14,6 +14,7 @@ import {ProductImage} from '~/components/ProductImage';
 import {ProductForm} from '~/components/ProductForm';
 import {AddToCartButton} from '~/components/AddToCartButton';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
+import {SITE_URL} from '~/lib/config';
 import type {ProductItemFragment} from 'storefrontapi.generated';
 import {ProductItem} from '~/components/ProductItem';
 import {useRecentlyViewed, type RecentProduct} from '~/hooks/useRecentlyViewed';
@@ -29,7 +30,7 @@ export const meta: Route.MetaFunction = ({data}) => {
     {property: 'og:type', content: 'product'},
     {property: 'og:title', content: data?.product.title ?? 'Termék'},
     {property: 'og:description', content: data?.product.description || 'Ars Mosoris termék'},
-    {property: 'og:image', content: data?.product.selectedOrFirstAvailableVariant?.image?.url ?? `${data?.origin ?? ''}/og-default.png`},
+    {property: 'og:image', content: data?.product.selectedOrFirstAvailableVariant?.image?.url ?? `${SITE_URL}/og-default.png`},
     {property: 'og:url', content: data?.canonicalUrl ?? `/products/${data?.product.handle}`},
     {name: 'twitter:card', content: 'summary_large_image'},
   ];
@@ -74,9 +75,9 @@ export async function loader(args: Route.LoaderArgs) {
         .catch(() => [])
     : Promise.resolve([]);
 
-  const url = new URL(request.url);
-  const canonicalUrl = `${url.origin}/products/${product.handle}`;
-  const origin = url.origin;
+  // Fixed public origin: canonical/OG/breadcrumb URLs must not follow the request Host
+  const canonicalUrl = `${SITE_URL}/products/${product.handle}`;
+  const origin = SITE_URL;
 
   return {product, relatedProducts, canonicalUrl, origin};
 }

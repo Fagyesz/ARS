@@ -3,16 +3,16 @@ import {useLoaderData, Link, useNavigation} from 'react-router';
 import {ProductItem} from '~/components/ProductItem';
 import type {CollectionItemFragment} from 'storefrontapi.generated';
 import {ARTISTS} from '~/lib/artists';
-import {COLLECTION_TYPES} from '~/lib/config';
+import {COLLECTION_TYPES, SITE_URL} from '~/lib/config';
 
-export const meta: Route.MetaFunction = ({data}) => {
+export const meta: Route.MetaFunction = () => {
   return [
     {title: 'Katalógus | Ars Mosoris'},
     {name: 'description', content: 'Fedezd fel a teljes Ars Mosoris kollekcióját — egyedi póló és táska dizájnok magyar képzőművészektől.'},
     {property: 'og:type', content: 'website'},
     {property: 'og:title', content: 'Katalógus | Ars Mosoris'},
     {property: 'og:description', content: 'Fedezd fel a teljes Ars Mosoris kollekcióját — egyedi póló és táska dizájnok magyar képzőművészektől.'},
-    {property: 'og:image', content: `${data?.origin ?? ''}/og-default.png`},
+    {property: 'og:image', content: `${SITE_URL}/og-default.png`},
     {name: 'twitter:card', content: 'summary_large_image'},
   ];
 };
@@ -71,13 +71,7 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
     (a, b) => Number(!!b.featuredImage) - Number(!!a.featuredImage),
   );
 
-  return {
-    products: {...products, nodes},
-    artistFilter,
-    typeFilter,
-    sortParam,
-    origin: url.origin,
-  };
+  return {products: {...products, nodes}, artistFilter, typeFilter, sortParam};
 }
 
 function loadDeferredData(_args: Route.LoaderArgs) {

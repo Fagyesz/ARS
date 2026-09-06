@@ -4,9 +4,9 @@ import {Suspense} from 'react';
 import type {RecommendedProductsQuery, StoreCollectionsQuery} from 'storefrontapi.generated';
 import {ARTISTS} from '~/lib/artists';
 import {ProductItem} from '~/components/ProductItem';
+import {SITE_URL} from '~/lib/config';
 
-export const meta: Route.MetaFunction = ({data}) => {
-  const origin = data?.origin ?? '';
+export const meta: Route.MetaFunction = () => {
   return [
     {title: 'Ars Mosoris | Kortárs Művészet & Divat'},
     {
@@ -17,16 +17,13 @@ export const meta: Route.MetaFunction = ({data}) => {
     {property: 'og:type', content: 'website'},
     {property: 'og:title', content: 'Ars Mosoris — Magyar Képzőművészeti Bolt'},
     {property: 'og:description', content: 'Fedezd fel egyedi póló és táska dizájnjainkat, magyar képzőművészek alkotásaival.'},
-    {property: 'og:image', content: `${origin}/og-default.png`},
+    {property: 'og:image', content: `${SITE_URL}/og-default.png`},
     {name: 'twitter:card', content: 'summary_large_image'},
   ];
 };
 
 export async function loader(args: Route.LoaderArgs) {
-  return {
-    ...loadDeferredData(args),
-    origin: new URL(args.request.url).origin,
-  };
+  return loadDeferredData(args);
 }
 
 function loadDeferredData({context}: Route.LoaderArgs) {
