@@ -15,7 +15,11 @@ import {ProductForm} from '~/components/ProductForm';
 import {AddToCartButton} from '~/components/AddToCartButton';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {SITE_URL} from '~/lib/config';
-import type {ProductItemFragment} from 'storefrontapi.generated';
+import type {
+  ProductItemFragment,
+  RecommendedProductFragment,
+} from 'storefrontapi.generated';
+import type {CurrencyCode} from '@shopify/hydrogen/storefront-api-types';
 import {ProductItem} from '~/components/ProductItem';
 import {useRecentlyViewed, type RecentProduct} from '~/hooks/useRecentlyViewed';
 import {ImageSlider} from '~/components/ImageSlider';
@@ -460,41 +464,48 @@ function RecentlyViewedStrip({items}: {items: RecentProduct[]}) {
   return (
     <section className="section recently-viewed-section">
       <div className="container">
-        <h2 className="recently-viewed-title">Nemrég megnézted</h2>
-        <div className="recently-viewed-strip">
+        <div className="text-center mb-8">
+          <h2>Nemrég megnézted</h2>
+          <p className="text-muted">Korábban megtekintett darabok</p>
+        </div>
+        <div className="products-grid">
           {items.map((item) => (
-            <Link
+            <ProductItem
               key={item.handle}
-              to={`/products/${item.handle}`}
-              className="recently-viewed-card"
-              prefetch="intent"
-            >
-              <div className="recently-viewed-image">
-                {item.imageUrl ? (
-                  <img
-                    src={`${item.imageUrl}${item.imageUrl.includes('?') ? '&' : '?'}width=300`}
-                    alt={item.imageAlt || item.title}
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="recently-viewed-placeholder" />
-                )}
-              </div>
-              <div className="recently-viewed-info">
-                {item.vendor && (
-                  <span className="recently-viewed-vendor">{item.vendor}</span>
-                )}
-                <p className="recently-viewed-name">{item.title}</p>
-                <p className="recently-viewed-price">
-                  {parseFloat(item.price).toLocaleString('hu-HU')} {item.currencyCode}
-                </p>
-              </div>
-            </Link>
+              product={toProductCard(item)}
+              loading="lazy"
+            />
           ))}
         </div>
       </div>
     </section>
   );
+}
+
+/** Recently viewed entries live in localStorage; shape them like a catalog product so they share the card */
+function toProductCard(item: RecentProduct): RecommendedProductFragment {
+  return {
+    id: `recent:${item.handle}`,
+    handle: item.handle,
+    title: item.title,
+    vendor: item.vendor,
+    availableForSale: true,
+    featuredImage: item.imageUrl
+      ? {
+          id: `recent-image:${item.handle}`,
+          url: item.imageUrl,
+          altText: item.imageAlt,
+          width: null,
+          height: null,
+        }
+      : null,
+    priceRange: {
+      minVariantPrice: {
+        amount: item.price,
+        currencyCode: item.currencyCode as CurrencyCode,
+      },
+    },
+  };
 }
 
 function BackInStockForm({
