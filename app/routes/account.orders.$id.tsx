@@ -21,7 +21,13 @@ export async function loader({params, context}: Route.LoaderArgs) {
     return redirect('/account/orders');
   }
 
-  const orderId = atob(params.id);
+  // a mangled link (not base64) is a missing order, not a server error
+  let orderId: string;
+  try {
+    orderId = atob(params.id);
+  } catch {
+    throw new Response('Order not found', {status: 404});
+  }
   const {data, errors}: {data: OrderQuery; errors?: Array<{message: string}>} =
     await customerAccount.query(CUSTOMER_ORDER_QUERY, {
       variables: {
@@ -30,8 +36,10 @@ export async function loader({params, context}: Route.LoaderArgs) {
       },
     });
 
+  // unknown, foreign or malformed order ids come back as errors or a null order
   if (errors?.length || !data?.order) {
-    throw new Error('Order not found');
+    if (errors?.length) console.error('[order] query failed:', errors);
+    throw new Response('Order not found', {status: 404});
   }
 
   const {order} = data;
