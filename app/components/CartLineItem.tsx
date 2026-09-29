@@ -310,7 +310,7 @@ function SizeSwapForm({
           outOfStock
             ? 'Ebből a méretből nincs készleten.'
             : 'Nem sikerült a méretet módosítani. Próbáld újra!',
-          'info',
+          outOfStock ? 'info' : 'error',
         );
         if (selectRef.current) selectRef.current.value = currentVariantId;
       }

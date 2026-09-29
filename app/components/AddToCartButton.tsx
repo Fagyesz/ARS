@@ -35,7 +35,7 @@ function AddToCartInner({
       const warnings: CartWarning[] = fetcher.data?.warnings ?? [];
 
       if (errors.length) {
-        addToast('Nem sikerült a kosárba tenni. Próbáld újra!', 'info');
+        addToast('Nem sikerült a kosárba tenni. Próbáld újra!', 'error');
       } else if (warnings.some((w) => w.code && STOCK_WARNINGS.has(w.code))) {
         addToast('Ebből a méretből nincs több készleten.', 'info');
       } else if (warnings.length) {

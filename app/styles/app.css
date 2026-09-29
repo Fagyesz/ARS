@@ -5520,6 +5520,11 @@ button.reset {
   border-left: 3px solid var(--color-ars-red);
 }
 
+.toast-error {
+  background: var(--color-ars-red);
+  border-left: 3px solid var(--color-ars-red-dark);
+}
+
 @keyframes toast-in {
   from {
     opacity: 0;
