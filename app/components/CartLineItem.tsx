@@ -7,6 +7,7 @@ import {formatMoney} from '~/lib/money';
 import {Link, useFetcher} from 'react-router';
 import {useEffect, useRef} from 'react';
 import {useToast} from '~/components/Toast';
+import {useCartFeedback} from '~/hooks/useCartFeedback';
 import {ProductPrice} from './ProductPrice';
 import {useAside} from './Aside';
 import type {
@@ -139,10 +140,6 @@ export function CartLineItem({
 }
 
 function CartLineQuantity({line, lines}: {line: CartLine; lines: CartLine[]}) {
-  if (!line || typeof line?.quantity === 'undefined') return null;
-  const {quantity, isOptimistic} = line;
-  const busy = !!isOptimistic;
-
   // "+" grows the first underlying line; Shopify re-splits discounted units itself
   const first = lines[0];
   const increase = [{id: first.id, quantity: first.quantity + 1}];
@@ -154,6 +151,24 @@ function CartLineQuantity({line, lines}: {line: CartLine; lines: CartLine[]}) {
     ? [{id: shrinkable.id, quantity: shrinkable.quantity - 1}]
     : null;
   const decreaseRemove = !shrinkable && lines.length > 1 ? [lines[lines.length - 1].id] : null;
+
+  // Same stock and error toasts as the add-to-cart button. The CartForms below
+  // share fetchers by key, and "+" and "−" often use the same key: watch each
+  // distinct fetcher once so one request never shows two toasts.
+  const increaseKey = getUpdateKey([first.id]);
+  const decreaseKey = getUpdateKey(
+    decreaseRemove ?? (decreaseUpdate ?? [first]).map((l) => l.id),
+  );
+  const errorMessage = 'Nem sikerült módosítani a kosarat. Próbáld újra!';
+  useCartFeedback(useFetcher({key: increaseKey}), {errorMessage});
+  useCartFeedback(useFetcher({key: decreaseKey}), {
+    errorMessage,
+    enabled: decreaseKey !== increaseKey,
+  });
+
+  if (!line || typeof line?.quantity === 'undefined') return null;
+  const {quantity, isOptimistic} = line;
+  const busy = !!isOptimistic;
   const canDecrease = quantity > 1 && (decreaseUpdate || decreaseRemove);
 
   const decreaseButton = (
