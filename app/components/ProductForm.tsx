@@ -160,10 +160,12 @@ function OptionValueButton({
     );
   }
 
+  // A sold-out size stays selectable: the shopper sees "Elfogyott" on the
+  // disabled add-to-cart button and can ask for a back-in-stock e-mail.
   const title = !exists
     ? 'Ebben a kombinációban nem elérhető'
     : !available
-      ? 'Nincs készleten'
+      ? 'Elfogyott'
       : name;
 
   return (
@@ -172,7 +174,7 @@ function OptionValueButton({
       className={className}
       data-selected={selected}
       data-available={available}
-      disabled={!exists || !available}
+      disabled={!exists}
       onClick={() => {
         if (!selected && exists) onSelect(variantUriQuery);
       }}

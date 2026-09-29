@@ -1170,6 +1170,16 @@ aside header .close:hover {
   text-decoration: line-through;
 }
 
+/* sold out, but selectable for the back-in-stock form */
+.size-option[data-available="false"]:not(:disabled) {
+  text-decoration: line-through;
+  color: var(--color-text-muted);
+}
+
+.size-option[data-available="false"][data-selected="true"] {
+  color: white;
+}
+
 /* Add to Cart Button */
 .add-to-cart-btn {
   width: 100%;

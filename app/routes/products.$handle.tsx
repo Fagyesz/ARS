@@ -312,6 +312,8 @@ export default function Product() {
                 />
                 {!selectedVariant?.availableForSale && (
                   <BackInStockForm
+                    // a fresh form (and success message) for every sold-out size
+                    key={selectedVariant?.id}
                     productHandle={product.handle}
                     variantTitle={selectedVariant?.title ?? ''}
                   />
