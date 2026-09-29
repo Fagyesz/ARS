@@ -6972,6 +6972,12 @@ body:has(.cookie-banner--visible) .sticky-cart-bar {
   margin-bottom: 0.5rem;
 }
 
+.cart-discount-error {
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--color-ars-red);
+}
+
 .cart-checkout-note {
   margin: 0.625rem 0 0;
   font-size: 0.6875rem;
