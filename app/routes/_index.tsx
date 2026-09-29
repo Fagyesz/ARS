@@ -172,6 +172,16 @@ export async function action({request, context}: Route.ActionArgs) {
           text: `Új feliratkozó: ${email}`,
         }),
       ]);
+    } else {
+      // the Shopify subscription above worked; only the confirmation e-mails are skipped
+      console.error(
+        `[newsletter] confirmation e-mails not sent: missing ${[
+          !resendKey && 'RESEND_API_KEY',
+          !fromEmail && 'FROM_EMAIL',
+        ]
+          .filter(Boolean)
+          .join(', ')}`,
+      );
     }
 
     return {success: true};
