@@ -1,45 +1,40 @@
-# Hydrogen template: Skeleton
+# Ars Mosoris storefront
 
-Hydrogen is Shopify’s stack for headless commerce. Hydrogen is designed to dovetail with [Remix](https://remix.run/), Shopify’s full stack web framework. This template contains a **minimal setup** of components, queries and tooling to get started with Hydrogen.
+Headless Shopify storefront for [arsmosoris.art](https://arsmosoris.art), built with
+Hydrogen 2026.1 (React Router 7, Vite, Tailwind 4) and hosted on Shopify Oxygen.
+The shop UI is Hungarian. Checkout is handed to kosR (`/penztar`), shipping is FoxPost.
 
-[Check out Hydrogen docs](https://shopify.dev/custom-storefronts/hydrogen)
-[Get familiar with Remix](https://remix.run/docs/en/v1)
+## Setup
 
-## What's included
-
-- Remix
-- Hydrogen
-- Oxygen
-- Vite
-- Shopify CLI
-- ESLint
-- Prettier
-- GraphQL generator
-- TypeScript and JavaScript flavors
-- Minimal setup of components and routes
-
-## Getting started
-
-**Requirements:**
-
-- Node.js version 18.0.0 or higher
+Requirements: Node.js 22 (see `.nvmrc`; at least 20.10 for the Shopify CLI).
 
 ```bash
-npm create @shopify/hydrogen@latest
-```
-
-## Building for production
-
-```bash
-npm run build
-```
-
-## Local development
-
-```bash
+npm ci
+npx shopify hydrogen link       # link this repo to the Hydrogen storefront
+npx shopify hydrogen env pull   # writes .env from the Oxygen environment
 npm run dev
 ```
 
-## Setup for using Customer Account API (`/account` section)
+Without access to the Oxygen environment, copy `.env.example` to `.env` and fill in
+the values instead. Never commit `.env`.
 
-Follow step 1 and 2 of <https://shopify.dev/docs/custom-storefronts/building-with-the-customer-account-api/hydrogen#step-1-set-up-a-public-domain-for-local-development>
+Shop-managed content (settings, size guides, artists, menus) lives in Shopify
+metaobjects; `node scripts/seed-content.cjs [--apply]` creates their definitions.
+
+## Scripts
+
+| Command             | What it does                                         |
+| ------------------- | ---------------------------------------------------- |
+| `npm run dev`       | Local dev server with GraphQL codegen                |
+| `npm run build`     | Production build (runs codegen first)                |
+| `npm run preview`   | Build and serve the production bundle locally        |
+| `npm run lint`      | ESLint                                               |
+| `npm run typecheck` | React Router typegen + `tsc --noEmit`                |
+| `npm run codegen`   | Regenerate Storefront / Customer Account API types   |
+
+## Deployment and CI
+
+- Every push is deployed to Oxygen by `.github/workflows/oxygen-deployment-*.yml`
+  (which branch is production is set in the Hydrogen channel in Shopify admin).
+- `.github/workflows/ci.yml` runs `npm run lint`, `npm run typecheck` and
+  `npm run build` on every push and pull request.
