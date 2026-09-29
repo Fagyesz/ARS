@@ -341,7 +341,7 @@ export default function Product() {
             '@context': 'https://schema.org',
             '@type': 'Product',
             name: product.title,
-            description: product.description,
+            description: product.description || undefined,
             url: canonicalUrl,
             image: [
               selectedVariant?.image?.url,
@@ -351,19 +351,14 @@ export default function Product() {
               '@type': 'Brand',
               name: product.vendor || 'Ars Mosoris',
             },
-            sku: selectedVariant?.sku,
-            offers: {
-              '@type': 'Offer',
-              price: selectedVariant?.price.amount,
-              priceCurrency: selectedVariant?.price.currencyCode,
-              priceValidUntil: `${new Date().getFullYear() + 1}-12-31`,
-              itemCondition: 'https://schema.org/NewCondition',
-              availability: selectedVariant?.availableForSale
-                ? 'https://schema.org/InStock'
-                : 'https://schema.org/OutOfStock',
+            sku: selectedVariant?.sku || undefined,
+            offers: offerJsonLd({
+              priceRange: product.priceRange,
+              variant: selectedVariant,
+              productAvailable: product.availableForSale,
               url: canonicalUrl,
-              seller: {'@type': 'Organization', name: 'Ars Mosoris'},
-            },
+              shipping: settings.shipping,
+            }),
           }),
         }}
       />
@@ -422,6 +417,100 @@ export default function Product() {
       />
     </>
   );
+}
+
+/** "1–2 munkanap" → {min: 1, max: 2}; free text without a number gives null */
+function dayRange(text: string) {
+  const numbers = text.match(/\d+/g)?.map(Number) ?? [];
+  if (!numbers.length) return null;
+  return {min: Math.min(...numbers), max: Math.max(...numbers)};
+}
+
+function daysValue(range: {min: number; max: number}) {
+  return {'@type': 'QuantitativeValue', minValue: range.min, maxValue: range.max, unitCode: 'DAY'};
+}
+
+type Money = {amount: string; currencyCode: string};
+
+/**
+ * schema.org offer for the Product JSON-LD: a single Offer for the selected
+ * variant when every variant costs the same, an AggregateOffer (low/high
+ * price) when they differ. Shipping (FoxPost parcel point within Hungary) and
+ * the return window come from the shop_settings metaobject.
+ */
+function offerJsonLd({
+  priceRange,
+  variant,
+  productAvailable,
+  url,
+  shipping,
+}: {
+  priceRange: {minVariantPrice: Money; maxVariantPrice: Money};
+  variant: {price: Money; availableForSale: boolean} | null | undefined;
+  productAvailable: boolean;
+  url: string;
+  shipping: SiteSettings['shipping'];
+}) {
+  const low = Number(priceRange.minVariantPrice.amount);
+  const high = Number(priceRange.maxVariantPrice.amount);
+  const currency = priceRange.minVariantPrice.currencyCode;
+  const handling = dayRange(shipping.handlingDays);
+  const transit = dayRange(shipping.transitDays);
+  const freeShipping = shipping.freeOverFt > 0 && low >= shipping.freeOverFt;
+
+  const common = {
+    priceCurrency: currency,
+    priceValidUntil: `${new Date().getFullYear() + 1}-12-31`,
+    itemCondition: 'https://schema.org/NewCondition',
+    url,
+    seller: {'@type': 'Organization', name: 'Ars Mosoris'},
+    shippingDetails: {
+      '@type': 'OfferShippingDetails',
+      shippingRate: {
+        '@type': 'MonetaryAmount',
+        value: freeShipping ? 0 : shipping.parcelPointFt,
+        currency: 'HUF',
+      },
+      shippingDestination: {'@type': 'DefinedRegion', addressCountry: 'HU'},
+      ...(handling && transit
+        ? {
+            deliveryTime: {
+              '@type': 'ShippingDeliveryTime',
+              handlingTime: daysValue(handling),
+              transitTime: daysValue(transit),
+            },
+          }
+        : {}),
+    },
+    hasMerchantReturnPolicy: {
+      '@type': 'MerchantReturnPolicy',
+      applicableCountry: 'HU',
+      returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+      merchantReturnDays: shipping.returnDays,
+      returnMethod: 'https://schema.org/ReturnByMail',
+    },
+  };
+
+  if (low !== high) {
+    return {
+      '@type': 'AggregateOffer',
+      lowPrice: priceRange.minVariantPrice.amount,
+      highPrice: priceRange.maxVariantPrice.amount,
+      availability: productAvailable
+        ? 'https://schema.org/InStock'
+        : 'https://schema.org/OutOfStock',
+      ...common,
+    };
+  }
+
+  return {
+    '@type': 'Offer',
+    price: variant?.price.amount ?? priceRange.minVariantPrice.amount,
+    availability: variant?.availableForSale
+      ? 'https://schema.org/InStock'
+      : 'https://schema.org/OutOfStock',
+    ...common,
+  };
 }
 
 /**
@@ -776,8 +865,19 @@ const PRODUCT_FRAGMENT = `#graphql
     handle
     productType
     tags
+    availableForSale
     descriptionHtml
     description
+    priceRange {
+      minVariantPrice {
+        amount
+        currencyCode
+      }
+      maxVariantPrice {
+        amount
+        currencyCode
+      }
+    }
     encodedVariantExistence
     encodedVariantAvailability
     options {
