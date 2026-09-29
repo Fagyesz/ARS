@@ -50,7 +50,7 @@ export async function loader({request, context, params}: Route.LoaderArgs) {
   const cartResult = result.cart;
 
   if (result.errors?.length || !cartResult) {
-    throw new Response('Link may be expired. Try checking the URL.', {
+    throw new Response('A link lejárt vagy hibás. Ellenőrizd a címet, vagy tedd újra kosárba a termékeket.', {
       status: 410,
     });
   }
@@ -62,7 +62,7 @@ export async function loader({request, context, params}: Route.LoaderArgs) {
   if (cartResult.checkoutUrl) {
     return redirect(KOSR_CHECKOUT_ENABLED ? '/penztar' : cartResult.checkoutUrl, {headers});
   } else {
-    throw new Error('No checkout URL found');
+    throw new Error('A pénztár címe nem érhető el. Próbáld újra később!');
   }
 }
 
