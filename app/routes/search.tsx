@@ -73,8 +73,11 @@ export default function SearchPage() {
         )}
       </SearchForm>
       {error && <p style={{color: 'red'}}>{error}</p>}
-      {!term || !result?.total ? (
-        <SearchResults.Empty />
+      {!term.trim() ? (
+        <p>Írd be, mit keresel: terméknevet, alkotót vagy például „póló”, „pulóver”.</p>
+      ) : !result?.total ? (
+        // an API failure already shows its own message above
+        error ? null : <SearchResults.Empty />
       ) : (
         <SearchResults result={result} term={term}>
           {({articles, pages, products, term}) => (
