@@ -180,6 +180,8 @@ export default function Collection() {
             <Link
               to={buildFilterUrl({artist: '', type: typeFilter, sort: sortParam, size: sizeParam})}
               className={`catalog-artist-chip${!artistFilter ? ' active' : ''}`}
+              aria-current={!artistFilter ? 'true' : undefined}
+              preventScrollReset
             >
               <span className="catalog-artist-name">Összes</span>
             </Link>
@@ -188,6 +190,8 @@ export default function Collection() {
                 key={artist.name}
                 to={buildFilterUrl({artist: artist.name, type: typeFilter, sort: sortParam, size: sizeParam})}
                 className={`catalog-artist-chip${artistFilter === artist.name ? ' active' : ''}`}
+                aria-current={artistFilter === artist.name ? 'true' : undefined}
+                preventScrollReset
               >
                 <span className="catalog-artist-initial">{artist.name[0]}</span>
                 <span className="catalog-artist-name">{artist.name}</span>
@@ -196,6 +200,8 @@ export default function Collection() {
             <Link
               to={buildFilterUrl({artist: 'Ars Mosoris', type: typeFilter, sort: sortParam, size: sizeParam})}
               className={`catalog-artist-chip${artistFilter === 'Ars Mosoris' ? ' active' : ''}`}
+              aria-current={artistFilter === 'Ars Mosoris' ? 'true' : undefined}
+              preventScrollReset
             >
               <span className="catalog-artist-initial">A</span>
               <span className="catalog-artist-name">Ars Mosoris</span>
@@ -211,6 +217,8 @@ export default function Collection() {
                 key={type.value}
                 to={buildFilterUrl({artist: artistFilter, type: type.value, sort: sortParam, size: sizeParam})}
                 className={`catalog-type-chip${typeFilter === type.value ? ' active' : ''}`}
+                aria-current={typeFilter === type.value ? 'true' : undefined}
+                preventScrollReset
               >
                 {type.label}
               </Link>
@@ -231,6 +239,8 @@ export default function Collection() {
                   size: sizeParam,
                 })}
                 className={`catalog-sort-btn${sortParam === opt.value ? ' active' : ''}`}
+                aria-current={sortParam === opt.value ? 'true' : undefined}
+                preventScrollReset
               >
                 {opt.label}
               </Link>
@@ -271,7 +281,7 @@ export default function Collection() {
                   )}
                 </span>
                 {hasFilters && (
-                  <Link to="/collections/all" className="catalog-clear-btn">
+                  <Link to="/collections/all" className="catalog-clear-btn" preventScrollReset>
                     Szűrők törlése
                   </Link>
                 )}

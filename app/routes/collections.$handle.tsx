@@ -141,7 +141,8 @@ function buildSortUrl(handle: string, sort: string, size = '') {
 }
 
 export default function Collection() {
-  const {collection, sortParam, sizeParam, sizes} = useLoaderData<typeof loader>();
+  const {collection, productCount, sortParam, sizeParam, sizes} =
+    useLoaderData<typeof loader>();
   const navigation = useNavigation();
   // "Több termék" appends the next page in place; only a new sort or size
   // swaps the grid for the skeleton
@@ -235,6 +236,8 @@ export default function Collection() {
                 key={opt.value}
                 to={buildSortUrl(collection.handle, opt.value, sizeParam)}
                 className={`catalog-sort-btn${sortParam === opt.value ? ' active' : ''}`}
+                aria-current={sortParam === opt.value ? 'true' : undefined}
+                preventScrollReset
               >
                 {opt.label}
               </Link>
@@ -250,6 +253,23 @@ export default function Collection() {
       </div>
 
       <div className="container" style={{paddingTop: '1.5rem'}}>
+        {!isLoading && collection.products.nodes.length > 0 && (
+          <div className="catalog-meta">
+            <span className="catalog-meta-count">
+              {productCount} termék
+              {sizeParam && <span className="catalog-meta-filters"> · {sizeParam} méret</span>}
+            </span>
+            {sizeParam && (
+              <Link
+                to={buildSortUrl(collection.handle, sortParam)}
+                className="catalog-clear-btn"
+                preventScrollReset
+              >
+                Szűrők törlése
+              </Link>
+            )}
+          </div>
+        )}
         <h2 className="sr-only">Termékek</h2>
         {isLoading ? (
           <ProductGridSkeleton />
