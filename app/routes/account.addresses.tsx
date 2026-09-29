@@ -12,6 +12,7 @@ import {
   type Fetcher,
 } from 'react-router';
 import type {Route} from './+types/account.addresses';
+import {seoMeta} from '~/lib/seo';
 import {
   UPDATE_ADDRESS_MUTATION,
   DELETE_ADDRESS_MUTATION,
@@ -27,9 +28,8 @@ export type ActionResponse = {
   updatedAddress?: AddressFragment;
 };
 
-export const meta: Route.MetaFunction = () => {
-  return [{title: 'Címek | Ars Mosoris'}];
-};
+export const meta: Route.MetaFunction = ({location}) =>
+  seoMeta({title: 'Címek', path: location.pathname, noindex: true});
 
 export async function loader({context}: Route.LoaderArgs) {
   context.customerAccount.handleAuthStatus();

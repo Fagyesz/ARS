@@ -4,17 +4,18 @@ import {
   type HeadersFunction,
 } from 'react-router';
 import type {Route} from './+types/cart';
+import {seoMeta} from '~/lib/seo';
 import type {CartQueryDataReturn} from '@shopify/hydrogen';
 import {CartForm} from '@shopify/hydrogen';
 import {CartMain} from '~/components/CartMain';
 
-export const meta: Route.MetaFunction = () => {
-  return [
-    {title: `Kosár | Ars Mosoris`},
-    {name: 'description', content: 'Kosár — Ars Mosoris'},
-    {name: 'robots', content: 'noindex, nofollow'},
-  ];
-};
+export const meta: Route.MetaFunction = ({location}) =>
+  seoMeta({
+    title: 'Kosár',
+    description: 'Kosár — Ars Mosoris',
+    path: location.pathname,
+    noindex: true,
+  });
 
 export const headers: HeadersFunction = ({actionHeaders}) => actionHeaders;
 

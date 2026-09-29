@@ -1,5 +1,6 @@
 import {redirect, useLoaderData} from 'react-router';
 import type {Route} from './+types/account.orders.$id';
+import {seoMeta} from '~/lib/seo';
 import {Money, Image} from '@shopify/hydrogen';
 import type {
   OrderLineItemFullFragment,
@@ -7,9 +8,12 @@ import type {
 } from 'customer-accountapi.generated';
 import {CUSTOMER_ORDER_QUERY} from '~/graphql/customer-account/CustomerOrderQuery';
 
-export const meta: Route.MetaFunction = ({data}) => {
-  return [{title: `Rendelés ${data?.order?.name} | Ars Mosoris`}];
-};
+export const meta: Route.MetaFunction = ({data, location}) =>
+  seoMeta({
+    title: data?.order?.name ? `Rendelés ${data.order.name}` : 'Rendelés',
+    path: location.pathname,
+    noindex: true,
+  });
 
 export async function loader({params, context}: Route.LoaderArgs) {
   const {customerAccount} = context;

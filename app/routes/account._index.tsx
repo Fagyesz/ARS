@@ -1,5 +1,6 @@
 import {Link, useLoaderData, useOutletContext} from 'react-router';
 import type {Route} from './+types/account._index';
+import {seoMeta} from '~/lib/seo';
 import {Money} from '@shopify/hydrogen';
 import type {CurrencyCode} from '@shopify/hydrogen/storefront-api-types';
 import type {CustomerFragment} from 'customer-accountapi.generated';
@@ -21,9 +22,8 @@ type DashboardOrder = {
   };
 };
 
-export const meta: Route.MetaFunction = () => {
-  return [{title: 'Fiókom | Ars Mosoris'}];
-};
+export const meta: Route.MetaFunction = ({location}) =>
+  seoMeta({title: 'Fiókom', path: location.pathname, noindex: true});
 
 export async function loader({context}: Route.LoaderArgs) {
   const {customerAccount} = context;
