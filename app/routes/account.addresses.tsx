@@ -28,6 +28,54 @@ export type ActionResponse = {
   updatedAddress?: AddressFragment;
 };
 
+type AddressMethod = 'POST' | 'PUT' | 'DELETE';
+
+/** An error whose message is already shopper-facing Hungarian text */
+class AddressError extends Error {}
+
+const FAILED: Record<AddressMethod, string> = {
+  POST: 'Nem sikerült menteni az új címet. Próbáld újra!',
+  PUT: 'Nem sikerült menteni a címet. Próbáld újra!',
+  DELETE: 'Nem sikerült törölni a címet. Próbáld újra!',
+};
+
+/**
+ * Shopify's userErrors (and our own checks) come back in English: show the
+ * shopper a Hungarian message, by field where Shopify names one, and log the
+ * original for debugging.
+ */
+function userErrorMessage(
+  userError: {code?: string | null; field?: string[] | null; message: string},
+  method: AddressMethod,
+): string {
+  console.error('[addresses] Shopify user error:', userError);
+  const field = userError.field?.join('.') ?? '';
+  if (userError.code === 'TAKEN' || /already exists/i.test(userError.message)) {
+    return 'Ez a cím már szerepel a mentett címeid között.';
+  }
+  if (field.includes('phone')) return 'A telefonszám érvénytelen. Formátum: +36301234567';
+  if (field.includes('zip')) return 'Az irányítószám érvénytelen.';
+  if (field.includes('territory') || field.includes('country')) return 'Érvénytelen ország.';
+  if (field.includes('zone')) return 'Érvénytelen megye.';
+  if (field.includes('city')) return 'Add meg a várost.';
+  if (field.includes('address1')) return 'Add meg az utcát és a házszámot.';
+  if (field.includes('firstName') || field.includes('lastName')) return 'Add meg a teljes nevet.';
+  return FAILED[method];
+}
+
+/** Country codes offered in the form; HU first, since FoxPost delivers in Hungary */
+const COUNTRIES = [
+  ['HU', 'Magyarország'],
+  ['AT', 'Ausztria'],
+  ['HR', 'Horvátország'],
+  ['DE', 'Németország'],
+  ['RO', 'Románia'],
+  ['RS', 'Szerbia'],
+  ['SK', 'Szlovákia'],
+  ['SI', 'Szlovénia'],
+  ['UA', 'Ukrajna'],
+] as const;
+
 export const meta: Route.MetaFunction = ({location}) =>
   seoMeta({title: 'Címek', path: location.pathname, noindex: true});
 
@@ -47,14 +95,14 @@ export async function action({request, context}: Route.ActionArgs) {
       ? String(form.get('addressId'))
       : null;
     if (!addressId) {
-      throw new Error('You must provide an address id.');
+      throw new AddressError('Hiányzik a cím azonosítója. Töltsd újra az oldalt!');
     }
 
     // this will ensure redirecting to login never happen for mutatation
     const isLoggedIn = await customerAccount.isLoggedIn();
     if (!isLoggedIn) {
       return data(
-        {error: {[addressId]: 'Unauthorized'}},
+        {error: {[addressId]: 'A munkamenet lejárt. Jelentkezz be újra!'}},
         {
           status: 401,
         },
@@ -101,15 +149,16 @@ export async function action({request, context}: Route.ActionArgs) {
           );
 
           if (errors?.length) {
-            throw new Error(errors[0].message);
+            console.error('[addresses] POST failed:', errors);
+            throw new AddressError(FAILED.POST);
           }
 
           if (data?.customerAddressCreate?.userErrors?.length) {
-            throw new Error(data?.customerAddressCreate?.userErrors[0].message);
+            throw new AddressError(userErrorMessage(data.customerAddressCreate.userErrors[0], 'POST'));
           }
 
           if (!data?.customerAddressCreate?.customerAddress) {
-            throw new Error('Customer address create failed.');
+            throw new AddressError(FAILED.POST);
           }
 
           return {
@@ -118,7 +167,7 @@ export async function action({request, context}: Route.ActionArgs) {
             defaultAddress,
           };
         } catch (error: unknown) {
-          if (error instanceof Error) {
+          if (error instanceof AddressError) {
             return data(
               {error: {[addressId]: error.message}},
               {
@@ -126,8 +175,9 @@ export async function action({request, context}: Route.ActionArgs) {
               },
             );
           }
+          console.error('[addresses] POST failed:', error);
           return data(
-            {error: {[addressId]: error}},
+            {error: {[addressId]: FAILED.POST}},
             {
               status: 400,
             },
@@ -151,15 +201,16 @@ export async function action({request, context}: Route.ActionArgs) {
           );
 
           if (errors?.length) {
-            throw new Error(errors[0].message);
+            console.error('[addresses] PUT failed:', errors);
+            throw new AddressError(FAILED.PUT);
           }
 
           if (data?.customerAddressUpdate?.userErrors?.length) {
-            throw new Error(data?.customerAddressUpdate?.userErrors[0].message);
+            throw new AddressError(userErrorMessage(data.customerAddressUpdate.userErrors[0], 'PUT'));
           }
 
           if (!data?.customerAddressUpdate?.customerAddress) {
-            throw new Error('Customer address update failed.');
+            throw new AddressError(FAILED.PUT);
           }
 
           return {
@@ -168,7 +219,7 @@ export async function action({request, context}: Route.ActionArgs) {
             defaultAddress,
           };
         } catch (error: unknown) {
-          if (error instanceof Error) {
+          if (error instanceof AddressError) {
             return data(
               {error: {[addressId]: error.message}},
               {
@@ -176,8 +227,9 @@ export async function action({request, context}: Route.ActionArgs) {
               },
             );
           }
+          console.error('[addresses] PUT failed:', error);
           return data(
-            {error: {[addressId]: error}},
+            {error: {[addressId]: FAILED.PUT}},
             {
               status: 400,
             },
@@ -199,20 +251,21 @@ export async function action({request, context}: Route.ActionArgs) {
           );
 
           if (errors?.length) {
-            throw new Error(errors[0].message);
+            console.error('[addresses] DELETE failed:', errors);
+            throw new AddressError(FAILED.DELETE);
           }
 
           if (data?.customerAddressDelete?.userErrors?.length) {
-            throw new Error(data?.customerAddressDelete?.userErrors[0].message);
+            throw new AddressError(userErrorMessage(data.customerAddressDelete.userErrors[0], 'DELETE'));
           }
 
           if (!data?.customerAddressDelete?.deletedAddressId) {
-            throw new Error('Customer address delete failed.');
+            throw new AddressError(FAILED.DELETE);
           }
 
           return {error: null, deletedAddress: addressId};
         } catch (error: unknown) {
-          if (error instanceof Error) {
+          if (error instanceof AddressError) {
             return data(
               {error: {[addressId]: error.message}},
               {
@@ -220,8 +273,9 @@ export async function action({request, context}: Route.ActionArgs) {
               },
             );
           }
+          console.error('[addresses] DELETE failed:', error);
           return data(
-            {error: {[addressId]: error}},
+            {error: {[addressId]: FAILED.DELETE}},
             {
               status: 400,
             },
@@ -231,7 +285,7 @@ export async function action({request, context}: Route.ActionArgs) {
 
       default: {
         return data(
-          {error: {[addressId]: 'Method not allowed'}},
+          {error: {[addressId]: 'Ez a művelet nem támogatott.'}},
           {
             status: 405,
           },
@@ -239,7 +293,7 @@ export async function action({request, context}: Route.ActionArgs) {
       }
     }
   } catch (error: unknown) {
-    if (error instanceof Error) {
+    if (error instanceof AddressError) {
       return data(
         {error: error.message},
         {
@@ -247,8 +301,9 @@ export async function action({request, context}: Route.ActionArgs) {
         },
       );
     }
+    console.error('[addresses] action failed:', error);
     return data(
-      {error},
+      {error: 'Váratlan hiba történt. Próbáld újra!'},
       {
         status: 400,
       },
@@ -288,7 +343,7 @@ function NewAddressForm() {
     address2: '',
     city: '',
     company: '',
-    territoryCode: '',
+    territoryCode: 'HU',
     firstName: '',
     id: 'new',
     lastName: '',
@@ -353,6 +408,9 @@ function ExistingAddresses({
                   disabled={stateForMethod('DELETE') !== 'idle'}
                   formMethod="DELETE"
                   type="submit"
+                  onClick={(event) => {
+                    if (!window.confirm('Biztosan törlöd ezt a címet?')) event.preventDefault();
+                  }}
                 >
                   {stateForMethod('DELETE') !== 'idle' ? 'Törlés...' : 'Törlés'}
                 </button>
@@ -514,18 +572,25 @@ export function AddressForm({
             />
           </div>
           <div className="form-group">
-            <label htmlFor="territoryCode">Országkód *</label>
-            <input
-              aria-label="Országkód"
+            <label htmlFor="territoryCode">Ország *</label>
+            <select
               autoComplete="country"
-              defaultValue={address?.territoryCode ?? ''}
+              defaultValue={address?.territoryCode || 'HU'}
               id="territoryCode"
               name="territoryCode"
-              placeholder="HU"
               required
-              type="text"
-              maxLength={2}
-            />
+            >
+              {COUNTRIES.map(([code, name]) => (
+                <option key={code} value={code}>
+                  {name}
+                </option>
+              ))}
+              {/* keep a saved address's country even when it is not in the list */}
+              {address?.territoryCode &&
+                !COUNTRIES.some(([code]) => code === address.territoryCode) && (
+                  <option value={address.territoryCode}>{address.territoryCode}</option>
+                )}
+            </select>
           </div>
         </div>
 
