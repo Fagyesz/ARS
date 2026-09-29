@@ -16,6 +16,16 @@ export default {
     env: Env,
     executionContext: ExecutionContext,
   ): Promise<Response> {
+    // One URL per page: /products/x/ → /products/x (query string kept)
+    const requestUrl = new URL(request.url);
+    if (requestUrl.pathname.length > 1 && requestUrl.pathname.endsWith('/')) {
+      const pathname = requestUrl.pathname.replace(/\/+$/, '') || '/';
+      return new Response(null, {
+        status: 301,
+        headers: {Location: `${pathname}${requestUrl.search}`},
+      });
+    }
+
     try {
       const hydrogenContext = await createHydrogenRouterContext(
         request,
