@@ -183,10 +183,10 @@ export default function Collection() {
             fetchPriority="high"
           />
           <div className="collection-hero-overlay">
-            <nav className="collection-hero-breadcrumb">
+            <nav className="collection-hero-breadcrumb" aria-label="Morzsamenü">
               <Link to="/collections/all">Katalógus</Link>
-              <span> / </span>
-              <span>{collection.title}</span>
+              <span aria-hidden="true"> / </span>
+              <span aria-current="page">{collection.title}</span>
             </nav>
             <h1 className="collection-hero-title">{collection.title}</h1>
             {collection.description && (
@@ -196,10 +196,10 @@ export default function Collection() {
         </div>
       ) : (
         <div className="collection-text-header container">
-          <nav className="breadcrumb">
+          <nav className="breadcrumb" aria-label="Morzsamenü">
             <Link to="/collections/all">Katalógus</Link>
             <span className="breadcrumb-sep">/</span>
-            <span className="breadcrumb-current">{collection.title}</span>
+            <span className="breadcrumb-current" aria-current="page">{collection.title}</span>
           </nav>
           <h1>{collection.title}</h1>
           {collection.description && (

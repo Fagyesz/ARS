@@ -302,7 +302,7 @@ export default function Product() {
     <>
       <div className="section">
         <div className="container">
-          <nav className="breadcrumb">
+          <nav className="breadcrumb" aria-label="Morzsamenü">
             <Link to="/collections/all">Bolt</Link>
             <span className="breadcrumb-sep">/</span>
             {vendor && (
@@ -311,7 +311,7 @@ export default function Product() {
                 <span className="breadcrumb-sep">/</span>
               </>
             )}
-            <span className="breadcrumb-current">{title}</span>
+            <span className="breadcrumb-current" aria-current="page">{title}</span>
           </nav>
 
           <div className="product">
