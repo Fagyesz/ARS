@@ -185,8 +185,8 @@ function MobileMenuAside({
   header: PageLayoutProps['header'];
   publicStoreDomain: PageLayoutProps['publicStoreDomain'];
 }) {
+  // no "hydrogen-main" menu: HeaderMenu falls back to the built-in items, as in the header
   return (
-    header.menu &&
     header.shop.primaryDomain?.url && (
       <Aside type="mobile" heading="MENÜ">
         <HeaderMenu
@@ -240,7 +240,7 @@ function MobileBottomNavInner({cart: originalCart}: {cart: CartApiQueryFragment 
       <button
         className="mobile-nav-item"
         onClick={() => open('cart')}
-        aria-label="Kosár"
+        aria-label={count ? `Kosár, ${count} termék` : 'Kosár'}
       >
         <span className="mobile-nav-cart-wrap">
           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
