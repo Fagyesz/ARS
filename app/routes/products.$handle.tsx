@@ -36,6 +36,7 @@ import {ProductItem} from '~/components/ProductItem';
 import {useRecentlyViewed, type RecentProduct} from '~/hooks/useRecentlyViewed';
 import {ImageSlider} from '~/components/ImageSlider';
 import {ARTISTS, artistForVendor} from '~/lib/artists';
+import {isSizeOption} from '~/lib/sizes';
 
 export const meta: Route.MetaFunction = ({data, location}) => {
   const product = data?.product;
@@ -68,9 +69,10 @@ export async function loader(args: Route.LoaderArgs) {
     throw new Error('Expected product handle to be defined');
   }
 
+  const selectedOptions = getSelectedProductOptions(request);
   const [{product}] = await Promise.all([
     storefront.query(PRODUCT_QUERY, {
-      variables: {handle, selectedOptions: getSelectedProductOptions(request)},
+      variables: {handle, selectedOptions},
       cache: storefront.CacheShort(),
     }),
   ]);
@@ -103,7 +105,10 @@ export async function loader(args: Route.LoaderArgs) {
   const canonicalUrl = `${SITE_URL}/products/${product.handle}`;
   const origin = SITE_URL;
 
-  return {product, relatedProducts, canonicalUrl, origin};
+  // A size in the URL (a shared link, a reload) counts as already chosen
+  const sizeInUrl = selectedOptions.some((option) => isSizeOption(option.name));
+
+  return {product, relatedProducts, canonicalUrl, origin, sizeInUrl};
 }
 
 function ProductGallery({
@@ -147,10 +152,18 @@ function ProductGallery({
   );
 }
 
+/**
+ * Add-to-cart bar once the form scrolls away. With several sizes it never
+ * adds the pre-selected first size silently: until the shopper picks one, its
+ * button scrolls back to the size choice instead.
+ */
 function StickyCartBar({
   visible,
   title,
   variantTitle,
+  size,
+  needsSizeChoice,
+  onChooseSize,
   price,
   currencyCode,
   lines,
@@ -159,6 +172,10 @@ function StickyCartBar({
   visible: boolean;
   title: string;
   variantTitle: string;
+  /** the selected size, when the product has a size option */
+  size: string | null;
+  needsSizeChoice: boolean;
+  onChooseSize: () => void;
   price: string;
   currencyCode: string;
   lines: Array<{merchandiseId: string; quantity: number}>;
@@ -166,28 +183,41 @@ function StickyCartBar({
 }) {
   if (!selectedVariant.availableForSale) return null;
 
+  const detail = needsSizeChoice
+    ? null
+    : size
+      ? `Méret: ${size}`
+      : variantTitle && variantTitle !== 'Default Title'
+        ? variantTitle
+        : null;
+
   return (
     <div className={`sticky-cart-bar${visible ? ' sticky-cart-bar--visible' : ''}`}>
       <div className="container sticky-cart-bar-inner">
         <div className="sticky-cart-bar-info">
           <span className="sticky-cart-bar-title">{title}</span>
-          {variantTitle && variantTitle !== 'Default Title' && (
-            <span className="sticky-cart-bar-variant">{variantTitle}</span>
-          )}
+          {detail && <span className="sticky-cart-bar-variant">{detail}</span>}
           <span className="sticky-cart-bar-price">
             {formatMoney(price, currencyCode)}
           </span>
         </div>
-        <AddToCartButton lines={lines} disabled={!selectedVariant.availableForSale}>
-          KOSÁRBA
-        </AddToCartButton>
+        {needsSizeChoice ? (
+          <button type="button" className="add-to-cart-btn" onClick={onChooseSize}>
+            MÉRETET VÁLASZTOK
+          </button>
+        ) : (
+          <AddToCartButton lines={lines} disabled={!selectedVariant.availableForSale}>
+            {size ? `KOSÁRBA · ${size}` : 'KOSÁRBA'}
+          </AddToCartButton>
+        )}
       </div>
     </div>
   );
 }
 
 export default function Product() {
-  const {product, relatedProducts, canonicalUrl, origin} = useLoaderData<typeof loader>();
+  const {product, relatedProducts, canonicalUrl, origin, sizeInUrl} =
+    useLoaderData<typeof loader>();
   const rootData = useRouteLoaderData<RootLoader>('root');
   const campaign = eligibleCampaign(rootData?.campaigns, product.id);
   const settings = rootData?.content?.settings ?? FALLBACK_SETTINGS;
@@ -216,6 +246,10 @@ export default function Product() {
 
   const [stickyVisible, setStickyVisible] = useState(false);
   const addToCartRef = useRef<HTMLDivElement>(null);
+  // a size picked on the page (or already in the URL) counts as chosen; keyed
+  // by handle so the next product starts without a choice
+  const [sizeChosenFor, setSizeChosenFor] = useState<string | null>(null);
+  const sizeChosen = sizeInUrl || sizeChosenFor === product.handle;
 
   useEffect(() => {
     const el = addToCartRef.current;
@@ -252,6 +286,16 @@ export default function Product() {
     product.options
       .find((o) => o.name.toLowerCase() === 'méret' || o.name.toLowerCase() === 'size')
       ?.optionValues.map((v) => v.name) ?? [];
+  const selectedSize =
+    selectedVariant?.selectedOptions.find((o) => isSizeOption(o.name))?.value ?? null;
+
+  // scroll the size buttons into view and put focus on the first one
+  const chooseSize = () => {
+    const form = addToCartRef.current;
+    if (!form) return;
+    form.scrollIntoView({behavior: 'smooth', block: 'center'});
+    form.querySelector<HTMLElement>('[role="radio"]:not(:disabled)')?.focus({preventScroll: true});
+  };
 
   return (
     <>
@@ -305,6 +349,9 @@ export default function Product() {
                 <ProductForm
                   productOptions={productOptions}
                   selectedVariant={selectedVariant}
+                  onOptionSelect={(name) => {
+                    if (isSizeOption(name)) setSizeChosenFor(product.handle);
+                  }}
                 />
                 <StockNote
                   available={selectedVariant?.availableForSale ?? false}
@@ -385,6 +432,9 @@ export default function Product() {
         visible={stickyVisible}
         title={title}
         variantTitle={selectedVariant?.title ?? ''}
+        size={selectedSize}
+        needsSizeChoice={sizeValues.length > 1 && !sizeChosen}
+        onChooseSize={chooseSize}
         price={selectedVariant?.price.amount ?? '0'}
         currencyCode={selectedVariant?.price.currencyCode ?? 'HUF'}
         lines={

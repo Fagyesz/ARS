@@ -35,9 +35,12 @@ type OptionValue = MappedProductOptions['optionValues'][number];
 export function ProductForm({
   productOptions,
   selectedVariant,
+  onOptionSelect,
 }: {
   productOptions: MappedProductOptions[];
   selectedVariant: ProductFragment['selectedOrFirstAvailableVariant'];
+  /** told which option the shopper picked (the sticky bar waits for a size) */
+  onOptionSelect?: (optionName: string) => void;
 }) {
   const navigate = useNavigate();
   const {open} = useAside();
@@ -84,6 +87,9 @@ export function ProductForm({
                     key={option.name + slot.name}
                     value={slot}
                     onSelect={(variantUriQuery) => {
+                      onOptionSelect?.(option.name);
+                      // picking the size that is already selected confirms it
+                      if (slot.selected) return;
                       void navigate(`?${variantUriQuery}`, {
                         replace: true,
                         preventScrollReset: true,
@@ -188,7 +194,7 @@ function OptionValueButton({
       data-available={available}
       disabled={!exists}
       onClick={() => {
-        if (!selected && exists) onSelect(variantUriQuery);
+        if (exists) onSelect(variantUriQuery);
       }}
       style={swatchStyle}
       title={title}
