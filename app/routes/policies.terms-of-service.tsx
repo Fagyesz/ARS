@@ -1,6 +1,10 @@
-import {Link} from 'react-router';
+import {Link, useRouteLoaderData} from 'react-router';
 import type {Route} from './+types/policies.terms-of-service';
+import {OperatorDetails} from '~/components/OperatorDetails';
+import {SITE_URL} from '~/lib/config';
+import {FALLBACK_SETTINGS} from '~/lib/content';
 import {seoMeta} from '~/lib/seo';
+import type {RootLoader} from '~/root';
 
 export const meta: Route.MetaFunction = ({location}) =>
   seoMeta({
@@ -11,6 +15,10 @@ export const meta: Route.MetaFunction = ({location}) =>
   });
 
 export default function TermsOfService() {
+  // operator details and payment text come from the shop_settings metaobject
+  const rootData = useRouteLoaderData<RootLoader>('root');
+  const settings = rootData?.content?.settings ?? FALLBACK_SETTINGS;
+  const {contactEmail} = settings;
   return (
     <div className="policy-page">
       <div className="container">
@@ -21,19 +29,14 @@ export default function TermsOfService() {
         <div className="policy-header">
           <p className="policy-tag">Jogi feltételek</p>
           <h1>Általános Szerződési Feltételek</h1>
-          <p className="policy-meta">Utolsó módosítás: 2025. január 1.</p>
+          <p className="policy-meta">Utolsó módosítás: 2026. szeptember 29.</p>
         </div>
 
         <div className="policy-body">
-          <h2>1. Az eladó adatai</h2>
+          <h2>1. Üzemeltető adatai</h2>
+          <OperatorDetails company={settings.company} />
           <p>
-            <strong>Ars Mosoris</strong>
-            <br />
-            Székhely: 1046 Budapest, Kiss Ernő u. 4.
-            <br />
-            E-mail: <a href="mailto:arsmosoris@gmail.com">arsmosoris@gmail.com</a>
-            <br />
-            Weboldal: <a href="https://new.arsmosoris.art">new.arsmosoris.art</a>
+            Weboldal: <a href={SITE_URL}>{new URL(SITE_URL).host}</a>
           </p>
 
           <h2>2. Az ÁSZF hatálya</h2>
@@ -60,12 +63,12 @@ export default function TermsOfService() {
             adót (ÁFA) tartalmazzák. Fenntartjuk az árváltoztatás jogát; a módosítás a
             közzétételkor lép hatályba, és a már visszaigazolt rendeléseket nem érinti.
           </p>
-          <p>Az elfogadott fizetési módok:</p>
-          <ul>
-            <li>Bankkártya (Visa, Mastercard, American Express) – Shopify Payments</li>
-            <li>PayPal</li>
-            <li>Google Pay / Apple Pay</li>
-          </ul>
+          <p>Fizetési módok: {settings.paymentMethods}.</p>
+          <p>
+            A fizetés és a számlázás a kosR által üzemeltetett pénztároldalon történik; az
+            aktuálisan választható fizetési módok (például utánvét) a pénztárban jelennek
+            meg. A számlát a Billingo számlázó rendszerével állítjuk ki.
+          </p>
 
           <h2>5. Termékek és elérhetőség</h2>
           <p>
@@ -95,7 +98,7 @@ export default function TermsOfService() {
             A Polgári Törvénykönyv és a 151/2003. (IX. 22.) Korm. rendelet alapján a
             termékek hibájáért kellékszavatossággal és termékszavatossággal tartozunk. Ha
             hibás terméket kaptál, kérjük, vedd fel velünk a kapcsolatot a{' '}
-            <a href="mailto:arsmosoris@gmail.com">arsmosoris@gmail.com</a>{' '}
+            <a href={`mailto:${contactEmail}`}>{contactEmail}</a>{' '}
             e-mail-címen.
           </p>
 
@@ -115,7 +118,7 @@ export default function TermsOfService() {
 
           <h2>11. Panaszkezelés</h2>
           <p>
-            Panaszaidat a <a href="mailto:arsmosoris@gmail.com">arsmosoris@gmail.com</a>{' '}
+            Panaszaidat a <a href={`mailto:${contactEmail}`}>{contactEmail}</a>{' '}
             e-mail-címen fogadjuk. Panaszaid kezelésére 30 napon belül reagálunk. Ha a
             panasz rendezése nem sikerül, a{' '}
             <strong>Budapesti Békéltető Testülethez</strong> fordulhatsz
@@ -134,7 +137,7 @@ export default function TermsOfService() {
           <h3>Kérdésed van az ÁSZF-fel kapcsolatban?</h3>
           <p>Írj nekünk, szívesen segítünk!</p>
           <p>
-            <a href="mailto:arsmosoris@gmail.com">arsmosoris@gmail.com</a>
+            <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
           </p>
         </div>
       </div>

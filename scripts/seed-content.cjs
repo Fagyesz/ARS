@@ -57,6 +57,8 @@ const SETTINGS = {
   company_name: '',
   company_address: 'Budapest, Magyarország',
   tax_number: '',
+  company_phone: '',
+  company_email: '',
 };
 
 const SIZE_GUIDES = [
@@ -103,6 +105,8 @@ const DEFINITIONS = [
     T('company_name', 'Cégnév', 'single_line_text_field'),
     T('company_address', 'Székhely / cím', 'single_line_text_field'),
     T('tax_number', 'Adószám', 'single_line_text_field'),
+    T('company_phone', 'Telefonszám (jogi oldalak)', 'single_line_text_field'),
+    T('company_email', 'E-mail (jogi oldalak, üresen a kapcsolati e-mail)', 'single_line_text_field'),
   ]},
   {type: 'size_guide', name: 'Mérettáblázat', displayNameField: 'title', fieldDefinitions: [
     T('title', 'Cím', 'single_line_text_field', {required: true}),
