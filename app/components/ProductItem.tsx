@@ -35,6 +35,16 @@ export function ProductItem({
   const rootData = useRouteLoaderData<RootLoader>('root');
   const campaign = eligibleCampaign(rootData?.campaigns, product.id);
 
+  // "12 990 Ft-tól" when the sizes cost differently; the compare-at price is
+  // struck through when Shopify has one above the lowest price
+  const minPrice = product.priceRange.minVariantPrice;
+  const maxPrice =
+    'maxVariantPrice' in product.priceRange ? product.priceRange.maxVariantPrice : null;
+  const hasRange = !!maxPrice && Number(maxPrice.amount) > Number(minPrice.amount);
+  const compareAt =
+    'compareAtPriceRange' in product ? product.compareAtPriceRange?.minVariantPrice : null;
+  const onSale = !!compareAt && Number(compareAt.amount) > Number(minPrice.amount);
+
   useEffect(() => {
     const el = wrapperRef.current;
     if (!el) return;
@@ -78,9 +88,15 @@ export function ProductItem({
         <div className="product-card-info">
           <h3 className="product-card-title">{product.title}</h3>
           <div className="product-card-price">
-            {formatMoney(
-              product.priceRange.minVariantPrice.amount,
-              product.priceRange.minVariantPrice.currencyCode,
+            <span className={onSale ? 'product-card-price-sale' : undefined}>
+              {formatMoney(minPrice.amount, minPrice.currencyCode)}
+              {hasRange ? '-tól' : ''}
+            </span>
+            {onSale && (
+              <s className="product-card-price-original">
+                <span className="sr-only">Eredeti ár: </span>
+                {formatMoney(compareAt.amount, compareAt.currencyCode)}
+              </s>
             )}
           </div>
         </div>

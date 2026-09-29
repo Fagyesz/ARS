@@ -1039,6 +1039,12 @@ const RELATED_PRODUCT_FRAGMENT = `#graphql
         currencyCode
       }
     }
+    compareAtPriceRange {
+      minVariantPrice {
+        amount
+        currencyCode
+      }
+    }
   }
 ` as const;
 

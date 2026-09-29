@@ -58,6 +58,12 @@ const WISHLIST_PRODUCT_QUERY = `#graphql
           currencyCode
         }
       }
+      compareAtPriceRange {
+        minVariantPrice {
+          amount
+          currencyCode
+        }
+      }
     }
   }
 ` as const;
