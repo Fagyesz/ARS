@@ -65,10 +65,11 @@ export async function action({request, context}: Route.ActionArgs) {
       return {success: false, error: 'Az üzenet küldése sikertelen volt. Próbáld újra.'};
     }
 
-    // Fire Discord notification if webhook is configured (non-blocking)
+    // Discord notification if a webhook is configured. It does not block the
+    // response, but waitUntil keeps the worker alive until it is delivered.
     const discordWebhookUrl = context.env.DISCORD_WEBHOOK_URL;
     if (discordWebhookUrl) {
-      fetch(discordWebhookUrl, {
+      const discordNotification = fetch(discordWebhookUrl, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
@@ -87,6 +88,7 @@ export async function action({request, context}: Route.ActionArgs) {
           ],
         }),
       }).catch(() => {/* ignore Discord errors */});
+      context.waitUntil?.(discordNotification);
     }
 
     return {success: true};
