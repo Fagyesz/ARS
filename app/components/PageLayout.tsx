@@ -50,6 +50,9 @@ export function PageLayout({
   return (
     <ToastProvider>
       <Aside.Provider>
+        <a href="#main" className="skip-link">
+          Ugrás a tartalomra
+        </a>
         <CartAside cart={cart} />
         <SearchAside />
         <MobileMenuAside header={header} publicStoreDomain={publicStoreDomain} />
@@ -62,7 +65,9 @@ export function PageLayout({
             publicStoreDomain={publicStoreDomain}
           />
         )}
-        <main>{children}</main>
+        <main id="main" tabIndex={-1}>
+          {children}
+        </main>
         <Footer
           footer={footer}
           header={header}
