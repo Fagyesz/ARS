@@ -105,19 +105,23 @@ export async function loader(args: Route.LoaderArgs) {
   // Start fetching non-critical data without blocking time to first byte
   const deferredData = loadDeferredData(args);
 
-  // Await the critical data required to render initial state of the page
-  const criticalData = await loadCriticalData(args);
-
   const {storefront, env, session} = args.context;
+
+  // Critical data, campaigns and shop content are independent: fetch them in parallel
+  const [criticalData, campaigns, content] = await Promise.all([
+    loadCriticalData(args),
+    // active automatic discounts from Shopify (memoised); drives banner, badges, nudges
+    loadCampaigns(env),
+    // shop-managed content: settings, size guides, artists, categories (cached long)
+    loadSiteContent(storefront),
+  ]);
 
   return {
     ...deferredData,
     ...criticalData,
     publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
-    // active automatic discounts from Shopify (memoised); drives banner, badges, nudges
-    campaigns: await loadCampaigns(env),
-    // shop-managed content: settings, size guides, artists, categories (cached long)
-    content: await loadSiteContent(storefront),
+    campaigns,
+    content,
     // set by /penztar when the cart was handed to the kosR checkout
     checkoutStartedAt: (session.get('checkoutStartedAt') as number | undefined) ?? null,
     shop: getShopAnalytics({
