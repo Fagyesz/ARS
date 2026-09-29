@@ -1,53 +1,41 @@
-import type {Route} from './+types/[robots.txt]';
-import {parseGid} from '@shopify/hydrogen';
 import {SITE_URL} from '~/lib/config';
 
-export async function loader({context}: Route.LoaderArgs) {
-  const {shop} = await context.storefront.query(ROBOTS_QUERY);
-
-  const shopId = parseGid(shop.id).id;
+export function loader() {
   // Always advertise the public origin, never the preview host that served the request
-  const body = robotsTxtData({url: SITE_URL, shopId});
+  const body = robotsTxtData({sitemapUrl: `${SITE_URL}/sitemap.xml`});
 
   return new Response(body, {
     status: 200,
     headers: {
-      'Content-Type': 'text/plain',
-
+      'Content-Type': 'text/plain; charset=utf-8',
       'Cache-Control': `max-age=${60 * 60 * 24}`,
     },
   });
 }
 
-function robotsTxtData({url, shopId}: {shopId?: string; url?: string}) {
-  const sitemapUrl = url ? `${url}/sitemap.xml` : undefined;
-
+function robotsTxtData({sitemapUrl}: {sitemapUrl: string}) {
   return `
 User-agent: *
-${generalDisallowRules({sitemapUrl, shopId})}
+${generalDisallowRules()}
+Sitemap: ${sitemapUrl}
 
 # Google adsbot ignores robots.txt unless specifically named!
 User-agent: adsbot-google
-Disallow: /checkouts/
-Disallow: /checkout
-Disallow: /carts
-Disallow: /orders
-${shopId ? `Disallow: /${shopId}/checkouts` : ''}
-${shopId ? `Disallow: /${shopId}/orders` : ''}
-Disallow: /*?*oseid=*
-Disallow: /*preview_theme_id*
-Disallow: /*preview_script_id*
+Disallow: /cart
+Disallow: /penztar
+Disallow: /koszonjuk
+Disallow: /account
 
 User-agent: Nutch
 Disallow: /
 
 User-agent: AhrefsBot
 Crawl-delay: 10
-${generalDisallowRules({sitemapUrl, shopId})}
+${generalDisallowRules()}
 
 User-agent: AhrefsSiteAudit
 Crawl-delay: 10
-${generalDisallowRules({sitemapUrl, shopId})}
+${generalDisallowRules()}
 
 User-agent: MJ12bot
 Crawl-Delay: 10
@@ -58,67 +46,24 @@ Crawl-delay: 1
 }
 
 /**
- * Disallow rules adapted from Shopify's Online Store defaults to this app's
- * URLs: our own cart/checkout hand-off, search, wishlist and API routes are
- * blocked; the hand-written policy pages stay crawlable; sorted catalogue
- * views (`?sort=`) are duplicates of the unsorted page.
+ * Only this app's own URLs: the cart and the kosR checkout hand-off, the
+ * thank-you page, account, search, wishlist and API routes. The Shopify Online
+ * Store defaults (/checkouts, /collections/*+*, ?ls=, preview_theme_id…) are
+ * left out: none of those URLs exist on this Hydrogen storefront.
+ * Sorted and filtered catalogue views (`?sort=`, `?size=`, `?artist=`,
+ * `?type=`) are duplicates of the unfiltered page or of an artist page.
  */
-function generalDisallowRules({
-  shopId,
-  sitemapUrl,
-}: {
-  shopId?: string;
-  sitemapUrl?: string;
-}) {
-  return `Disallow: /admin
-Disallow: /cart
-Disallow: /cart/
-Disallow: /orders
-Disallow: /checkouts/
-Disallow: /checkout
+function generalDisallowRules() {
+  return `Disallow: /cart
 Disallow: /penztar
 Disallow: /koszonjuk
 Disallow: /discount/
 Disallow: /api/
 Disallow: /wishlist
-${shopId ? `Disallow: /${shopId}/checkouts` : ''}
-${shopId ? `Disallow: /${shopId}/orders` : ''}
-Disallow: /carts
 Disallow: /account
+Disallow: /search
 Disallow: /*?*sort=
 Disallow: /*?*size=
-Disallow: /collections/*+*
-Disallow: /collections/*%2B*
-Disallow: /collections/*%2b*
-Disallow: /*/collections/*+*
-Disallow: /*/collections/*%2B*
-Disallow: /*/collections/*%2b*
-Disallow: */collections/*filter*&*filter*
-Disallow: /blogs/*+*
-Disallow: /blogs/*%2B*
-Disallow: /blogs/*%2b*
-Disallow: /*/blogs/*+*
-Disallow: /*/blogs/*%2B*
-Disallow: /*/blogs/*%2b*
-Disallow: /*?*oseid=*
-Disallow: /*preview_theme_id*
-Disallow: /*preview_script_id*
-Disallow: /*/*?*ls=*&ls=*
-Disallow: /*/*?*ls%3D*%3Fls%3D*
-Disallow: /*/*?*ls%3d*%3fls%3d*
-Disallow: /search
-Allow: /search/
-Disallow: /search/?*
-Disallow: /apple-app-site-association
-Disallow: /.well-known/shopify/monorail
-${sitemapUrl ? `Sitemap: ${sitemapUrl}` : ''}`;
+Disallow: /*?*artist=
+Disallow: /*?*type=`;
 }
-
-const ROBOTS_QUERY = `#graphql
-  query StoreRobots($country: CountryCode, $language: LanguageCode)
-   @inContext(country: $country, language: $language) {
-    shop {
-      id
-    }
-  }
-` as const;
