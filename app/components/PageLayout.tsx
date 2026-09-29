@@ -92,7 +92,7 @@ function CartAside({cart}: {cart: PageLayoutProps['cart']}) {
 function SearchAside() {
   const queriesDatalistId = useId();
   return (
-    <Aside type="search" heading="KERESÉS">
+    <Aside type="search" heading="KERESÉS" initialFocus='input[type="search"]'>
       <div className="predictive-search">
         <SearchFormPredictive>
           {({fetchResults, goToSearch, inputRef}) => (
