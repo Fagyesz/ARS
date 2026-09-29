@@ -33,6 +33,9 @@ export function ImageSlider({slides}: ImageSliderProps) {
   const touchStartX = useRef<number | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const zoomRef = useRef<HTMLButtonElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     trackRef.current?.style.setProperty('--slide-index', String(current));
@@ -50,15 +53,27 @@ export function ImageSlider({slides}: ImageSliderProps) {
     setCurrent((i) => (i === slides.length - 1 ? 0 : i + 1));
   }, [slides.length]);
 
+  // Arrow keys page only while the zoom is open or focus is in the gallery,
+  // so they keep scrolling the page and moving the caret everywhere else.
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
+      const focused = rootRef.current?.contains(document.activeElement) ?? false;
+      if (!lightbox && !focused) return;
       if (e.key === 'ArrowLeft') prev();
       if (e.key === 'ArrowRight') next();
-      if (e.key === 'Escape') setLightbox(false);
+      if (e.key === 'Escape' && lightbox) setLightbox(false);
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [prev, next]);
+  }, [prev, next, lightbox]);
+
+  // Focus moves into the zoom when it opens and back to its trigger on close
+  const wasOpen = useRef(false);
+  useEffect(() => {
+    if (lightbox) closeRef.current?.focus();
+    else if (wasOpen.current) zoomRef.current?.focus();
+    wasOpen.current = lightbox;
+  }, [lightbox]);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
@@ -95,13 +110,13 @@ export function ImageSlider({slides}: ImageSliderProps) {
 
   return (
     <div
+      ref={rootRef}
       className="slider"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
       {/* Main stage */}
-      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- zoom is a pointer convenience; keyboard users use the buttons and arrow keys */}
-      <div className="slider-stage" onClick={() => setLightbox(true)}>
+      <div className="slider-stage">
         <div ref={trackRef} className="slider-track">
           {slides.map((slide, i) => (
             <div key={i} className="slider-slide">
@@ -119,6 +134,15 @@ export function ImageSlider({slides}: ImageSliderProps) {
             </div>
           ))}
         </div>
+
+        {/* covers the stage under the arrows: a click or Enter opens the zoom */}
+        <button
+          ref={zoomRef}
+          type="button"
+          className="slider-zoom"
+          onClick={() => setLightbox(true)}
+          aria-label={`Kép nagyítása (${current + 1}/${slides.length})`}
+        />
 
         <button
           type="button"
@@ -177,7 +201,7 @@ export function ImageSlider({slides}: ImageSliderProps) {
       </div>
 
       {lightbox && typeof document !== 'undefined' && createPortal(
-        // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions -- backdrop click closes; Escape is handled by the window keydown listener
+        // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions -- backdrop click closes; Escape is handled by the keydown listener
         <div
           className="slider-lightbox"
           onClick={() => setLightbox(false)}
@@ -186,6 +210,7 @@ export function ImageSlider({slides}: ImageSliderProps) {
           aria-label="Kép nagyítva"
         >
           <button
+            ref={closeRef}
             type="button"
             className="slider-lightbox-close"
             onClick={() => setLightbox(false)}
