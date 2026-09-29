@@ -4,6 +4,7 @@ import type {Route} from './+types/wishlist';
 import {useWishlist} from '~/hooks/useWishlist';
 import {ProductItem} from '~/components/ProductItem';
 import {seoMeta} from '~/lib/seo';
+import type {WishlistProductQuery} from 'storefrontapi.generated';
 
 export const meta: Route.MetaFunction = ({location}) =>
   seoMeta({
@@ -13,24 +14,7 @@ export const meta: Route.MetaFunction = ({location}) =>
     noindex: true,
   });
 
-type WishlistProduct = {
-  id: string;
-  handle: string;
-  title: string;
-  vendor: string;
-  availableForSale: boolean;
-  featuredImage: {
-    id: string;
-    altText: string | null;
-    url: string;
-    width: number;
-    height: number;
-  } | null;
-  priceRange: {
-    minVariantPrice: {amount: string; currencyCode: string};
-    maxVariantPrice: {amount: string; currencyCode: string};
-  };
-};
+type WishlistProduct = NonNullable<WishlistProductQuery['product']>;
 
 export default function Wishlist() {
   const {handles} = useWishlist();

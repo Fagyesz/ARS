@@ -16,6 +16,8 @@ declare global {
     FACEBOOK_URL: string;
     TIKTOK_URL: string;
     YOUTUBE_URL: string;
+    /** Discord webhook that receives contact-form submissions (optional) */
+    DISCORD_WEBHOOK_URL?: string;
     STOREFRONT_API_VERSION: string;
     /** Custom app (client credentials) with read access to discounts + products; drives the campaign surfaces */
     SHOPIFY_ADMIN_CLIENT_ID?: string;

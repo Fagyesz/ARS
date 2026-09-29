@@ -8,6 +8,7 @@ import type {
   ProductItemFragment,
   CollectionItemFragment,
   RecommendedProductFragment,
+  WishlistProductQuery,
 } from 'storefrontapi.generated';
 import {useVariantUrl} from '~/lib/variants';
 import {useWishlist} from '~/hooks/useWishlist';
@@ -20,7 +21,8 @@ export function ProductItem({
   product:
     | CollectionItemFragment
     | ProductItemFragment
-    | RecommendedProductFragment;
+    | RecommendedProductFragment
+    | NonNullable<WishlistProductQuery['product']>;
   loading?: 'eager' | 'lazy';
 }) {
   const variantUrl = useVariantUrl(product.handle);

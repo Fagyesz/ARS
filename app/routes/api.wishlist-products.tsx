@@ -20,7 +20,7 @@ export async function loader({request, context}: Route.LoaderArgs) {
           variables: {handle},
           cache: context.storefront.CacheShort(),
         })
-        .then((data: {product: unknown}) => data.product)
+        .then((data) => data.product)
         .catch(() => null),
     ),
   );
