@@ -47,7 +47,7 @@ export default function TermsOfService() {
           <ol>
             <li>Válaszd ki a kívánt terméke(ke)t, és add a kosárba.</li>
             <li>A pénztárnál add meg a szállítási és fizetési adatokat.</li>
-            <li>Ellenőrizd a rendelés összesítőjét, majd kattints a „Rendelés leadása" gombra.</li>
+            <li>Ellenőrizd a rendelés összesítőjét, majd kattints a „Rendelés leadása” gombra.</li>
             <li>
               A rendelés leadása után e-mailben visszaigazolást küldünk. A szerződés a
               visszaigazoló e-mail megküldésével jön létre.

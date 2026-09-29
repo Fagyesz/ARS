@@ -44,7 +44,7 @@ export default function Wishlist() {
   useEffect(() => {
     if (!hydrated || handles.length === 0) return;
     const params = new URLSearchParams({handles: handles.join(',')});
-    fetcher.load(`/api/wishlist-products?${params}`);
+    void fetcher.load(`/api/wishlist-products?${params}`);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated, handles.join(',')]);
 

@@ -112,7 +112,7 @@ export default function PrivacyPolicy() {
               <strong>Helyesbítés:</strong> kérheted a pontatlan adatok kijavítását
             </li>
             <li>
-              <strong>Törlés („elfeledtetés joga"):</strong> kérheted az adatok törlését,
+              <strong>Törlés („elfeledtetés joga”):</strong> kérheted az adatok törlését,
               ha azok kezelése nem szükséges tovább
             </li>
             <li>

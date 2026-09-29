@@ -96,6 +96,7 @@ export function ImageSlider({slides}: ImageSliderProps) {
       onTouchEnd={handleTouchEnd}
     >
       {/* Main stage */}
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- zoom is a pointer convenience; keyboard users use the buttons and arrow keys */}
       <div className="slider-stage" onClick={() => setLightbox(true)}>
         <div ref={trackRef} className="slider-track">
           {slides.map((slide, i) => (
@@ -170,6 +171,7 @@ export function ImageSlider({slides}: ImageSliderProps) {
       </div>
 
       {lightbox && typeof document !== 'undefined' && createPortal(
+        // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions -- backdrop click closes; Escape is handled by the window keydown listener
         <div
           className="slider-lightbox"
           onClick={() => setLightbox(false)}
@@ -200,6 +202,7 @@ export function ImageSlider({slides}: ImageSliderProps) {
               </svg>
             </button>
           )}
+          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions -- only stops the backdrop click */}
           <img
             className="slider-lightbox-img"
             src={shopifyUrl(slides[current].url, 1600)}
