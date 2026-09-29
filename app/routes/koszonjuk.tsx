@@ -43,8 +43,8 @@ export default function ThankYou() {
         <p className="thank-you-lead">
           A rendelésed megérkezett hozzánk. A visszaigazolást és a számlát
           e-mailben küldjük, a csomagot pedig {shipping.handlingDays}on belül
-          adjuk fel {shipping.carrier} futárral. A feladásról követési számot
-          kapsz.
+          feladjuk, és a {shipping.carrier} {deliveryTargets(shipping)} szállítja.
+          A feladásról követési számot kapsz.
         </p>
         <ol className="thank-you-steps">
           <li>
