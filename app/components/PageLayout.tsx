@@ -156,7 +156,7 @@ function SearchAside() {
                 {term.current && total ? (
                   <Link
                     onClick={closeSearch}
-                    to={`${SEARCH_ENDPOINT}?q=${term.current}`}
+                    to={`${SEARCH_ENDPOINT}?q=${encodeURIComponent(term.current)}`}
                   >
                     <p>
                       Összes találat: <q>{term.current}</q>
