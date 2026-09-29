@@ -4,6 +4,9 @@ import {createPortal} from 'react-dom';
 type Slide = {
   url: string;
   alt: string;
+  /** intrinsic size, so the first (LCP) image reserves its box before it loads */
+  width?: number | null;
+  height?: number | null;
 };
 
 type ImageSliderProps = {
@@ -81,8 +84,9 @@ export function ImageSlider({slides}: ImageSliderProps) {
           srcSet={shopifySrcSet(slides[0].url, SLIDE_WIDTHS)}
           sizes="(max-width: 600px) 100vw, (max-width: 1200px) 80vw, 1200px"
           alt={slides[0].alt}
+          width={slides[0].width ?? undefined}
+          height={slides[0].height ?? undefined}
           loading="eager"
-          decoding="sync"
           fetchPriority="high"
         />
       </div>
@@ -106,8 +110,10 @@ export function ImageSlider({slides}: ImageSliderProps) {
                 srcSet={shopifySrcSet(slide.url, SLIDE_WIDTHS)}
                 sizes="(max-width: 600px) 100vw, (max-width: 1200px) 80vw, 1200px"
                 alt={slide.alt}
+                width={i === 0 ? slide.width ?? undefined : undefined}
+                height={i === 0 ? slide.height ?? undefined : undefined}
                 loading={i === 0 ? 'eager' : 'lazy'}
-                decoding={i === 0 ? 'sync' : 'async'}
+                decoding={i === 0 ? undefined : 'async'}
                 fetchPriority={i === 0 ? 'high' : 'low'}
               />
             </div>

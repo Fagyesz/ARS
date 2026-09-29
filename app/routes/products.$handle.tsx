@@ -112,21 +112,29 @@ function ProductGallery({
   productTitle,
 }: {
   images: Array<{id: string; url: string; altText: string | null; width: number | null; height: number | null}>;
-  selectedImage: {url: string; altText: string | null} | null | undefined;
+  selectedImage:
+    | {url: string; altText: string | null; width?: number | null; height?: number | null}
+    | null
+    | undefined;
   productTitle: string;
 }) {
   const seen = new Set<string>();
-  const slides: {url: string; alt: string}[] = [];
+  const slides: {url: string; alt: string; width?: number | null; height?: number | null}[] = [];
 
   if (selectedImage?.url) {
     seen.add(selectedImage.url);
-    slides.push({url: selectedImage.url, alt: selectedImage.altText || productTitle});
+    slides.push({
+      url: selectedImage.url,
+      alt: selectedImage.altText || productTitle,
+      width: selectedImage.width,
+      height: selectedImage.height,
+    });
   }
 
   for (const img of images) {
     if (!seen.has(img.url)) {
       seen.add(img.url);
-      slides.push({url: img.url, alt: img.altText || productTitle});
+      slides.push({url: img.url, alt: img.altText || productTitle, width: img.width, height: img.height});
     }
   }
 
@@ -264,7 +272,16 @@ export default function Product() {
           <div className="product">
             <ProductGallery
               images={(product as any).images?.nodes ?? []}
-              selectedImage={selectedVariant?.image ? {url: selectedVariant.image.url, altText: selectedVariant.image.altText ?? null} : null}
+              selectedImage={
+                selectedVariant?.image
+                  ? {
+                      url: selectedVariant.image.url,
+                      altText: selectedVariant.image.altText ?? null,
+                      width: selectedVariant.image.width,
+                      height: selectedVariant.image.height,
+                    }
+                  : null
+              }
               productTitle={product.title}
             />
             <div className="product-main">
