@@ -35,6 +35,7 @@ import type {CurrencyCode} from '@shopify/hydrogen/storefront-api-types';
 import {ProductItem} from '~/components/ProductItem';
 import {useRecentlyViewed, type RecentProduct} from '~/hooks/useRecentlyViewed';
 import {ImageSlider} from '~/components/ImageSlider';
+import {ARTISTS, artistForVendor} from '~/lib/artists';
 
 export const meta: Route.MetaFunction = ({data, location}) => {
   const product = data?.product;
@@ -182,6 +183,12 @@ export default function Product() {
   const rootData = useRouteLoaderData<RootLoader>('root');
   const campaign = eligibleCampaign(rootData?.campaigns, product.id);
   const settings = rootData?.content?.settings ?? FALLBACK_SETTINGS;
+  // the vendor links to the artist's profile page; vendors without one (e.g.
+  // "Ars Mosoris") fall back to the filtered catalogue
+  const artist = artistForVendor(rootData?.content?.artists ?? ARTISTS, product.vendor);
+  const artistPath = artist
+    ? `/artists/${artist.handle}`
+    : `/collections/all?artist=${encodeURIComponent(product.vendor ?? '')}`;
   // size guide: the product's own (custom.size_guide metafield) or the one for its type
   const override = (product as any).sizeGuide?.reference;
   const sizeGuide = findSizeGuide(
@@ -247,7 +254,7 @@ export default function Product() {
             <span className="breadcrumb-sep">/</span>
             {vendor && (
               <>
-                <Link to={`/collections/all?artist=${encodeURIComponent(vendor)}`}>{vendor}</Link>
+                <Link to={artistPath}>{vendor}</Link>
                 <span className="breadcrumb-sep">/</span>
               </>
             )}
@@ -262,7 +269,7 @@ export default function Product() {
             />
             <div className="product-main">
               {vendor && (
-                <Link to={`/collections/all?artist=${encodeURIComponent(vendor)}`} className="product-artist">
+                <Link to={artistPath} className="product-artist">
                   {vendor}
                 </Link>
               )}
@@ -386,13 +393,15 @@ export default function Product() {
                 name: 'Bolt',
                 item: `${origin}/collections/all`,
               },
-              ...(product.vendor
+              // only an artist with a profile page gets a crawlable crumb;
+              // filtered catalogue URLs are disallowed in robots.txt
+              ...(artist
                 ? [
                     {
                       '@type': 'ListItem',
                       position: 2,
                       name: product.vendor,
-                      item: `${origin}/collections/all?artist=${encodeURIComponent(product.vendor)}`,
+                      item: `${origin}${artistPath}`,
                     },
                     {
                       '@type': 'ListItem',
