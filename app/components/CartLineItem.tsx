@@ -5,6 +5,8 @@ import {useVariantUrl} from '~/lib/variants';
 import {discountLabel} from '~/lib/discounts';
 import {formatMoney} from '~/lib/money';
 import {Link, useFetcher} from 'react-router';
+import {useEffect, useRef} from 'react';
+import {useToast} from '~/components/Toast';
 import {ProductPrice} from './ProductPrice';
 import {useAside} from './Aside';
 import type {
@@ -251,6 +253,12 @@ function CartLineUpdateButton({
   );
 }
 
+type SizeSwapResult = {
+  errors?: unknown[];
+  userErrors?: unknown[];
+  warnings?: Array<{code?: string}>;
+};
+
 type SizeVariant = {
   id: string;
   availableForSale: boolean;
@@ -284,7 +292,31 @@ function SizeSwapForm({
     );
   });
 
-  const fetcher = useFetcher();
+  const fetcher = useFetcher<SizeSwapResult>();
+  const {addToast} = useToast();
+  const selectRef = useRef<HTMLSelectElement>(null);
+  const prevState = useRef(fetcher.state);
+
+  // The action keeps the old line when the new size cannot be added: tell
+  // the shopper and put the select back on the size that is still in the cart.
+  useEffect(() => {
+    if (prevState.current !== 'idle' && fetcher.state === 'idle' && fetcher.data) {
+      const {errors, userErrors, warnings} = fetcher.data;
+      const outOfStock = warnings?.some(
+        (w) => w.code === 'MERCHANDISE_OUT_OF_STOCK',
+      );
+      if (errors?.length || userErrors?.length || outOfStock) {
+        addToast(
+          outOfStock
+            ? 'Ebből a méretből nincs készleten.'
+            : 'Nem sikerült a méretet módosítani. Próbáld újra!',
+          'info',
+        );
+        if (selectRef.current) selectRef.current.value = currentVariantId;
+      }
+    }
+    prevState.current = fetcher.state;
+  }, [fetcher.state, fetcher.data, addToast, currentVariantId]);
 
   if (sizeVariants.length === 0) return null;
 
@@ -294,6 +326,7 @@ function SizeSwapForm({
       <input type="hidden" name="swapLineId" value={lineId} />
       <input type="hidden" name="swapQuantity" value={quantity} />
       <select
+        ref={selectRef}
         name="swapVariantId"
         defaultValue={currentVariantId}
         onChange={(e) => {
