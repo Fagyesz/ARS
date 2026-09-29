@@ -1,4 +1,4 @@
-import {createContext, useContext, useState, useEffect} from 'react';
+import {createContext, useContext, useState, useEffect, useRef} from 'react';
 import {Link} from 'react-router';
 
 type ConsentChoice = 'accepted' | 'rejected';
@@ -7,6 +7,10 @@ type CookieConsentContextValue = {
   choice: ConsentChoice | null;
   accept: () => void;
   reject: () => void;
+  /** shows the banner again (footer "Süti beállítások"); the stored choice stays until a new one is made */
+  reopen: () => void;
+  /** true while the banner was reopened on purpose, so it takes focus */
+  reopened: boolean;
 };
 
 const STORAGE_KEY = 'ars-cookie-consent';
@@ -15,7 +19,13 @@ const CookieConsentContext = createContext<CookieConsentContextValue>({
   choice: null,
   accept: () => {},
   reject: () => {},
+  reopen: () => {},
+  reopened: false,
 });
+
+export function useCookieConsent() {
+  return useContext(CookieConsentContext);
+}
 
 /**
  * Hand the visitor's choice to Shopify's Customer Privacy API, which gates the
@@ -51,6 +61,7 @@ function readStoredChoice(): ConsentChoice | null {
 
 export function CookieConsentProvider({children}: {children: React.ReactNode}) {
   const [choice, setChoice] = useState<ConsentChoice | null>(null);
+  const [reopened, setReopened] = useState(false);
 
   // Returning visitors: re-apply the stored choice on every page load, since
   // Shopify only remembers consent for the current session/cookie lifetime.
@@ -69,12 +80,24 @@ export function CookieConsentProvider({children}: {children: React.ReactNode}) {
       // private mode: the banner will simply show again next visit
     }
     setChoice(next);
+    setReopened(false);
     applyConsent(next);
+  }
+
+  function reopen() {
+    setChoice(null);
+    setReopened(true);
   }
 
   return (
     <CookieConsentContext.Provider
-      value={{choice, accept: () => decide('accepted'), reject: () => decide('rejected')}}
+      value={{
+        choice,
+        accept: () => decide('accepted'),
+        reject: () => decide('rejected'),
+        reopen,
+        reopened,
+      }}
     >
       {children}
     </CookieConsentContext.Provider>
@@ -82,15 +105,22 @@ export function CookieConsentProvider({children}: {children: React.ReactNode}) {
 }
 
 export function CookieConsentBanner() {
-  const {choice, accept, reject} = useContext(CookieConsentContext);
+  const {choice, accept, reject, reopened} = useContext(CookieConsentContext);
   const [visible, setVisible] = useState(false);
+  const firstButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (choice === null) {
       const timer = setTimeout(() => setVisible(true), 300);
       return () => clearTimeout(timer);
     }
+    setVisible(false);
   }, [choice]);
+
+  // reopened from the footer: move focus into the banner
+  useEffect(() => {
+    if (visible && reopened) firstButtonRef.current?.focus();
+  }, [visible, reopened]);
 
   if (choice !== null) return null;
 
@@ -108,7 +138,7 @@ export function CookieConsentBanner() {
         <Link to="/policies/privacy-policy">Adatkezelési tájékoztató</Link>
       </p>
       <div className="cookie-banner-actions">
-        <button type="button" className="btn btn-outline" onClick={reject}>
+        <button ref={firstButtonRef} type="button" className="btn btn-outline" onClick={reject}>
           Csak szükséges
         </button>
         <button type="button" className="btn btn-primary" onClick={accept}>

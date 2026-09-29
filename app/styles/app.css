@@ -661,6 +661,23 @@ aside header .close:hover {
   color: var(--color-ars-cream);
 }
 
+/* "Süti beállítások": a button that looks like the footer links */
+.footer-cookie-btn {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: rgba(247, 234, 215, 0.72);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.footer-cookie-btn:hover {
+  color: var(--color-ars-cream);
+}
+
 @media (min-width: 768px) {
   .footer-bottom {
     flex-direction: row;
