@@ -12,9 +12,14 @@ export async function loader({
     request: requestOnPublicOrigin(request),
     params,
     getLink: ({type, baseUrl, handle}) => {
-      // blog and article handles live under /blogs/, everything else under its type
-      if (type === 'blogs' || type === 'articles') {
-        return `${baseUrl}/blogs/${handle}`;
+      if (type === 'blogs') return `${baseUrl}/blogs/${handle}`;
+      // Articles live at /blogs/{blog}/{article}. The index does not list them
+      // today (sitemap.custom[.xml].tsx does); should it ever, a handle that
+      // carries its blog is used as is, a bare one belongs to the events blog.
+      if (type === 'articles') {
+        return handle?.includes('/')
+          ? `${baseUrl}/blogs/${handle}`
+          : `${baseUrl}/blogs/event/${handle}`;
       }
       return `${baseUrl}/${type}/${handle}`;
     },
