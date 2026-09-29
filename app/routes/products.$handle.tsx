@@ -37,6 +37,7 @@ import {useRecentlyViewed, type RecentProduct} from '~/hooks/useRecentlyViewed';
 import {ImageSlider} from '~/components/ImageSlider';
 import {ARTISTS, artistForVendor} from '~/lib/artists';
 import {isSizeOption} from '~/lib/sizes';
+import {ablative} from '~/lib/hungarian';
 
 export const meta: Route.MetaFunction = ({data, location}) => {
   const product = data?.product;
@@ -768,7 +769,7 @@ function RelatedProducts({
     <section className="section" style={{backgroundColor: 'var(--color-background-alt)'}}>
       <div className="container">
         <div className="text-center mb-8">
-          <h2>{sameArtist ? `Még ${artistName}-tól` : 'Ezek is tetszhetnek'}</h2>
+          <h2>{sameArtist && artistName ? `Még ${ablative(artistName)}` : 'Ezek is tetszhetnek'}</h2>
           <p className="text-muted">
             {sameArtist
               ? 'További alkotások ugyanattól a művésztől'
