@@ -322,12 +322,13 @@ function SizeSwapForm({
 
   return (
     <fetcher.Form method="post" action="/cart" className="cart-line-size">
-      <span className="cart-line-size-label">Méret:</span>
+      <span className="cart-line-size-label" aria-hidden="true">Méret:</span>
       <input type="hidden" name="swapLineId" value={lineId} />
       <input type="hidden" name="swapQuantity" value={quantity} />
       <select
         ref={selectRef}
         name="swapVariantId"
+        aria-label="Méret"
         defaultValue={currentVariantId}
         onChange={(e) => {
           e.currentTarget.form?.requestSubmit();

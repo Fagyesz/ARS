@@ -58,14 +58,18 @@ export function ProductForm({
             )
           : option.optionValues;
 
+        const labelId = `option-label-${option.name.replace(/\W+/g, '-')}`;
+
         return (
           <div className="product-option-group" key={option.name}>
-            <span className="size-selector-label">{optionLabel}</span>
-            <div className="size-selector">
+            <span className="size-selector-label" id={labelId}>{optionLabel}</span>
+            <div className="size-selector" role="radiogroup" aria-labelledby={labelId}>
               {slots.map((slot) =>
                 typeof slot === 'string' ? (
                   <button
                     type="button"
+                    role="radio"
+                    aria-checked={false}
                     className="size-option"
                     key={option.name + slot}
                     data-selected={false}
@@ -145,12 +149,17 @@ function OptionValueButton({
       }
     : undefined;
   const className = `size-option ${hasSwatchStyle ? 'swatch' : ''}`;
+  // a colour swatch has no text, so it needs its name as the accessible label
+  const label = hasSwatchStyle ? name : undefined;
 
   if (isDifferentProduct) {
     return (
       <a
         className={className}
         href={`/products/${handle}?${variantUriQuery}`}
+        role="radio"
+        aria-checked={selected}
+        aria-label={label}
         data-selected={selected}
         data-available={available}
         style={swatchStyle}
@@ -171,6 +180,9 @@ function OptionValueButton({
   return (
     <button
       type="button"
+      role="radio"
+      aria-checked={selected}
+      aria-label={label && (available ? label : `${label} – elfogyott`)}
       className={className}
       data-selected={selected}
       data-available={available}
