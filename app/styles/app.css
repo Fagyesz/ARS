@@ -816,6 +816,13 @@ aside header .close:hover {
   margin-bottom: 1.5rem;
 }
 
+/* "Több termék" under paginated grids */
+.pagination-next {
+  display: flex;
+  justify-content: center;
+  margin-top: 2.5rem;
+}
+
 /* ============================================
    Infinite Scroll / Eager Load
    ============================================ */

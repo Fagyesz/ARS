@@ -2,6 +2,8 @@ import type {Route} from './+types/collections.all';
 import {useLoaderData, Link, useNavigation} from 'react-router';
 import {ProductItem} from '~/components/ProductItem';
 import {SizeFilter} from '~/components/SizeFilter';
+import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
+import {getPaginationVariables} from '@shopify/hydrogen';
 import type {CollectionItemFragment} from 'storefrontapi.generated';
 import {ARTISTS} from '~/lib/artists';
 import {COLLECTION_TYPES} from '~/lib/config';
@@ -70,22 +72,44 @@ async function loadCriticalData({context, request}: Route.LoaderArgs) {
   if (typeFilter) queryParts.push(`tag:${typeFilter.replace(/[^a-z0-9-]/gi, '')}`);
   const query = queryParts.join(' AND ');
 
-  const {products} = await storefront.query(CATALOG_QUERY, {
-    variables: {query, sortKey: sortKey as any, reverse},
-    cache: storefront.CacheShort(),
-  });
+  // Paginated like collections/$handle: 24 cards a page, the size chips and
+  // the count come from a lean variants-only query over the whole (artist/type
+  // filtered) set, and a chosen size shows every match on one page.
+  const [{products}, {products: sizeData}] = await Promise.all([
+    storefront.query(CATALOG_QUERY, {
+      variables: {
+        query,
+        sortKey: sortKey as any,
+        reverse,
+        ...(sizeParam ? {first: 250} : getPaginationVariables(request, {pageBy: 24})),
+      },
+      cache: storefront.CacheShort(),
+    }),
+    storefront.query(CATALOG_SIZES_QUERY, {
+      variables: {query},
+      cache: storefront.CacheShort(),
+    }),
+  ]);
 
-  // Keep the chosen sort, but never open the catalog with image-less cards
+  // Keep the chosen sort, but never open a page with image-less cards first
   const nodes = [...products.nodes].sort(
     (a, b) => Number(!!b.featuredImage) - Number(!!a.featuredImage),
   );
 
   // Size chips list every size the (artist/type-filtered) set is in stock in,
   // so a chosen size never hides the other choices.
-  const sizes = sizeOptions(nodes);
+  const sizes = sizeOptions(sizeData.nodes);
+  const matching = new Set(filterBySize(sizeData.nodes, sizeParam).map((p) => p.id));
+  const shown = sizeParam ? nodes.filter((p) => matching.has(p.id)) : nodes;
 
   return {
-    products: {...products, nodes: filterBySize(nodes, sizeParam)},
+    products: sizeParam
+      ? {
+          nodes: shown,
+          pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null},
+        }
+      : {...products, nodes},
+    productCount: sizeParam ? shown.length : sizeData.nodes.length,
     artistFilter,
     typeFilter,
     sortParam,
@@ -119,10 +143,13 @@ function buildFilterUrl({
 }
 
 export default function Collection() {
-  const {products, artistFilter, typeFilter, sortParam, sizeParam, sizes} =
+  const {products, productCount, artistFilter, typeFilter, sortParam, sizeParam, sizes} =
     useLoaderData<typeof loader>();
   const navigation = useNavigation();
-  const isLoading = navigation.state === 'loading';
+  // "Több termék" appends the next page in place; only a new filter dims the grid
+  const isLoading =
+    navigation.state === 'loading' &&
+    !new URLSearchParams(navigation.location?.search).has('cursor');
 
   const hasFilters = !!(artistFilter || typeFilter || sizeParam);
   const activeFilterLabel = [
@@ -238,7 +265,7 @@ export default function Collection() {
             {(hasFilters || products.nodes.length > 0) && (
               <div className="catalog-meta">
                 <span className="catalog-meta-count">
-                  {products.nodes.length} termék
+                  {productCount} termék
                   {activeFilterLabel && (
                     <span className="catalog-meta-filters"> · {activeFilterLabel}</span>
                   )}
@@ -251,15 +278,18 @@ export default function Collection() {
               </div>
             )}
             <h2 className="sr-only">Termékek</h2>
-            <div className="products-grid">
-              {products.nodes.map((product, index) => (
+            <PaginatedResourceSection<CollectionItemFragment>
+              connection={products}
+              resourcesClassName="products-grid"
+            >
+              {({node: product, index}) => (
                 <ProductItem
                   key={product.id}
                   product={product}
                   loading={index < 8 ? 'eager' : undefined}
                 />
-              ))}
-            </div>
+              )}
+            </PaginatedResourceSection>
           </div>
         )}
       </div>
@@ -305,17 +335,43 @@ const CATALOG_QUERY = `#graphql
     $query: String
     $sortKey: ProductSortKeys
     $reverse: Boolean
+    $first: Int
+    $last: Int
+    $startCursor: String
+    $endCursor: String
   ) @inContext(country: $country, language: $language) {
     products(
-      first: 250
+      first: $first
+      last: $last
+      before: $startCursor
+      after: $endCursor
       query: $query
       sortKey: $sortKey
       reverse: $reverse
     ) {
       nodes {
         ...CollectionItem
-        # for the size filter: which sizes are in stock (app/lib/sizes.ts);
-        # kept out of the shared card fragment so other routes stay unchanged
+      }
+      pageInfo {
+        hasPreviousPage
+        hasNextPage
+        startCursor
+        endCursor
+      }
+    }
+  }
+` as const;
+
+/** For the size filter: which sizes each product is in stock in (app/lib/sizes.ts) */
+const CATALOG_SIZES_QUERY = `#graphql
+  query CatalogSizes(
+    $country: CountryCode
+    $language: LanguageCode
+    $query: String
+  ) @inContext(country: $country, language: $language) {
+    products(first: 250, query: $query) {
+      nodes {
+        id
         variants(first: 20) {
           nodes {
             availableForSale

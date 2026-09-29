@@ -26,7 +26,7 @@ export function PaginatedResourceSection<NodesType>({
           )}
           {hasNextPage && (
             <div className="pagination-next">
-              <NextLink>Több termék</NextLink>
+              <NextLink className="btn btn-outline">Több termék</NextLink>
             </div>
           )}
         </div>
