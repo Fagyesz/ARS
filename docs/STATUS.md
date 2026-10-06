@@ -31,8 +31,7 @@ Updated 2026-10-06. Scope for this repo is DevOps only.
    cleared by the minor/patch Dependabot group and a later Hydrogen upgrade.
 4. Security headers: only HSTS and `nosniff` are sent. Add `Referrer-Policy`, `X-Frame-Options` /
    `frame-ancestors` and `Permissions-Policy` in `server.ts` (CSP already exists from Hydrogen).
-5. Oxygen preview hosts send no `X-Robots-Tag: noindex` (audit S1). They are private today, but add it in
-   `server.ts` for hosts other than `arsmosoris.art`.
+5. SEO and shopper QoL gaps: see `docs/audits/2026-10-06-seo-qol-gaps.md`.
 6. Lint: 19 `no-console` warnings. Use `console.warn`/`error` or remove the calls.
 7. Still open from the audit: payment logos, hero product visual, `app.css` size (133 KB render-blocking).
 
