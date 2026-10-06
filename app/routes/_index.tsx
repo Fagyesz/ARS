@@ -15,6 +15,7 @@ import {ProductItem} from '~/components/ProductItem';
 import {seoMeta} from '~/lib/seo';
 import {CAMPAIGN_PATH, untilHu} from '~/lib/campaigns';
 import type {RootLoader} from '~/root';
+import {BackgroundCanvas} from '~/components/BackgroundCanvas';
 
 // The hero watermark is the largest paint on the home page; let the browser
 // fetch it before it discovers the CSS background rule.
@@ -211,6 +212,7 @@ function HeroSection() {
   return (
     <section className="hero">
       <div className="hero-background" />
+      <BackgroundCanvas scene="halftone" />
       <div className="hero-overlay" />
       <div className="hero-content">
         {campaign && (
