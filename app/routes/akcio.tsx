@@ -3,7 +3,7 @@ import type {Route} from './+types/akcio';
 import {ProductItem} from '~/components/ProductItem';
 import {loadCampaigns} from '~/lib/campaigns.server';
 import {type Campaign, untilHu} from '~/lib/campaigns';
-import {jsonLd, productListJsonLd, seoMeta} from '~/lib/seo';
+import {breadcrumbJsonLd, jsonLd, productListJsonLd, seoMeta} from '~/lib/seo';
 import type {CampaignProductFragment} from 'storefrontapi.generated';
 
 export const meta: Route.MetaFunction = ({data, location}) => {
@@ -42,6 +42,14 @@ export default function CampaignsPage() {
 
   return (
     <div className="catalog-page campaign-page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLd(
+            breadcrumbJsonLd([{name: 'Katalógus', path: '/collections/all'}, {name: 'Akciók'}]),
+          ),
+        }}
+      />
       <div className="catalog-header container">
         <h1>Akciók</h1>
         <p className="catalog-header-sub">

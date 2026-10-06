@@ -35,15 +35,20 @@ import type {CurrencyCode} from '@shopify/hydrogen/storefront-api-types';
 import {ProductItem} from '~/components/ProductItem';
 import {useRecentlyViewed, type RecentProduct} from '~/hooks/useRecentlyViewed';
 import {ImageSlider} from '~/components/ImageSlider';
-import {ARTISTS, artistForVendor} from '~/lib/artists';
+import {ARTISTS, artistForVendor, type Artist} from '~/lib/artists';
 import {isSizeOption} from '~/lib/sizes';
 import {ablative} from '~/lib/hungarian';
 
-export const meta: Route.MetaFunction = ({data, location}) => {
+export const meta: Route.MetaFunction = ({data, location, matches}) => {
   const product = data?.product;
   const variant = product?.selectedOrFirstAvailableVariant;
+  const rootData = matches.find((match) => match?.id === 'root')?.data as
+    | {content?: {artists?: Artist[]}}
+    | undefined;
   const tags = seoMeta({
-    title: product?.seo?.title || product?.title || 'Termék',
+    title:
+      product?.seo?.title ||
+      (product ? productTitleWithArtist(product, rootData?.content?.artists ?? ARTISTS) : 'Termék'),
     description: product?.seo?.description || product?.description,
     // canonical is the product URL without the size/colour query string
     path: location.pathname,
@@ -60,6 +65,22 @@ export const meta: Route.MetaFunction = ({data, location}) => {
 };
 
 export const links: Route.LinksFunction = () => [];
+
+/**
+ * Fallback page title when the product has no SEO title in Shopify: the artist's
+ * full name is what people search for ("Bika póló – Kéringer Dóri"). Shop-brand
+ * vendors ("Ars Mosoris…") add nothing next to the " | Ars Mosoris" suffix.
+ */
+function productTitleWithArtist(
+  product: {title: string; vendor?: string | null},
+  artists: Artist[],
+): string {
+  const vendor = product.vendor?.trim();
+  if (!vendor || vendor.startsWith('Ars Mosoris')) return product.title;
+  const name = artistForVendor(artists, vendor)?.fullName ?? vendor;
+  if (product.title.toLowerCase().includes(name.toLowerCase())) return product.title;
+  return `${product.title} – ${name}`;
+}
 
 export async function loader(args: Route.LoaderArgs) {
   const {context, params, request} = args;
@@ -404,29 +425,14 @@ export default function Product() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: jsonLd({
-            '@context': 'https://schema.org',
-            '@type': 'Product',
-            name: product.title,
-            description: product.description || undefined,
-            url: canonicalUrl,
-            image: [
-              selectedVariant?.image?.url,
-              ...((product as any).images?.nodes ?? []).map((img: {url: string}) => img.url),
-            ].filter((url, index, all) => url && all.indexOf(url) === index),
-            brand: {
-              '@type': 'Brand',
-              name: product.vendor || 'Ars Mosoris',
-            },
-            sku: selectedVariant?.sku || undefined,
-            offers: offerJsonLd({
-              priceRange: product.priceRange,
-              variant: selectedVariant,
-              productAvailable: product.availableForSale,
+          __html: jsonLd(
+            productJsonLd({
+              product,
+              selectedVariant,
               url: canonicalUrl,
               shipping: settings.shipping,
             }),
-          }),
+          ),
         }}
       />
       <StickyCartBar
@@ -455,7 +461,7 @@ export default function Product() {
               {
                 '@type': 'ListItem',
                 position: 1,
-                name: 'Bolt',
+                name: 'Katalógus',
                 item: `${origin}/collections/all`,
               },
               // only an artist with a profile page gets a crawlable crumb;
@@ -501,6 +507,116 @@ function daysValue(range: {min: number; max: number}) {
 }
 
 type Money = {amount: string; currencyCode: string};
+
+type SchemaVariant = {
+  sku?: string | null;
+  title: string;
+  availableForSale: boolean;
+  price: Money;
+  selectedOptions: Array<{name: string; value: string}>;
+  image?: {url: string} | null;
+};
+
+/** The schema.org property a product option maps to, if Google understands it. */
+function schemaProperty(optionName: string): 'size' | 'color' | null {
+  if (isSizeOption(optionName)) return 'size';
+  return /^(szín|color|colour)$/i.test(optionName.trim()) ? 'color' : null;
+}
+
+/**
+ * Product structured data. A product sold in several sizes or colours is a
+ * ProductGroup with one Product per variant (own price, stock and URL), so
+ * Google can show which sizes are available; a single-variant piece stays a
+ * plain Product.
+ */
+function productJsonLd({
+  product,
+  selectedVariant,
+  url,
+  shipping,
+}: {
+  product: {
+    id: string;
+    title: string;
+    description: string;
+    vendor?: string | null;
+    availableForSale: boolean;
+    priceRange: {minVariantPrice: Money; maxVariantPrice: Money};
+    images?: {nodes: Array<{url: string}>};
+    schemaVariants?: {nodes: SchemaVariant[]};
+  };
+  selectedVariant: (SchemaVariant & {image?: {url: string} | null}) | null | undefined;
+  url: string;
+  shipping: SiteSettings['shipping'];
+}) {
+  const images = [
+    selectedVariant?.image?.url,
+    ...(product.images?.nodes ?? []).map((img) => img.url),
+  ].filter((src, index, all): src is string => !!src && all.indexOf(src) === index);
+  const base = {
+    '@context': 'https://schema.org',
+    name: product.title,
+    description: product.description || undefined,
+    url,
+    image: images,
+    brand: {'@type': 'Brand', name: product.vendor || 'Ars Mosoris'},
+  };
+
+  const variants = product.schemaVariants?.nodes ?? [];
+  const varies = [
+    ...new Set(
+      variants.flatMap((v) =>
+        v.selectedOptions.map((o) => schemaProperty(o.name)).filter(Boolean),
+      ),
+    ),
+  ] as Array<'size' | 'color'>;
+
+  if (variants.length < 2 || varies.length === 0) {
+    return {
+      ...base,
+      '@type': 'Product',
+      sku: selectedVariant?.sku || undefined,
+      offers: offerJsonLd({
+        priceRange: product.priceRange,
+        variant: selectedVariant,
+        productAvailable: product.availableForSale,
+        url,
+        shipping,
+      }),
+    };
+  }
+
+  return {
+    ...base,
+    '@type': 'ProductGroup',
+    productGroupID: product.id.split('/').pop(),
+    variesBy: varies.map((prop) => `https://schema.org/${prop}`),
+    hasVariant: variants.map((variant) => {
+      const variantUrl = `${url}?${new URLSearchParams(
+        variant.selectedOptions.map((o) => [o.name, o.value]),
+      )}`;
+      const properties: Partial<Record<'size' | 'color', string>> = {};
+      for (const option of variant.selectedOptions) {
+        const prop = schemaProperty(option.name);
+        if (prop) properties[prop] = option.value;
+      }
+      return {
+        '@type': 'Product',
+        name: `${product.title} – ${variant.title}`,
+        sku: variant.sku || undefined,
+        image: variant.image?.url ?? images[0],
+        ...properties,
+        offers: offerJsonLd({
+          priceRange: {minVariantPrice: variant.price, maxVariantPrice: variant.price},
+          variant,
+          productAvailable: variant.availableForSale,
+          url: variantUrl,
+          shipping,
+        }),
+      };
+    }),
+  };
+}
 
 /**
  * schema.org offer for the Product JSON-LD: a single Offer for the selected
@@ -995,6 +1111,26 @@ const PRODUCT_FRAGMENT = `#graphql
         altText
         width
         height
+      }
+    }
+    # every size/colour for the ProductGroup structured data
+    schemaVariants: variants(first: 50) {
+      nodes {
+        id
+        sku
+        title
+        availableForSale
+        price {
+          amount
+          currencyCode
+        }
+        selectedOptions {
+          name
+          value
+        }
+        image {
+          url
+        }
       }
     }
   }
