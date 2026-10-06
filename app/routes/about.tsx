@@ -1,6 +1,7 @@
 import {Link} from 'react-router';
 import type {Route} from './+types/about';
 import {seoMeta} from '~/lib/seo';
+import {BackgroundCanvas} from '~/components/BackgroundCanvas';
 
 export const meta: Route.MetaFunction = ({location}) =>
   seoMeta({
@@ -15,6 +16,7 @@ export default function About() {
     <div className="about-page">
       {/* Dark editorial hero */}
       <section className="about-hero">
+        <BackgroundCanvas scene="ink" />
         <div className="container">
           <span className="about-hero-eyebrow">Ars Mosoris</span>
           <h1 className="about-hero-title">Rólunk</h1>

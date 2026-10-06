@@ -3,6 +3,7 @@ import type {Route} from './+types/artists._index';
 import {ARTISTS, artistPortrait} from '~/lib/artists';
 import {seoMeta} from '~/lib/seo';
 import type {RootLoader} from '~/root';
+import {BackgroundCanvas} from '~/components/BackgroundCanvas';
 
 export const meta: Route.MetaFunction = ({location}) =>
   seoMeta({
@@ -18,6 +19,7 @@ export default function ArtistsIndex() {
     <div className="artists-index-page">
       {/* Editorial dark header */}
       <div className="artists-index-hero">
+        <BackgroundCanvas scene="beetles" />
         <div className="container">
           <span className="artists-index-eyebrow">Ars Mosoris</span>
           <h1 className="artists-index-title">Alkotóink</h1>

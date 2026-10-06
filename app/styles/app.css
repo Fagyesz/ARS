@@ -7278,3 +7278,27 @@ body:has(.cookie-banner--visible) .sticky-cart-bar {
   text-transform: uppercase;
   color: var(--color-ars-red-dark) !important;
 }
+
+/* ── three.js header backgrounds (BackgroundCanvas) ── */
+.bg-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.bg-canvas canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+.bg-canvas canvas.is-visible {
+  opacity: 1;
+}
+.about-hero > .container,
+.artists-index-hero > .container {
+  position: relative;
+  z-index: 1;
+}
