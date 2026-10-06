@@ -28,6 +28,25 @@ Updated 2026-10-06. Scope for this repo is DevOps only.
    `shopify-setup-oxygen-workflow-xyl6` (all merged or stale) and remove the two worktrees.
 3. Triage the first Dependabot PRs.
 
+## Health check 2026-10-06
+
+1. **The site is private.** Every URL on https://arsmosoris.art (home, robots.txt, sitemap) 302-redirects
+   to a Shopify account login (`accounts.shopify.com/oauth/authorize`, via `cf-auth-worker`). On 2026-09-06
+   it was public. Shoppers and Google cannot reach the shop. Fix in Shopify admin → Hydrogen → Ars Mosoris →
+   Storefront settings → Environments and variables → Production → URL privacy: **Public**.
+2. **react-router 7.13.0 in production** has high-severity advisories, including unauthenticated RCE
+   through turbo-stream deserialisation (GHSA-49rj-9fvp-4h2h, GHSA-337j-9hxr-rhxg) and open redirects.
+   Fixed in 7.18.2+. Hydrogen 2026.4.7 (latest) declares `react-router ~7.16.0`, so the fix means running
+   7.18.x with an npm override ahead of Hydrogen's range. Build it on a branch and smoke-test the preview.
+3. Dev-only advisories (codegen, mini-oxygen, vite, Shopify CLI) are not in the deployed worker. They are
+   cleared by the minor/patch Dependabot group and a later Hydrogen upgrade.
+4. Security headers: only HSTS and `nosniff` are sent. Add `Referrer-Policy`, `X-Frame-Options` /
+   `frame-ancestors` and `Permissions-Policy` in `server.ts` (CSP already exists from Hydrogen).
+5. Oxygen preview hosts send no `X-Robots-Tag: noindex` (audit S1). They are private today, but add it in
+   `server.ts` for hosts other than `arsmosoris.art`.
+6. Lint: 19 `no-console` warnings. Use `console.warn`/`error` or remove the calls.
+7. Still open from the audit: payment logos, hero product visual, `app.css` size (133 KB render-blocking).
+
 ## Owner actions still open
 
 - Set `https://arsmosoris.art/koszonjuk` as the post-order return URL in kosR.
