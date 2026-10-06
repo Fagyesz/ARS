@@ -59,7 +59,16 @@ export async function action({request, context}: Route.ActionArgs) {
   const contactEmail = context.env.CONTACT_EMAIL;
 
   if (!apiKey || !fromEmail) {
-    // Email not configured — silently succeed so UX is not broken
+    // The shopper still sees a success message, but the request goes nowhere:
+    // make that loud in the logs so the missing configuration gets noticed.
+    console.error(
+      `[back-in-stock] e-mail not configured (missing ${[
+        !apiKey && 'RESEND_API_KEY',
+        !fromEmail && 'FROM_EMAIL',
+      ]
+        .filter(Boolean)
+        .join(', ')}); a request for ${product.handle} was NOT delivered`,
+    );
     return Response.json({success: true});
   }
 

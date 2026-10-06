@@ -4,17 +4,18 @@ import {
   type HeadersFunction,
 } from 'react-router';
 import type {Route} from './+types/cart';
+import {seoMeta} from '~/lib/seo';
 import type {CartQueryDataReturn} from '@shopify/hydrogen';
 import {CartForm} from '@shopify/hydrogen';
 import {CartMain} from '~/components/CartMain';
 
-export const meta: Route.MetaFunction = () => {
-  return [
-    {title: `Kosár | Ars Mosoris`},
-    {name: 'description', content: 'Kosár — Ars Mosoris'},
-    {name: 'robots', content: 'noindex, nofollow'},
-  ];
-};
+export const meta: Route.MetaFunction = ({location}) =>
+  seoMeta({
+    title: 'Kosár',
+    description: 'Kosár — Ars Mosoris',
+    path: location.pathname,
+    noindex: true,
+  });
 
 export const headers: HeadersFunction = ({actionHeaders}) => actionHeaders;
 
@@ -32,8 +33,26 @@ export async function action({request, context}: Route.ActionArgs) {
   if (swapLineId) {
     const newVariantId = formData.get('swapVariantId') as string;
     const quantity = Number(formData.get('swapQuantity'));
-    await cart.removeLines(swapLineId.split(',').filter(Boolean));
-    result = await cart.addLines([{merchandiseId: newVariantId, quantity}]);
+    // Add the new size first and drop the old line only once that worked,
+    // so a failed add (e.g. the size just sold out) never empties the line.
+    const added = await cart.addLines([{merchandiseId: newVariantId, quantity}]);
+    const addFailed =
+      Boolean(added.errors?.length) ||
+      Boolean(added.userErrors?.length) ||
+      Boolean(
+        added.warnings?.some((w) => w.code === 'MERCHANDISE_OUT_OF_STOCK'),
+      );
+    if (addFailed) {
+      result = added;
+    } else {
+      const removed = await cart.removeLines(
+        swapLineId.split(',').filter(Boolean),
+      );
+      result = {
+        ...removed,
+        warnings: [...(added.warnings ?? []), ...(removed.warnings ?? [])],
+      };
+    }
   } else {
 
   const {action, inputs} = CartForm.getFormInput(formData);
@@ -99,7 +118,7 @@ export async function action({request, context}: Route.ActionArgs) {
 
   const cartId = result?.cart?.id;
   const headers = cartId ? cart.setCartId(result.cart.id) : new Headers();
-  const {cart: cartResult, errors, warnings} = result;
+  const {cart: cartResult, errors, userErrors, warnings} = result;
 
   const redirectTo = formData.get('redirectTo') ?? null;
   if (typeof redirectTo === 'string') {
@@ -111,6 +130,7 @@ export async function action({request, context}: Route.ActionArgs) {
     {
       cart: cartResult,
       errors,
+      userErrors,
       warnings,
       analytics: {
         cartId,

@@ -1,0 +1,3 @@
+# graphql-codegen writes LF on every OS; keep the checkout identical so
+# `npm run codegen` never shows line-ending churn (and the CI drift check stays clean)
+*.generated.d.ts text eol=lf

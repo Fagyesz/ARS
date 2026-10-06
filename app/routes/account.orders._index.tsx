@@ -5,6 +5,7 @@ import {
   useSearchParams,
 } from 'react-router';
 import type {Route} from './+types/account.orders._index';
+import {seoMeta} from '~/lib/seo';
 import {useRef} from 'react';
 import {
   Money,
@@ -29,9 +30,8 @@ type OrdersLoaderData = {
   filters: OrderFilterParams;
 };
 
-export const meta: Route.MetaFunction = () => {
-  return [{title: 'Rendelések | Ars Mosoris'}];
-};
+export const meta: Route.MetaFunction = ({location}) =>
+  seoMeta({title: 'Rendelések', path: location.pathname, noindex: true});
 
 export async function loader({request, context}: Route.LoaderArgs) {
   const {customerAccount} = context;

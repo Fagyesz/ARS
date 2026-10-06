@@ -134,7 +134,7 @@ export default function ArtistProfile() {
         <div className="container">
           <div className="artist-statement">
             <h2>Művészi hitvallás</h2>
-            <blockquote>"{artist.statement}"</blockquote>
+            <blockquote>„{artist.statement}”</blockquote>
           </div>
         </div>
       </section>
@@ -209,6 +209,12 @@ const ARTIST_PRODUCTS_QUERY = `#graphql
             currencyCode
           }
           maxVariantPrice {
+            amount
+            currencyCode
+          }
+        }
+        compareAtPriceRange {
+          minVariantPrice {
             amount
             currencyCode
           }

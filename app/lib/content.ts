@@ -29,7 +29,15 @@ export type SiteSettings = {
   /** free text shown in the cart and footer, e.g. "Bankkártya, utánvét" */
   paymentMethods: string;
   usp: {title: string; text: string};
-  company: {name: string; address: string; taxNumber: string};
+  /** operator details for the legal pages; the owner fills them in the admin */
+  company: {
+    name: string;
+    address: string;
+    taxNumber: string;
+    phone: string;
+    /** falls back to contactEmail */
+    email: string;
+  };
 };
 
 export type SizeGuide = {
@@ -67,7 +75,13 @@ export const FALLBACK_SETTINGS: SiteSettings = {
   },
   paymentMethods: 'Biztonságos online fizetés',
   usp: {title: 'Kézzel készül Budapesten', text: 'kis szériás, egyedi grafika'},
-  company: {name: '', address: 'Budapest, Magyarország', taxNumber: ''},
+  company: {
+    name: '',
+    address: 'Budapest, Magyarország',
+    taxNumber: '',
+    phone: '',
+    email: EMAIL,
+  },
 };
 
 /** Used until size_guide metaobjects exist; mirrors what the shop showed so far */
@@ -146,9 +160,10 @@ export function toSettings(node: {fields: Field[]} | null | undefined): SiteSett
   if (!node) return FALLBACK_SETTINGS;
   const f = fieldMap(node.fields);
   const d = FALLBACK_SETTINGS;
+  const contactEmail = f.contact_email ?? d.contactEmail;
   return {
     tagline: f.tagline ?? d.tagline,
-    contactEmail: f.contact_email ?? d.contactEmail,
+    contactEmail,
     social: {
       instagram: f.instagram ?? d.social.instagram,
       facebook: f.facebook ?? d.social.facebook,
@@ -170,6 +185,8 @@ export function toSettings(node: {fields: Field[]} | null | undefined): SiteSett
       name: f.company_name ?? d.company.name,
       address: f.company_address ?? d.company.address,
       taxNumber: f.tax_number ?? d.company.taxNumber,
+      phone: f.company_phone ?? d.company.phone,
+      email: f.company_email ?? contactEmail,
     },
   };
 }

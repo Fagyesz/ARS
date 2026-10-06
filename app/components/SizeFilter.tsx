@@ -31,13 +31,14 @@ export function SizeFilter({
               aria-current={isActive ? 'true' : undefined}
               title={isActive ? 'Méretszűrő törlése' : `Csak ${size} méretben kapható darabok`}
               prefetch="intent"
+              preventScrollReset
             >
               {size}
             </Link>
           );
         })}
         {active && (
-          <Link to={hrefFor('')} className="catalog-size-clear">
+          <Link to={hrefFor('')} className="catalog-size-clear" preventScrollReset>
             Minden méret
           </Link>
         )}

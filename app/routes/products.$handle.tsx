@@ -35,6 +35,9 @@ import type {CurrencyCode} from '@shopify/hydrogen/storefront-api-types';
 import {ProductItem} from '~/components/ProductItem';
 import {useRecentlyViewed, type RecentProduct} from '~/hooks/useRecentlyViewed';
 import {ImageSlider} from '~/components/ImageSlider';
+import {ARTISTS, artistForVendor} from '~/lib/artists';
+import {isSizeOption} from '~/lib/sizes';
+import {ablative} from '~/lib/hungarian';
 
 export const meta: Route.MetaFunction = ({data, location}) => {
   const product = data?.product;
@@ -67,9 +70,10 @@ export async function loader(args: Route.LoaderArgs) {
     throw new Error('Expected product handle to be defined');
   }
 
+  const selectedOptions = getSelectedProductOptions(request);
   const [{product}] = await Promise.all([
     storefront.query(PRODUCT_QUERY, {
-      variables: {handle, selectedOptions: getSelectedProductOptions(request)},
+      variables: {handle, selectedOptions},
       cache: storefront.CacheShort(),
     }),
   ]);
@@ -102,7 +106,10 @@ export async function loader(args: Route.LoaderArgs) {
   const canonicalUrl = `${SITE_URL}/products/${product.handle}`;
   const origin = SITE_URL;
 
-  return {product, relatedProducts, canonicalUrl, origin};
+  // A size in the URL (a shared link, a reload) counts as already chosen
+  const sizeInUrl = selectedOptions.some((option) => isSizeOption(option.name));
+
+  return {product, relatedProducts, canonicalUrl, origin, sizeInUrl};
 }
 
 function ProductGallery({
@@ -111,21 +118,29 @@ function ProductGallery({
   productTitle,
 }: {
   images: Array<{id: string; url: string; altText: string | null; width: number | null; height: number | null}>;
-  selectedImage: {url: string; altText: string | null} | null | undefined;
+  selectedImage:
+    | {url: string; altText: string | null; width?: number | null; height?: number | null}
+    | null
+    | undefined;
   productTitle: string;
 }) {
   const seen = new Set<string>();
-  const slides: {url: string; alt: string}[] = [];
+  const slides: {url: string; alt: string; width?: number | null; height?: number | null}[] = [];
 
   if (selectedImage?.url) {
     seen.add(selectedImage.url);
-    slides.push({url: selectedImage.url, alt: selectedImage.altText || productTitle});
+    slides.push({
+      url: selectedImage.url,
+      alt: selectedImage.altText || productTitle,
+      width: selectedImage.width,
+      height: selectedImage.height,
+    });
   }
 
   for (const img of images) {
     if (!seen.has(img.url)) {
       seen.add(img.url);
-      slides.push({url: img.url, alt: img.altText || productTitle});
+      slides.push({url: img.url, alt: img.altText || productTitle, width: img.width, height: img.height});
     }
   }
 
@@ -138,10 +153,18 @@ function ProductGallery({
   );
 }
 
+/**
+ * Add-to-cart bar once the form scrolls away. With several sizes it never
+ * adds the pre-selected first size silently: until the shopper picks one, its
+ * button scrolls back to the size choice instead.
+ */
 function StickyCartBar({
   visible,
   title,
   variantTitle,
+  size,
+  needsSizeChoice,
+  onChooseSize,
   price,
   currencyCode,
   lines,
@@ -150,6 +173,10 @@ function StickyCartBar({
   visible: boolean;
   title: string;
   variantTitle: string;
+  /** the selected size, when the product has a size option */
+  size: string | null;
+  needsSizeChoice: boolean;
+  onChooseSize: () => void;
   price: string;
   currencyCode: string;
   lines: Array<{merchandiseId: string; quantity: number}>;
@@ -157,31 +184,50 @@ function StickyCartBar({
 }) {
   if (!selectedVariant.availableForSale) return null;
 
+  const detail = needsSizeChoice
+    ? null
+    : size
+      ? `Méret: ${size}`
+      : variantTitle && variantTitle !== 'Default Title'
+        ? variantTitle
+        : null;
+
   return (
     <div className={`sticky-cart-bar${visible ? ' sticky-cart-bar--visible' : ''}`}>
       <div className="container sticky-cart-bar-inner">
         <div className="sticky-cart-bar-info">
           <span className="sticky-cart-bar-title">{title}</span>
-          {variantTitle && variantTitle !== 'Default Title' && (
-            <span className="sticky-cart-bar-variant">{variantTitle}</span>
-          )}
+          {detail && <span className="sticky-cart-bar-variant">{detail}</span>}
           <span className="sticky-cart-bar-price">
             {formatMoney(price, currencyCode)}
           </span>
         </div>
-        <AddToCartButton lines={lines} disabled={!selectedVariant.availableForSale}>
-          KOSÁRBA
-        </AddToCartButton>
+        {needsSizeChoice ? (
+          <button type="button" className="add-to-cart-btn" onClick={onChooseSize}>
+            MÉRETET VÁLASZTOK
+          </button>
+        ) : (
+          <AddToCartButton lines={lines} disabled={!selectedVariant.availableForSale}>
+            {size ? `KOSÁRBA · ${size}` : 'KOSÁRBA'}
+          </AddToCartButton>
+        )}
       </div>
     </div>
   );
 }
 
 export default function Product() {
-  const {product, relatedProducts, canonicalUrl, origin} = useLoaderData<typeof loader>();
+  const {product, relatedProducts, canonicalUrl, origin, sizeInUrl} =
+    useLoaderData<typeof loader>();
   const rootData = useRouteLoaderData<RootLoader>('root');
   const campaign = eligibleCampaign(rootData?.campaigns, product.id);
   const settings = rootData?.content?.settings ?? FALLBACK_SETTINGS;
+  // the vendor links to the artist's profile page; vendors without one (e.g.
+  // "Ars Mosoris") fall back to the filtered catalogue
+  const artist = artistForVendor(rootData?.content?.artists ?? ARTISTS, product.vendor);
+  const artistPath = artist
+    ? `/artists/${artist.handle}`
+    : `/collections/all?artist=${encodeURIComponent(product.vendor ?? '')}`;
   // size guide: the product's own (custom.size_guide metafield) or the one for its type
   const override = (product as any).sizeGuide?.reference;
   const sizeGuide = findSizeGuide(
@@ -201,6 +247,10 @@ export default function Product() {
 
   const [stickyVisible, setStickyVisible] = useState(false);
   const addToCartRef = useRef<HTMLDivElement>(null);
+  // a size picked on the page (or already in the URL) counts as chosen; keyed
+  // by handle so the next product starts without a choice
+  const [sizeChosenFor, setSizeChosenFor] = useState<string | null>(null);
+  const sizeChosen = sizeInUrl || sizeChosenFor === product.handle;
 
   useEffect(() => {
     const el = addToCartRef.current;
@@ -237,32 +287,51 @@ export default function Product() {
     product.options
       .find((o) => o.name.toLowerCase() === 'méret' || o.name.toLowerCase() === 'size')
       ?.optionValues.map((v) => v.name) ?? [];
+  const selectedSize =
+    selectedVariant?.selectedOptions.find((o) => isSizeOption(o.name))?.value ?? null;
+
+  // scroll the size buttons into view and put focus on the first one
+  const chooseSize = () => {
+    const form = addToCartRef.current;
+    if (!form) return;
+    form.scrollIntoView({behavior: 'smooth', block: 'center'});
+    form.querySelector<HTMLElement>('[role="radio"]:not(:disabled)')?.focus({preventScroll: true});
+  };
 
   return (
     <>
       <div className="section">
         <div className="container">
-          <nav className="breadcrumb">
+          <nav className="breadcrumb" aria-label="Morzsamenü">
             <Link to="/collections/all">Bolt</Link>
             <span className="breadcrumb-sep">/</span>
             {vendor && (
               <>
-                <Link to={`/collections/all?artist=${encodeURIComponent(vendor)}`}>{vendor}</Link>
+                <Link to={artistPath}>{vendor}</Link>
                 <span className="breadcrumb-sep">/</span>
               </>
             )}
-            <span className="breadcrumb-current">{title}</span>
+            <span className="breadcrumb-current" aria-current="page">{title}</span>
           </nav>
 
           <div className="product">
             <ProductGallery
               images={(product as any).images?.nodes ?? []}
-              selectedImage={selectedVariant?.image ? {url: selectedVariant.image.url, altText: selectedVariant.image.altText ?? null} : null}
+              selectedImage={
+                selectedVariant?.image
+                  ? {
+                      url: selectedVariant.image.url,
+                      altText: selectedVariant.image.altText ?? null,
+                      width: selectedVariant.image.width,
+                      height: selectedVariant.image.height,
+                    }
+                  : null
+              }
               productTitle={product.title}
             />
             <div className="product-main">
               {vendor && (
-                <Link to={`/collections/all?artist=${encodeURIComponent(vendor)}`} className="product-artist">
+                <Link to={artistPath} className="product-artist">
                   {vendor}
                 </Link>
               )}
@@ -281,6 +350,9 @@ export default function Product() {
                 <ProductForm
                   productOptions={productOptions}
                   selectedVariant={selectedVariant}
+                  onOptionSelect={(name) => {
+                    if (isSizeOption(name)) setSizeChosenFor(product.handle);
+                  }}
                 />
                 <StockNote
                   available={selectedVariant?.availableForSale ?? false}
@@ -288,6 +360,8 @@ export default function Product() {
                 />
                 {!selectedVariant?.availableForSale && (
                   <BackInStockForm
+                    // a fresh form (and success message) for every sold-out size
+                    key={selectedVariant?.id}
                     productHandle={product.handle}
                     variantTitle={selectedVariant?.title ?? ''}
                   />
@@ -334,7 +408,7 @@ export default function Product() {
             '@context': 'https://schema.org',
             '@type': 'Product',
             name: product.title,
-            description: product.description,
+            description: product.description || undefined,
             url: canonicalUrl,
             image: [
               selectedVariant?.image?.url,
@@ -344,19 +418,14 @@ export default function Product() {
               '@type': 'Brand',
               name: product.vendor || 'Ars Mosoris',
             },
-            sku: selectedVariant?.sku,
-            offers: {
-              '@type': 'Offer',
-              price: selectedVariant?.price.amount,
-              priceCurrency: selectedVariant?.price.currencyCode,
-              priceValidUntil: `${new Date().getFullYear() + 1}-12-31`,
-              itemCondition: 'https://schema.org/NewCondition',
-              availability: selectedVariant?.availableForSale
-                ? 'https://schema.org/InStock'
-                : 'https://schema.org/OutOfStock',
+            sku: selectedVariant?.sku || undefined,
+            offers: offerJsonLd({
+              priceRange: product.priceRange,
+              variant: selectedVariant,
+              productAvailable: product.availableForSale,
               url: canonicalUrl,
-              seller: {'@type': 'Organization', name: 'Ars Mosoris'},
-            },
+              shipping: settings.shipping,
+            }),
           }),
         }}
       />
@@ -364,6 +433,9 @@ export default function Product() {
         visible={stickyVisible}
         title={title}
         variantTitle={selectedVariant?.title ?? ''}
+        size={selectedSize}
+        needsSizeChoice={sizeValues.length > 1 && !sizeChosen}
+        onChooseSize={chooseSize}
         price={selectedVariant?.price.amount ?? '0'}
         currencyCode={selectedVariant?.price.currencyCode ?? 'HUF'}
         lines={
@@ -386,13 +458,15 @@ export default function Product() {
                 name: 'Bolt',
                 item: `${origin}/collections/all`,
               },
-              ...(product.vendor
+              // only an artist with a profile page gets a crawlable crumb;
+              // filtered catalogue URLs are disallowed in robots.txt
+              ...(artist
                 ? [
                     {
                       '@type': 'ListItem',
                       position: 2,
                       name: product.vendor,
-                      item: `${origin}/collections/all?artist=${encodeURIComponent(product.vendor)}`,
+                      item: `${origin}${artistPath}`,
                     },
                     {
                       '@type': 'ListItem',
@@ -413,6 +487,100 @@ export default function Product() {
       />
     </>
   );
+}
+
+/** "1–2 munkanap" → {min: 1, max: 2}; free text without a number gives null */
+function dayRange(text: string) {
+  const numbers = text.match(/\d+/g)?.map(Number) ?? [];
+  if (!numbers.length) return null;
+  return {min: Math.min(...numbers), max: Math.max(...numbers)};
+}
+
+function daysValue(range: {min: number; max: number}) {
+  return {'@type': 'QuantitativeValue', minValue: range.min, maxValue: range.max, unitCode: 'DAY'};
+}
+
+type Money = {amount: string; currencyCode: string};
+
+/**
+ * schema.org offer for the Product JSON-LD: a single Offer for the selected
+ * variant when every variant costs the same, an AggregateOffer (low/high
+ * price) when they differ. Shipping (FoxPost parcel point within Hungary) and
+ * the return window come from the shop_settings metaobject.
+ */
+function offerJsonLd({
+  priceRange,
+  variant,
+  productAvailable,
+  url,
+  shipping,
+}: {
+  priceRange: {minVariantPrice: Money; maxVariantPrice: Money};
+  variant: {price: Money; availableForSale: boolean} | null | undefined;
+  productAvailable: boolean;
+  url: string;
+  shipping: SiteSettings['shipping'];
+}) {
+  const low = Number(priceRange.minVariantPrice.amount);
+  const high = Number(priceRange.maxVariantPrice.amount);
+  const currency = priceRange.minVariantPrice.currencyCode;
+  const handling = dayRange(shipping.handlingDays);
+  const transit = dayRange(shipping.transitDays);
+  const freeShipping = shipping.freeOverFt > 0 && low >= shipping.freeOverFt;
+
+  const common = {
+    priceCurrency: currency,
+    priceValidUntil: `${new Date().getFullYear() + 1}-12-31`,
+    itemCondition: 'https://schema.org/NewCondition',
+    url,
+    seller: {'@type': 'Organization', name: 'Ars Mosoris'},
+    shippingDetails: {
+      '@type': 'OfferShippingDetails',
+      shippingRate: {
+        '@type': 'MonetaryAmount',
+        value: freeShipping ? 0 : shipping.parcelPointFt,
+        currency: 'HUF',
+      },
+      shippingDestination: {'@type': 'DefinedRegion', addressCountry: 'HU'},
+      ...(handling && transit
+        ? {
+            deliveryTime: {
+              '@type': 'ShippingDeliveryTime',
+              handlingTime: daysValue(handling),
+              transitTime: daysValue(transit),
+            },
+          }
+        : {}),
+    },
+    hasMerchantReturnPolicy: {
+      '@type': 'MerchantReturnPolicy',
+      applicableCountry: 'HU',
+      returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+      merchantReturnDays: shipping.returnDays,
+      returnMethod: 'https://schema.org/ReturnByMail',
+    },
+  };
+
+  if (low !== high) {
+    return {
+      '@type': 'AggregateOffer',
+      lowPrice: priceRange.minVariantPrice.amount,
+      highPrice: priceRange.maxVariantPrice.amount,
+      availability: productAvailable
+        ? 'https://schema.org/InStock'
+        : 'https://schema.org/OutOfStock',
+      ...common,
+    };
+  }
+
+  return {
+    '@type': 'Offer',
+    price: variant?.price.amount ?? priceRange.minVariantPrice.amount,
+    availability: variant?.availableForSale
+      ? 'https://schema.org/InStock'
+      : 'https://schema.org/OutOfStock',
+    ...common,
+  };
 }
 
 /**
@@ -601,7 +769,7 @@ function RelatedProducts({
     <section className="section" style={{backgroundColor: 'var(--color-background-alt)'}}>
       <div className="container">
         <div className="text-center mb-8">
-          <h2>{sameArtist ? `Még ${artistName}-tól` : 'Ezek is tetszhetnek'}</h2>
+          <h2>{sameArtist && artistName ? `Még ${ablative(artistName)}` : 'Ezek is tetszhetnek'}</h2>
           <p className="text-muted">
             {sameArtist
               ? 'További alkotások ugyanattól a művésztől'
@@ -767,8 +935,19 @@ const PRODUCT_FRAGMENT = `#graphql
     handle
     productType
     tags
+    availableForSale
     descriptionHtml
     description
+    priceRange {
+      minVariantPrice {
+        amount
+        currencyCode
+      }
+      maxVariantPrice {
+        amount
+        currencyCode
+      }
+    }
     encodedVariantExistence
     encodedVariantAvailability
     options {
@@ -857,6 +1036,12 @@ const RELATED_PRODUCT_FRAGMENT = `#graphql
         currencyCode
       }
       maxVariantPrice {
+        amount
+        currencyCode
+      }
+    }
+    compareAtPriceRange {
+      minVariantPrice {
         amount
         currencyCode
       }

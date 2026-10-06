@@ -1,5 +1,6 @@
 import {Link, useRouteLoaderData} from 'react-router';
 import type {Route} from './+types/policies.privacy-policy';
+import {OperatorDetails} from '~/components/OperatorDetails';
 import {FALLBACK_SETTINGS} from '~/lib/content';
 import {seoMeta} from '~/lib/seo';
 import type {RootLoader} from '~/root';
@@ -13,9 +14,11 @@ export const meta: Route.MetaFunction = ({location}) =>
   });
 
 export default function PrivacyPolicy() {
-  // the carrier is a data processor; its name comes from the shop_settings metaobject
+  // operator details and the carrier (a data processor) come from the
+  // shop_settings metaobject
   const rootData = useRouteLoaderData<RootLoader>('root');
-  const {shipping} = rootData?.content?.settings ?? FALLBACK_SETTINGS;
+  const {shipping, company, contactEmail} =
+    rootData?.content?.settings ?? FALLBACK_SETTINGS;
   return (
     <div className="policy-page">
       <div className="container">
@@ -26,18 +29,12 @@ export default function PrivacyPolicy() {
         <div className="policy-header">
           <p className="policy-tag">Jogi feltételek</p>
           <h1>Adatvédelmi tájékoztató</h1>
-          <p className="policy-meta">Utolsó módosítás: 2025. január 1.</p>
+          <p className="policy-meta">Utolsó módosítás: 2026. szeptember 29.</p>
         </div>
 
         <div className="policy-body">
-          <h2>Adatkezelő</h2>
-          <p>
-            <strong>Ars Mosoris</strong>
-            <br />
-            Székhely: 1046 Budapest, Kiss Ernő u. 4.
-            <br />
-            E-mail: <a href="mailto:arsmosoris@gmail.com">arsmosoris@gmail.com</a>
-          </p>
+          <h2>Adatkezelő (üzemeltető adatai)</h2>
+          <OperatorDetails company={company} />
           <p>
             Az Ars Mosoris elkötelezett az érintettek személyes adatainak védelme iránt, és
             jelen tájékoztatóban bemutatja, hogyan kezeli a webshop használata során
@@ -53,8 +50,8 @@ export default function PrivacyPolicy() {
               a megrendelés teljesítése, szállítás, számlázás
             </li>
             <li>
-              <strong>Fizetési adatok:</strong> a tranzakciókat a Shopify Payments biztonságos
-              rendszere kezeli; kártyaadatot nem tárolunk
+              <strong>Fizetési adatok:</strong> a fizetés a kosR által üzemeltetett
+              pénztároldalon történik; kártyaadatot nem tárolunk
             </li>
             <li>
               <strong>Fiók adatok</strong> (ha regisztrálsz): a rendelési előzmények és a
@@ -85,13 +82,27 @@ export default function PrivacyPolicy() {
           </p>
           <ul>
             <li>
-              <strong>Shopify Inc.</strong> – webshop platform és fizetési rendszer (adatfeldolgozó)
+              <strong>Shopify</strong> – webshop platform: termékek, kosár, rendelések és
+              vásárlói fiókok tárolása (adatfeldolgozó)
+            </li>
+            <li>
+              <strong>kosR</strong> – pénztároldal: a rendelési, szállítási és fizetési
+              adatok felvétele
+            </li>
+            <li>
+              <strong>Billingo</strong> – számlák kiállítása (számlázási név és cím, a
+              rendelés tételei)
             </li>
             <li>
               <strong>{shipping.carrier}</strong> – csomagkézbesítés (név, telefonszám, választott csomagpont)
             </li>
             <li>
-              <strong>Resend</strong> – tranzakciós e-mailek küldése
+              <strong>Resend</strong> – e-mailek küldése (hírlevél-feliratkozás visszaigazolása,
+              a kapcsolatfelvételi űrlap üzenetei)
+            </li>
+            <li>
+              <strong>Discord</strong> – belső értesítés a kapcsolatfelvételi űrlapon érkezett
+              üzenetekről (név, e-mail, üzenet)
             </li>
           </ul>
 
@@ -112,7 +123,7 @@ export default function PrivacyPolicy() {
               <strong>Helyesbítés:</strong> kérheted a pontatlan adatok kijavítását
             </li>
             <li>
-              <strong>Törlés („elfeledtetés joga"):</strong> kérheted az adatok törlését,
+              <strong>Törlés („elfeledtetés joga”):</strong> kérheted az adatok törlését,
               ha azok kezelése nem szükséges tovább
             </li>
             <li>
@@ -125,7 +136,7 @@ export default function PrivacyPolicy() {
             </li>
           </ul>
           <p>
-            Kéréseidet a <a href="mailto:arsmosoris@gmail.com">arsmosoris@gmail.com</a>{' '}
+            Kéréseidet a <a href={`mailto:${contactEmail}`}>{contactEmail}</a>{' '}
             e-mail-címen fogadjuk, és 30 napon belül válaszolunk.
           </p>
 
@@ -148,7 +159,7 @@ export default function PrivacyPolicy() {
           <h3>Adatvédelemmel kapcsolatos megkeresések</h3>
           <p>Kérdés vagy adatigénylés esetén írj nekünk:</p>
           <p>
-            <a href="mailto:arsmosoris@gmail.com">arsmosoris@gmail.com</a>
+            <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
           </p>
         </div>
       </div>

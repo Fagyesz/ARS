@@ -32,7 +32,8 @@
     ],
     "paths": {
       "~/*": ["./app/*"],
-      "storefrontapi.generated": ["./storefrontapi.generated"]
+      "storefrontapi.generated": ["./storefrontapi.generated"],
+      "customer-accountapi.generated": ["./customer-accountapi.generated"]
     },
     "noEmit": true,
     "rootDirs": [".", "./.react-router/types"],

@@ -79,17 +79,23 @@ const CUSTOMER_CREATE_MUTATION = `#graphql
   }
 ` as const;
 
+const NEWSLETTER_GENERIC_ERROR =
+  'Nem sikerült a feliratkozás. Ellenőrizd az e-mail címet és a hozzájárulást, majd próbáld újra!';
+
 export async function action({request, context}: Route.ActionArgs) {
   const formData = await request.formData();
   const email = formData.get('email') as string;
 
   // marketing consent must be an active choice (GDPR): the checkbox is required
-  if (!email || formData.get('consent') !== 'on') return {success: false};
+  if (!email || formData.get('consent') !== 'on') {
+    return {success: false, error: NEWSLETTER_GENERIC_ERROR};
+  }
 
   try {
     // 1. Create customer in Shopify with marketing consent
     const randomPassword = crypto.randomUUID();
-    const {data} = await context.storefront.mutate(CUSTOMER_CREATE_MUTATION, {
+    // storefront.mutate resolves to the mutation's data itself (plus `errors`)
+    const result = await context.storefront.mutate(CUSTOMER_CREATE_MUTATION, {
       variables: {
         input: {
           email,
@@ -99,10 +105,27 @@ export async function action({request, context}: Route.ActionArgs) {
       },
     });
 
-    const errors = data?.customerCreate?.customerUserErrors ?? [];
-    // "TAKEN" means customer already exists — that's fine
-    if (errors.length > 0 && errors[0].code !== 'TAKEN') {
-      console.error('[newsletter] Shopify error:', errors[0].message);
+    if (result.errors?.length) {
+      console.error('[newsletter] Storefront API error:', result.errors);
+      return {success: false, error: NEWSLETTER_GENERIC_ERROR};
+    }
+
+    // "TAKEN" means the customer already exists; "CUSTOMER_DISABLED" means a
+    // guest customer exists and Shopify e-mailed an account invite. Both are fine.
+    const userErrors = (result.customerCreate?.customerUserErrors ?? []).filter(
+      (e) => e.code !== 'TAKEN' && e.code !== 'CUSTOMER_DISABLED',
+    );
+    if (userErrors.length > 0) {
+      console.error('[newsletter] Shopify error:', userErrors);
+      const invalidEmail = userErrors.some(
+        (e) => e.code === 'INVALID' || e.field?.includes('email'),
+      );
+      return {
+        success: false,
+        error: invalidEmail
+          ? 'Ez az e-mail cím nem érvényes. Ellenőrizd, majd próbáld újra!'
+          : NEWSLETTER_GENERIC_ERROR,
+      };
     }
 
     // 2. Send confirmation emails via Resend (non-blocking)
@@ -149,12 +172,22 @@ export async function action({request, context}: Route.ActionArgs) {
           text: `Új feliratkozó: ${email}`,
         }),
       ]);
+    } else {
+      // the Shopify subscription above worked; only the confirmation e-mails are skipped
+      console.error(
+        `[newsletter] confirmation e-mails not sent: missing ${[
+          !resendKey && 'RESEND_API_KEY',
+          !fromEmail && 'FROM_EMAIL',
+        ]
+          .filter(Boolean)
+          .join(', ')}`,
+      );
     }
 
     return {success: true};
   } catch (err) {
     console.error('[newsletter] Exception:', err);
-    return {success: false};
+    return {success: false, error: NEWSLETTER_GENERIC_ERROR};
   }
 }
 
@@ -438,9 +471,7 @@ function NewsletterSection() {
         </span>
       </label>
       {actionData && !actionData.success && (
-        <p className="newsletter-error">
-          Nem sikerült a feliratkozás. Ellenőrizd az e-mail címet és a hozzájárulást, majd próbáld újra!
-        </p>
+        <p className="newsletter-error">{actionData.error}</p>
       )}
     </section>
   );

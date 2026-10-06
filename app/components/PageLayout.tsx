@@ -50,6 +50,9 @@ export function PageLayout({
   return (
     <ToastProvider>
       <Aside.Provider>
+        <a href="#main" className="skip-link">
+          Ugrás a tartalomra
+        </a>
         <CartAside cart={cart} />
         <SearchAside />
         <MobileMenuAside header={header} publicStoreDomain={publicStoreDomain} />
@@ -62,7 +65,9 @@ export function PageLayout({
             publicStoreDomain={publicStoreDomain}
           />
         )}
-        <main>{children}</main>
+        <main id="main" tabIndex={-1}>
+          {children}
+        </main>
         <Footer
           footer={footer}
           header={header}
@@ -92,7 +97,7 @@ function CartAside({cart}: {cart: PageLayoutProps['cart']}) {
 function SearchAside() {
   const queriesDatalistId = useId();
   return (
-    <Aside type="search" heading="KERESÉS">
+    <Aside type="search" heading="KERESÉS" initialFocus='input[type="search"]'>
       <div className="predictive-search">
         <SearchFormPredictive>
           {({fetchResults, goToSearch, inputRef}) => (
@@ -156,7 +161,7 @@ function SearchAside() {
                 {term.current && total ? (
                   <Link
                     onClick={closeSearch}
-                    to={`${SEARCH_ENDPOINT}?q=${term.current}`}
+                    to={`${SEARCH_ENDPOINT}?q=${encodeURIComponent(term.current)}`}
                   >
                     <p>
                       Összes találat: <q>{term.current}</q>
@@ -180,8 +185,8 @@ function MobileMenuAside({
   header: PageLayoutProps['header'];
   publicStoreDomain: PageLayoutProps['publicStoreDomain'];
 }) {
+  // no "hydrogen-main" menu: HeaderMenu falls back to the built-in items, as in the header
   return (
-    header.menu &&
     header.shop.primaryDomain?.url && (
       <Aside type="mobile" heading="MENÜ">
         <HeaderMenu
@@ -235,7 +240,7 @@ function MobileBottomNavInner({cart: originalCart}: {cart: CartApiQueryFragment 
       <button
         className="mobile-nav-item"
         onClick={() => open('cart')}
-        aria-label="Kosár"
+        aria-label={count ? `Kosár, ${count} termék` : 'Kosár'}
       >
         <span className="mobile-nav-cart-wrap">
           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

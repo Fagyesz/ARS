@@ -35,6 +35,15 @@ export function artistPortrait(artist: Artist) {
   };
 }
 
+/** The artist whose pieces carry this Shopify vendor name, if they have a profile page */
+export function artistForVendor(
+  artists: Artist[],
+  vendor: string | null | undefined,
+): Artist | undefined {
+  if (!vendor) return undefined;
+  return artists.find((a) => (a.vendor ?? a.name) === vendor);
+}
+
 export const ARTISTS: Artist[] = [
   {
     name: 'Dóri',

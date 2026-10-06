@@ -200,6 +200,11 @@ function CartDiscounts({
     discountCodes
       ?.filter((discount) => discount.applicable)
       ?.map(({code}) => code) || [];
+  // Shopify keeps an entered code on the cart with applicable: false when it
+  // does not exist or its conditions are not met
+  const hasRejectedCode = Boolean(
+    discountCodes?.some((discount) => !discount.applicable),
+  );
 
   return (
     <div className="cart-discounts">
@@ -231,19 +236,29 @@ function CartDiscounts({
       )}
 
       {/* Collapsed by default: an open coupon field invites shoppers to leave and hunt for codes */}
-      <details className="cart-coupon">
+      <details className="cart-coupon" open={hasRejectedCode || undefined}>
         <summary>Van kuponkódod?</summary>
         <UpdateDiscountForm discountCodes={codes}>
-          <div className="cart-discount-form">
-            <input
-              id="discount-code-input"
-              type="text"
-              name="discountCode"
-              placeholder="Kuponkód"
-              aria-label="Kuponkód"
-            />
-            <button type="submit">Alkalmaz</button>
-          </div>
+          {(fetcher) => (
+            <>
+              <div className="cart-discount-form">
+                <input
+                  id="discount-code-input"
+                  type="text"
+                  name="discountCode"
+                  placeholder="Kuponkód"
+                  aria-label="Kuponkód"
+                />
+                <button type="submit">Alkalmaz</button>
+              </div>
+              {fetcher.state === 'idle' &&
+                (hasRejectedCode || fetcher.data?.userErrors?.length > 0) && (
+                  <p className="cart-discount-error" role="alert">
+                    Ez a kuponkód nem érvényes.
+                  </p>
+                )}
+            </>
+          )}
         </UpdateDiscountForm>
       </details>
     </div>
@@ -255,7 +270,7 @@ function UpdateDiscountForm({
   children,
 }: {
   discountCodes?: string[];
-  children: React.ReactNode;
+  children: React.ComponentProps<typeof CartForm>['children'];
 }) {
   return (
     <CartForm

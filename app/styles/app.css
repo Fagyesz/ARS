@@ -661,6 +661,23 @@ aside header .close:hover {
   color: var(--color-ars-cream);
 }
 
+/* "Süti beállítások": a button that looks like the footer links */
+.footer-cookie-btn {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: rgba(247, 234, 215, 0.72);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.footer-cookie-btn:hover {
+  color: var(--color-ars-cream);
+}
+
 @media (min-width: 768px) {
   .footer-bottom {
     flex-direction: row;
@@ -814,6 +831,13 @@ aside header .close:hover {
   font-size: 1.125rem;
   color: var(--color-text-muted);
   margin-bottom: 1.5rem;
+}
+
+/* "Több termék" under paginated grids */
+.pagination-next {
+  display: flex;
+  justify-content: center;
+  margin-top: 2.5rem;
 }
 
 /* ============================================
@@ -1161,6 +1185,16 @@ aside header .close:hover {
   opacity: 0.4;
   cursor: not-allowed;
   text-decoration: line-through;
+}
+
+/* sold out, but selectable for the back-in-stock form */
+.size-option[data-available="false"]:not(:disabled) {
+  text-decoration: line-through;
+  color: var(--color-text-muted);
+}
+
+.size-option[data-available="false"][data-selected="true"] {
+  color: white;
 }
 
 /* Add to Cart Button */
@@ -2998,6 +3032,23 @@ aside .cart-empty {
   cursor: zoom-in;
 }
 
+/* transparent button over the image that opens the zoom */
+.slider-zoom {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: zoom-in;
+}
+
+.slider-zoom:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -4px;
+}
+
 /* Lightbox */
 .slider-lightbox {
   position: fixed;
@@ -4029,6 +4080,27 @@ aside .cart-empty {
 /* ============================================
    Utilities
    ============================================ */
+/* "Ugrás a tartalomra": hidden until it gets keyboard focus */
+.skip-link {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 10000;
+  padding: 0.75rem 1.25rem;
+  background: var(--color-ars-dark);
+  color: #fff;
+  font-weight: 600;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
+main:focus {
+  outline: none;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -5484,6 +5556,11 @@ button.reset {
 .toast-success {
   background: var(--color-ars-dark);
   border-left: 3px solid var(--color-ars-red);
+}
+
+.toast-error {
+  background: var(--color-ars-red);
+  border-left: 3px solid var(--color-ars-red-dark);
 }
 
 @keyframes toast-in {
@@ -6970,6 +7047,12 @@ body:has(.cookie-banner--visible) .sticky-cart-bar {
 
 .cart-coupon[open] summary {
   margin-bottom: 0.5rem;
+}
+
+.cart-discount-error {
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--color-ars-red);
 }
 
 .cart-checkout-note {

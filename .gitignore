@@ -9,5 +9,7 @@ node_modules
 /.mf
 .env
 .env.*
+!.env.example
 .shopify
 .react-router
+*.tsbuildinfo

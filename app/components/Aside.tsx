@@ -16,10 +16,15 @@ type AsideContextValue = {
   close: () => void;
 };
 
+const FOCUSABLE =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 /**
  * A slide-in drawer with an overlay. Closed drawers are not rendered at all:
  * a hidden dialog would still add landmarks and headings to every page for
- * crawlers and screen readers.
+ * crawlers and screen readers. While open, Tab and Shift+Tab stay inside it.
+ * `initialFocus` is a selector for the element that gets focus on open (the
+ * search input in the search drawer); the close button otherwise.
  * @example
  * ```jsx
  * <Aside type="search" heading="KERESÉS">
@@ -32,21 +37,27 @@ export function Aside({
   children,
   heading,
   type,
+  initialFocus,
 }: {
   children?: React.ReactNode;
   type: AsideType;
   heading: string;
+  initialFocus?: string;
 }) {
   const {type: activeType, close} = useAside();
   const expanded = type === activeType;
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const asideRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     if (!expanded) return;
 
     // Move focus into the dialog and give it back to the opener on close
     const opener = document.activeElement as HTMLElement | null;
-    closeButtonRef.current?.focus();
+    const target = initialFocus
+      ? asideRef.current?.querySelector<HTMLElement>(initialFocus)
+      : null;
+    (target ?? closeButtonRef.current)?.focus();
 
     const abortController = new AbortController();
     document.addEventListener(
@@ -54,6 +65,23 @@ export function Aside({
       function handler(event: KeyboardEvent) {
         if (event.key === 'Escape') {
           close();
+          return;
+        }
+        // keep Tab inside the drawer: wrap from the last element to the first
+        if (event.key !== 'Tab' || !asideRef.current) return;
+        const focusable = [
+          ...asideRef.current.querySelectorAll<HTMLElement>(FOCUSABLE),
+        ];
+        if (!focusable.length) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        const inside = asideRef.current.contains(document.activeElement);
+        if (event.shiftKey && (document.activeElement === first || !inside)) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && (document.activeElement === last || !inside)) {
+          event.preventDefault();
+          first.focus();
         }
       },
       {signal: abortController.signal},
@@ -62,7 +90,7 @@ export function Aside({
       abortController.abort();
       opener?.focus?.();
     };
-  }, [close, expanded]);
+  }, [close, expanded, initialFocus]);
 
   if (!expanded) return null;
 
@@ -79,7 +107,7 @@ export function Aside({
         aria-label="Bezárás"
         tabIndex={-1}
       />
-      <aside>
+      <aside ref={asideRef}>
         <header>
           <h2>{heading}</h2>
           <button

@@ -1,10 +1,11 @@
 import {redirect, useLoaderData, useRouteLoaderData, Link, useNavigation} from 'react-router';
 import type {RootLoader} from '~/root';
 import type {Route} from './+types/collections.$handle';
-import {Analytics} from '@shopify/hydrogen';
+import {Analytics, getPaginationVariables} from '@shopify/hydrogen';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {ProductItem} from '~/components/ProductItem';
 import {SizeFilter} from '~/components/SizeFilter';
+import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import type {ProductItemFragment} from 'storefrontapi.generated';
 import {breadcrumbJsonLd, jsonLd, productListJsonLd, seoMeta} from '~/lib/seo';
 import {filterBySize, parseSizeParam, sizeOptions} from '~/lib/sizes';
@@ -57,10 +58,27 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
     throw redirect('/collections');
   }
 
-  const {collection} = await storefront.query(COLLECTION_QUERY, {
-    variables: {handle, sortKey, reverse},
-    cache: storefront.CacheShort(),
-  });
+  // The grid is paginated (24 cards, "Több termék" loads the next page). The
+  // size filter needs every product's variants, so a separate lean query reads
+  // just those: it drives the size chips and the product count, and only its
+  // result (not 250 × 20 variants) reaches the page. With a size chosen the
+  // matching products are shown on one page, since Shopify's cursors cannot
+  // page through a filter it does not know about ("M-L" counts as M and L).
+  const [{collection}, {collection: sizeData}] = await Promise.all([
+    storefront.query(COLLECTION_QUERY, {
+      variables: {
+        handle,
+        sortKey,
+        reverse,
+        ...(sizeParam ? {first: 250} : getPaginationVariables(request, {pageBy: 24})),
+      },
+      cache: storefront.CacheShort(),
+    }),
+    storefront.query(COLLECTION_SIZES_QUERY, {
+      variables: {handle},
+      cache: storefront.CacheShort(),
+    }),
+  ]);
 
   if (!collection) {
     throw new Response(`Collection ${handle} not found`, {status: 404});
@@ -70,11 +88,19 @@ async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
 
   // Size chips list every size the collection is in stock in; the grid keeps
   // only the products available in the chosen one.
-  const sizes = sizeOptions(collection.products.nodes);
-  const nodes = filterBySize(collection.products.nodes, sizeParam);
+  const sizeNodes = sizeData?.products.nodes ?? [];
+  const sizes = sizeOptions(sizeNodes);
+  const matching = new Set(filterBySize(sizeNodes, sizeParam).map((p) => p.id));
+  const products = sizeParam
+    ? {
+        nodes: collection.products.nodes.filter((p) => matching.has(p.id)),
+        pageInfo: {hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null},
+      }
+    : collection.products;
 
   return {
-    collection: {...collection, products: {...collection.products, nodes}},
+    collection: {...collection, products},
+    productCount: sizeParam ? products.nodes.length : sizeNodes.length,
     sortParam,
     sizeParam,
     sizes,
@@ -115,9 +141,14 @@ function buildSortUrl(handle: string, sort: string, size = '') {
 }
 
 export default function Collection() {
-  const {collection, sortParam, sizeParam, sizes} = useLoaderData<typeof loader>();
+  const {collection, productCount, sortParam, sizeParam, sizes} =
+    useLoaderData<typeof loader>();
   const navigation = useNavigation();
-  const isLoading = navigation.state === 'loading';
+  // "Több termék" appends the next page in place; only a new sort or size
+  // swaps the grid for the skeleton
+  const isLoading =
+    navigation.state === 'loading' &&
+    !new URLSearchParams(navigation.location?.search).has('cursor');
   // sibling categories = the shop's published collections (root loader)
   const siblings = useRouteLoaderData<RootLoader>('root')?.content?.collections ?? [];
 
@@ -152,10 +183,10 @@ export default function Collection() {
             fetchPriority="high"
           />
           <div className="collection-hero-overlay">
-            <nav className="collection-hero-breadcrumb">
+            <nav className="collection-hero-breadcrumb" aria-label="Morzsamenü">
               <Link to="/collections/all">Katalógus</Link>
-              <span> / </span>
-              <span>{collection.title}</span>
+              <span aria-hidden="true"> / </span>
+              <span aria-current="page">{collection.title}</span>
             </nav>
             <h1 className="collection-hero-title">{collection.title}</h1>
             {collection.description && (
@@ -165,10 +196,10 @@ export default function Collection() {
         </div>
       ) : (
         <div className="collection-text-header container">
-          <nav className="breadcrumb">
+          <nav className="breadcrumb" aria-label="Morzsamenü">
             <Link to="/collections/all">Katalógus</Link>
             <span className="breadcrumb-sep">/</span>
-            <span className="breadcrumb-current">{collection.title}</span>
+            <span className="breadcrumb-current" aria-current="page">{collection.title}</span>
           </nav>
           <h1>{collection.title}</h1>
           {collection.description && (
@@ -205,6 +236,8 @@ export default function Collection() {
                 key={opt.value}
                 to={buildSortUrl(collection.handle, opt.value, sizeParam)}
                 className={`catalog-sort-btn${sortParam === opt.value ? ' active' : ''}`}
+                aria-current={sortParam === opt.value ? 'true' : undefined}
+                preventScrollReset
               >
                 {opt.label}
               </Link>
@@ -220,6 +253,23 @@ export default function Collection() {
       </div>
 
       <div className="container" style={{paddingTop: '1.5rem'}}>
+        {!isLoading && collection.products.nodes.length > 0 && (
+          <div className="catalog-meta">
+            <span className="catalog-meta-count">
+              {productCount} termék
+              {sizeParam && <span className="catalog-meta-filters"> · {sizeParam} méret</span>}
+            </span>
+            {sizeParam && (
+              <Link
+                to={buildSortUrl(collection.handle, sortParam)}
+                className="catalog-clear-btn"
+                preventScrollReset
+              >
+                Szűrők törlése
+              </Link>
+            )}
+          </div>
+        )}
         <h2 className="sr-only">Termékek</h2>
         {isLoading ? (
           <ProductGridSkeleton />
@@ -239,15 +289,18 @@ export default function Collection() {
             </Link>
           </div>
         ) : (
-          <div className="products-grid">
-            {(collection.products.nodes as ProductItemFragment[]).map((product, index) => (
+          <PaginatedResourceSection<ProductItemFragment>
+            connection={collection.products}
+            resourcesClassName="products-grid"
+          >
+            {({node: product, index}) => (
               <ProductItem
                 key={product.id}
                 product={product}
                 loading={index < 8 ? 'eager' : undefined}
               />
-            ))}
-          </div>
+            )}
+          </PaginatedResourceSection>
         )}
         <Analytics.CollectionView
           data={{
@@ -289,6 +342,11 @@ const PRODUCT_ITEM_FRAGMENT = `#graphql
         ...MoneyProductItem
       }
     }
+    compareAtPriceRange {
+      minVariantPrice {
+        ...MoneyProductItem
+      }
+    }
   }
 ` as const;
 
@@ -300,6 +358,10 @@ const COLLECTION_QUERY = `#graphql
     $language: LanguageCode
     $sortKey: ProductCollectionSortKeys
     $reverse: Boolean
+    $first: Int
+    $last: Int
+    $startCursor: String
+    $endCursor: String
   ) @inContext(country: $country, language: $language) {
     collection(handle: $handle) {
       id
@@ -317,14 +379,38 @@ const COLLECTION_QUERY = `#graphql
         height
       }
       products(
-        first: 250
+        first: $first
+        last: $last
+        before: $startCursor
+        after: $endCursor
         sortKey: $sortKey
         reverse: $reverse
       ) {
         nodes {
           ...ProductItem
-          # for the size filter: which sizes are in stock (app/lib/sizes.ts);
-          # kept out of the shared card fragment so other routes stay unchanged
+        }
+        pageInfo {
+          hasPreviousPage
+          hasNextPage
+          startCursor
+          endCursor
+        }
+      }
+    }
+  }
+` as const;
+
+/** For the size filter: which sizes each product is in stock in (app/lib/sizes.ts) */
+const COLLECTION_SIZES_QUERY = `#graphql
+  query CollectionSizes(
+    $handle: String!
+    $country: CountryCode
+    $language: LanguageCode
+  ) @inContext(country: $country, language: $language) {
+    collection(handle: $handle) {
+      products(first: 250) {
+        nodes {
+          id
           variants(first: 20) {
             nodes {
               availableForSale

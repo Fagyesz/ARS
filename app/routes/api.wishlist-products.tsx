@@ -1,12 +1,16 @@
 import type {Route} from './+types/api.wishlist-products';
 
+/** Each handle is one Storefront query: cap how many a single request can fan out to */
+const MAX_HANDLES = 50;
+
 export async function loader({request, context}: Route.LoaderArgs) {
   const url = new URL(request.url);
   const handlesParam = url.searchParams.get('handles') || '';
   const handles = handlesParam
     .split(',')
     .map((h) => h.trim())
-    .filter(Boolean);
+    .filter(Boolean)
+    .slice(0, MAX_HANDLES);
 
   if (handles.length === 0) {
     return Response.json({products: []});
@@ -20,7 +24,7 @@ export async function loader({request, context}: Route.LoaderArgs) {
           variables: {handle},
           cache: context.storefront.CacheShort(),
         })
-        .then((data: {product: unknown}) => data.product)
+        .then((data) => data.product)
         .catch(() => null),
     ),
   );
@@ -54,6 +58,12 @@ const WISHLIST_PRODUCT_QUERY = `#graphql
           currencyCode
         }
         maxVariantPrice {
+          amount
+          currencyCode
+        }
+      }
+      compareAtPriceRange {
+        minVariantPrice {
           amount
           currencyCode
         }

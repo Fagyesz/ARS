@@ -35,9 +35,12 @@ type OptionValue = MappedProductOptions['optionValues'][number];
 export function ProductForm({
   productOptions,
   selectedVariant,
+  onOptionSelect,
 }: {
   productOptions: MappedProductOptions[];
   selectedVariant: ProductFragment['selectedOrFirstAvailableVariant'];
+  /** told which option the shopper picked (the sticky bar waits for a size) */
+  onOptionSelect?: (optionName: string) => void;
 }) {
   const navigate = useNavigate();
   const {open} = useAside();
@@ -58,14 +61,18 @@ export function ProductForm({
             )
           : option.optionValues;
 
+        const labelId = `option-label-${option.name.replace(/\W+/g, '-')}`;
+
         return (
           <div className="product-option-group" key={option.name}>
-            <span className="size-selector-label">{optionLabel}</span>
-            <div className="size-selector">
+            <span className="size-selector-label" id={labelId}>{optionLabel}</span>
+            <div className="size-selector" role="radiogroup" aria-labelledby={labelId}>
               {slots.map((slot) =>
                 typeof slot === 'string' ? (
                   <button
                     type="button"
+                    role="radio"
+                    aria-checked={false}
                     className="size-option"
                     key={option.name + slot}
                     data-selected={false}
@@ -80,6 +87,9 @@ export function ProductForm({
                     key={option.name + slot.name}
                     value={slot}
                     onSelect={(variantUriQuery) => {
+                      onOptionSelect?.(option.name);
+                      // picking the size that is already selected confirms it
+                      if (slot.selected) return;
                       void navigate(`?${variantUriQuery}`, {
                         replace: true,
                         preventScrollReset: true,
@@ -145,12 +155,17 @@ function OptionValueButton({
       }
     : undefined;
   const className = `size-option ${hasSwatchStyle ? 'swatch' : ''}`;
+  // a colour swatch has no text, so it needs its name as the accessible label
+  const label = hasSwatchStyle ? name : undefined;
 
   if (isDifferentProduct) {
     return (
       <a
         className={className}
         href={`/products/${handle}?${variantUriQuery}`}
+        role="radio"
+        aria-checked={selected}
+        aria-label={label}
         data-selected={selected}
         data-available={available}
         style={swatchStyle}
@@ -160,21 +175,26 @@ function OptionValueButton({
     );
   }
 
+  // A sold-out size stays selectable: the shopper sees "Elfogyott" on the
+  // disabled add-to-cart button and can ask for a back-in-stock e-mail.
   const title = !exists
     ? 'Ebben a kombinációban nem elérhető'
     : !available
-      ? 'Nincs készleten'
+      ? 'Elfogyott'
       : name;
 
   return (
     <button
       type="button"
+      role="radio"
+      aria-checked={selected}
+      aria-label={label && (available ? label : `${label} – elfogyott`)}
       className={className}
       data-selected={selected}
       data-available={available}
-      disabled={!exists || !available}
+      disabled={!exists}
       onClick={() => {
-        if (!selected && exists) onSelect(variantUriQuery);
+        if (exists) onSelect(variantUriQuery);
       }}
       style={swatchStyle}
       title={title}

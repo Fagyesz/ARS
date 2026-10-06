@@ -3,6 +3,7 @@ import {Await, NavLink, useRouteLoaderData} from 'react-router';
 import type {FooterQuery, HeaderQuery} from 'storefrontapi.generated';
 import {FALLBACK_SETTINGS, shippingFacts} from '~/lib/content';
 import {menuItemPath} from '~/components/Header';
+import {useCookieConsent} from '~/components/CookieConsent';
 import type {RootLoader} from '~/root';
 
 interface FooterProps {
@@ -41,6 +42,7 @@ export function Footer({
   };
   const hosts = [publicStoreDomain, header?.shop?.primaryDomain?.url];
   const {shipping} = settings;
+  const {reopen: openCookieSettings} = useCookieConsent();
 
   return (
     <Suspense fallback={null}>
@@ -163,6 +165,10 @@ export function Footer({
                   <p>
                     <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
                     {settings.company.address ? ` · ${settings.company.address}` : ''}
+                    {' · '}
+                    <button type="button" className="footer-cookie-btn" onClick={openCookieSettings}>
+                      Süti beállítások
+                    </button>
                   </p>
                 </div>
               </div>

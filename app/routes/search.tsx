@@ -24,17 +24,26 @@ export const meta: Route.MetaFunction = ({location}) =>
 export async function loader({request, context}: Route.LoaderArgs) {
   const url = new URL(request.url);
   const isPredictive = url.searchParams.has('predictive');
-  const searchPromise: Promise<PredictiveSearchReturn | RegularSearchReturn> =
-    isPredictive
-      ? predictiveSearch({request, context})
-      : regularSearch({request, context});
 
-  searchPromise.catch((error: Error) => {
+  try {
+    return isPredictive
+      ? await predictiveSearch({request, context})
+      : await regularSearch({request, context});
+  } catch (error) {
+    // An API failure shows the inline message instead of the error boundary
     console.error(error);
-    return {term: '', result: null, error: error.message};
-  });
-
-  return await searchPromise;
+    const term = String(url.searchParams.get('q') || '');
+    const message = 'A keresés most nem sikerült. Próbáld újra később!';
+    if (isPredictive) {
+      return {
+        type: 'predictive',
+        term,
+        error: message,
+        result: getEmptyPredictiveSearchResult(),
+      } satisfies PredictiveSearchReturn;
+    }
+    return {type: 'regular' as const, term, error: message, result: null};
+  }
 }
 
 /**
@@ -64,8 +73,11 @@ export default function SearchPage() {
         )}
       </SearchForm>
       {error && <p style={{color: 'red'}}>{error}</p>}
-      {!term || !result?.total ? (
-        <SearchResults.Empty />
+      {!term.trim() ? (
+        <p>Írd be, mit keresel: terméknevet, alkotót vagy például „póló”, „pulóver”.</p>
+      ) : !result?.total ? (
+        // an API failure already shows its own message above
+        error ? null : <SearchResults.Empty />
       ) : (
         <SearchResults result={result} term={term}>
           {({articles, pages, products, term}) => (

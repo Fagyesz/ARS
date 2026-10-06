@@ -1,15 +1,6 @@
-import {useEffect, useRef} from 'react';
 import {type FetcherWithComponents} from 'react-router';
 import {CartForm, type OptimisticCartLineInput} from '@shopify/hydrogen';
-import {useToast} from '~/components/Toast';
-
-// Shopify accepted the request but capped or dropped the quantity
-const STOCK_WARNINGS = new Set([
-  'MERCHANDISE_NOT_ENOUGH_STOCK',
-  'MERCHANDISE_OUT_OF_STOCK',
-]);
-
-type CartWarning = {code?: string; message?: string};
+import {useCartFeedback} from '~/hooks/useCartFeedback';
 
 function AddToCartInner({
   fetcher,
@@ -26,26 +17,10 @@ function AddToCartInner({
   onClick?: () => void;
   successToast: boolean;
 }) {
-  const {addToast} = useToast();
-  const prevState = useRef(fetcher.state);
-
-  useEffect(() => {
-    if (prevState.current === 'submitting' && fetcher.state === 'idle') {
-      const errors: unknown[] = fetcher.data?.errors ?? [];
-      const warnings: CartWarning[] = fetcher.data?.warnings ?? [];
-
-      if (errors.length) {
-        addToast('Nem sikerült a kosárba tenni. Próbáld újra!', 'info');
-      } else if (warnings.some((w) => w.code && STOCK_WARNINGS.has(w.code))) {
-        addToast('Ebből a méretből nincs több készleten.', 'info');
-      } else if (warnings.length) {
-        addToast(warnings[0].message || 'A kosár frissült.', 'info');
-      } else if (successToast) {
-        addToast('Kosárba helyezve!', 'success');
-      }
-    }
-    prevState.current = fetcher.state;
-  }, [fetcher.state, fetcher.data, addToast, successToast]);
+  useCartFeedback(fetcher, {
+    errorMessage: 'Nem sikerült a kosárba tenni. Próbáld újra!',
+    successMessage: successToast ? 'Kosárba helyezve!' : undefined,
+  });
 
   return (
     <>

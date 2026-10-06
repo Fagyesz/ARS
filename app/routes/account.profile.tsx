@@ -9,15 +9,15 @@ import {
   useOutletContext,
 } from 'react-router';
 import type {Route} from './+types/account.profile';
+import {seoMeta} from '~/lib/seo';
 
 export type ActionResponse = {
   error: string | null;
   customer: CustomerFragment | null;
 };
 
-export const meta: Route.MetaFunction = () => {
-  return [{title: 'Profil | Ars Mosoris'}];
-};
+export const meta: Route.MetaFunction = ({location}) =>
+  seoMeta({title: 'Profil', path: location.pathname, noindex: true});
 
 export async function loader({context}: Route.LoaderArgs) {
   context.customerAccount.handleAuthStatus();

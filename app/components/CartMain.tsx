@@ -170,7 +170,7 @@ function CartEmpty({
 
   useEffect(() => {
     if (!hydrated || hidden) return;
-    fetcher.load('/api/featured-products');
+    void fetcher.load('/api/featured-products');
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated, hidden]);
 

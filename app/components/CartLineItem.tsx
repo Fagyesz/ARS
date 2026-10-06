@@ -5,6 +5,9 @@ import {useVariantUrl} from '~/lib/variants';
 import {discountLabel} from '~/lib/discounts';
 import {formatMoney} from '~/lib/money';
 import {Link, useFetcher} from 'react-router';
+import {useEffect, useRef} from 'react';
+import {useToast} from '~/components/Toast';
+import {useCartFeedback} from '~/hooks/useCartFeedback';
 import {ProductPrice} from './ProductPrice';
 import {useAside} from './Aside';
 import type {
@@ -137,10 +140,6 @@ export function CartLineItem({
 }
 
 function CartLineQuantity({line, lines}: {line: CartLine; lines: CartLine[]}) {
-  if (!line || typeof line?.quantity === 'undefined') return null;
-  const {quantity, isOptimistic} = line;
-  const busy = !!isOptimistic;
-
   // "+" grows the first underlying line; Shopify re-splits discounted units itself
   const first = lines[0];
   const increase = [{id: first.id, quantity: first.quantity + 1}];
@@ -152,6 +151,24 @@ function CartLineQuantity({line, lines}: {line: CartLine; lines: CartLine[]}) {
     ? [{id: shrinkable.id, quantity: shrinkable.quantity - 1}]
     : null;
   const decreaseRemove = !shrinkable && lines.length > 1 ? [lines[lines.length - 1].id] : null;
+
+  // Same stock and error toasts as the add-to-cart button. The CartForms below
+  // share fetchers by key, and "+" and "−" often use the same key: watch each
+  // distinct fetcher once so one request never shows two toasts.
+  const increaseKey = getUpdateKey([first.id]);
+  const decreaseKey = getUpdateKey(
+    decreaseRemove ?? (decreaseUpdate ?? [first]).map((l) => l.id),
+  );
+  const errorMessage = 'Nem sikerült módosítani a kosarat. Próbáld újra!';
+  useCartFeedback(useFetcher({key: increaseKey}), {errorMessage});
+  useCartFeedback(useFetcher({key: decreaseKey}), {
+    errorMessage,
+    enabled: decreaseKey !== increaseKey,
+  });
+
+  if (!line || typeof line?.quantity === 'undefined') return null;
+  const {quantity, isOptimistic} = line;
+  const busy = !!isOptimistic;
   const canDecrease = quantity > 1 && (decreaseUpdate || decreaseRemove);
 
   const decreaseButton = (
@@ -251,6 +268,12 @@ function CartLineUpdateButton({
   );
 }
 
+type SizeSwapResult = {
+  errors?: unknown[];
+  userErrors?: unknown[];
+  warnings?: Array<{code?: string}>;
+};
+
 type SizeVariant = {
   id: string;
   availableForSale: boolean;
@@ -284,17 +307,43 @@ function SizeSwapForm({
     );
   });
 
-  const fetcher = useFetcher();
+  const fetcher = useFetcher<SizeSwapResult>();
+  const {addToast} = useToast();
+  const selectRef = useRef<HTMLSelectElement>(null);
+  const prevState = useRef(fetcher.state);
+
+  // The action keeps the old line when the new size cannot be added: tell
+  // the shopper and put the select back on the size that is still in the cart.
+  useEffect(() => {
+    if (prevState.current !== 'idle' && fetcher.state === 'idle' && fetcher.data) {
+      const {errors, userErrors, warnings} = fetcher.data;
+      const outOfStock = warnings?.some(
+        (w) => w.code === 'MERCHANDISE_OUT_OF_STOCK',
+      );
+      if (errors?.length || userErrors?.length || outOfStock) {
+        addToast(
+          outOfStock
+            ? 'Ebből a méretből nincs készleten.'
+            : 'Nem sikerült a méretet módosítani. Próbáld újra!',
+          outOfStock ? 'info' : 'error',
+        );
+        if (selectRef.current) selectRef.current.value = currentVariantId;
+      }
+    }
+    prevState.current = fetcher.state;
+  }, [fetcher.state, fetcher.data, addToast, currentVariantId]);
 
   if (sizeVariants.length === 0) return null;
 
   return (
     <fetcher.Form method="post" action="/cart" className="cart-line-size">
-      <span className="cart-line-size-label">Méret:</span>
+      <span className="cart-line-size-label" aria-hidden="true">Méret:</span>
       <input type="hidden" name="swapLineId" value={lineId} />
       <input type="hidden" name="swapQuantity" value={quantity} />
       <select
+        ref={selectRef}
         name="swapVariantId"
+        aria-label="Méret"
         defaultValue={currentVariantId}
         onChange={(e) => {
           e.currentTarget.form?.requestSubmit();
