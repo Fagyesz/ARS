@@ -8,6 +8,7 @@ Updated 2026-10-06. Scope for this repo is DevOps only.
   (`0504dd7`). It holds audit batches 1–3, Shopify-driven campaigns and content, the size filter, and the
   2026-09-29 fixes (a11y, SEO, cart, pagination). CI runs lint, a codegen drift check, typecheck and build
   on every push and PR. Dependabot checks npm and Actions weekly.
+- Also on `main` (2026-10-06): SEO gaps S2/S3/S5 (PR #16) and three.js printmaking header backgrounds on home, about and artists (PR #17, `app/lib/bg-scenes.ts`, lazy chunk, off for reduced motion).
 - All other branches and worktrees have been removed. GitHub CLI token has the `workflow` scope.
 
 ## Next (before launch)
