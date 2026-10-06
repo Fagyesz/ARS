@@ -4,36 +4,25 @@ Updated 2026-10-06. Scope for this repo is DevOps only.
 
 ## Where things stand
 
-- **Production** (`main`, deployed to Oxygen at https://arsmosoris.art): commit `30c4d57`, 2026-09-06.
-  It includes audit batches 1–3, Shopify-driven campaigns and content, and the size filter.
-  See `docs/audits/2026-09-06-conversion-ux-seo-audit.md`.
-- **`fix/audit-quick-wins`** (13 commits, pushed, preview deployed, CI green 2026-09-29): Hungarian
-  storefront context, newsletter/contact/search/cart fixes, a lint and typecheck that pass, CI workflow,
-  `.nvmrc`, `.env.example`, README.
-- **`fix/audit-batch-2`** (47 commits, a superset of quick-wins, **not pushed**): a11y (focus traps,
-  skip link, radiogroups), SEO (robots, trailing-slash 301, sitemap events, Product JSON-LD), pagination
-  at 24, Dependabot, prettier scripts, a CI step that fails on GraphQL codegen drift.
-  Checked locally 2026-10-06: lint has 0 errors (19 `no-console` warnings), typecheck and build pass.
+- **Production** (`main`, Oxygen, https://arsmosoris.art, **private until launch**): PR #2 merged 2026-10-06
+  (`0504dd7`). It holds audit batches 1–3, Shopify-driven campaigns and content, the size filter, and the
+  2026-09-29 fixes (a11y, SEO, cart, pagination). CI runs lint, a codegen drift check, typecheck and build
+  on every push and PR. Dependabot checks npm and Actions weekly.
+- All other branches and worktrees have been removed. GitHub CLI token has the `workflow` scope.
 
-## Blocked
+## Next (before launch)
 
-- Pushing `fix/audit-batch-2` is rejected because it edits `.github/workflows/ci.yml` and the git
-  credential lacks the `workflow` scope. Fix: `gh auth refresh -h github.com -s workflow`, then
-  `gh auth setup-git`, then push.
-
-## Next
-
-1. Push `fix/audit-batch-2`, open a PR to `main`, wait for the CI and preview deploy, smoke-test the preview.
-2. Merge to `main` (this deploys production). Then delete `fix/audit-quick-wins`, `kosr-checkout` and
-   `shopify-setup-oxygen-workflow-xyl6` (all merged or stale) and remove the two worktrees.
-3. Triage the first Dependabot PRs.
+1. Owner updates the product list in Shopify.
+2. End-to-end test on production while it is private: browse, filter, product, cart, coupon, kosR checkout,
+   FoxPost, `/koszonjuk`, newsletter, contact form, account login.
+3. react-router security upgrade (item 2 below), on a branch, verified on its preview.
+4. Switch production to Public.
 
 ## Health check 2026-10-06
 
-1. **The site is private.** Every URL on https://arsmosoris.art (home, robots.txt, sitemap) 302-redirects
-   to a Shopify account login (`accounts.shopify.com/oauth/authorize`, via `cf-auth-worker`). On 2026-09-06
-   it was public. Shoppers and Google cannot reach the shop. Fix in Shopify admin → Hydrogen → Ars Mosoris →
-   Storefront settings → Environments and variables → Production → URL privacy: **Public**.
+1. **The site is private on purpose** (owner, 2026-10-06): every URL redirects to a Shopify account login
+   until the product list is updated and the whole purchase flow is tested. To launch: Shopify admin →
+   Hydrogen → Ars Mosoris → Environments → Production → URL privacy: **Public**.
 2. **react-router 7.13.0 in production** has high-severity advisories, including unauthenticated RCE
    through turbo-stream deserialisation (GHSA-49rj-9fvp-4h2h, GHSA-337j-9hxr-rhxg) and open redirects.
    Fixed in 7.18.2+. Hydrogen 2026.4.7 (latest) declares `react-router ~7.16.0`, so the fix means running
