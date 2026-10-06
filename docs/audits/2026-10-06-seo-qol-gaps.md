@@ -42,6 +42,19 @@ focus traps, cookie banner reopen link.
 | Q6 | No web app manifest (apple-touch-icon exists). | `manifest.webmanifest` with the 144/512 logos and theme colour. | 15 min |
 | Q7 | No price filter. | Not needed at ~42 products; revisit above ~100. | — |
 
+## Done 2026-10-06
+
+- **S2:** products without an SEO title get `{title} – {artist full name}` from the artist profiles,
+  e.g. "Bika póló – Kéringer Dóri | Ars Mosoris". Vendors starting with "Ars Mosoris" keep the plain title.
+  An SEO title set in Shopify still wins.
+- **S3:** multi-variant products publish a `ProductGroup` (`variesBy` size/colour, `hasVariant` with
+  one `Product` per variant: own sku, size, colour, offer, availability and `?Méret=…&Szín=…` URL).
+  Single-variant pieces stay a plain `Product`. The query fetches up to 50 variants.
+- **S5:** `/akcio` got a BreadcrumbList (`/collections/all` already had an ItemList, and a one-item
+  breadcrumb adds nothing there). The product page's first crumb is now "Katalógus", like the collection pages.
+
+After launch, check with Google's Rich Results Test on a tee and a one-off.
+
 ## Suggested order
 
 Before launch: S2, S5, Q2, Q3, Q4, Q6 (about half a day, all code, no owner input). Decide S7 now, because
