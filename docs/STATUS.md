@@ -39,8 +39,7 @@ Updated 2026-10-06. Scope for this repo is DevOps only.
    7.18.x with an npm override ahead of Hydrogen's range. Build it on a branch and smoke-test the preview.
 3. Dev-only advisories (codegen, mini-oxygen, vite, Shopify CLI) are not in the deployed worker. They are
    cleared by the minor/patch Dependabot group and a later Hydrogen upgrade.
-4. Security headers: only HSTS and `nosniff` are sent. Add `Referrer-Policy`, `X-Frame-Options` /
-   `frame-ancestors` and `Permissions-Policy` in `server.ts` (CSP already exists from Hydrogen).
+4. **Fixed (PR #29).** Referrer-Policy, X-Frame-Options and Permissions-Policy are now sent from `server.ts`.
 5. SEO and shopper QoL gaps: see `docs/audits/2026-10-06-seo-qol-gaps.md`.
 6. Lint: 19 `no-console` warnings. Use `console.warn`/`error` or remove the calls.
 7. Still open from the audit: payment logos, hero product visual, `app.css` size (133 KB render-blocking).
