@@ -13,7 +13,10 @@ Updated 2026-10-06. Scope for this repo is DevOps only.
 
 ## Next (before launch)
 
-1. Owner updates the product list in Shopify.
+1. Product list: synced with the owner’s sheet on 2026-10-08 (43 products). Cserebogár got a Technika option
+   (black M: digital 7 500 Ft x2, lino 7 000 Ft x1, like Dongó); Cápali szatyor added (Emi, 3 000 Ft x3, 2 photos).
+   Sheet clean-ups left to the owner: "Visons", "zöd", size spellings, artist column labels; rows 116–117 say
+   Linóleum but their text says digital print.
 2. End-to-end test on production while it is private: browse, filter, product, cart, coupon, kosR checkout,
    FoxPost, `/koszonjuk`, newsletter, contact form, account login.
    Invoicing (kosR → e-invoice, set up 2026-10-08 for B2C): invoice on "paid", e-mailed, AAM on the 0% lines
