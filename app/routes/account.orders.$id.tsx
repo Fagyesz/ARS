@@ -53,6 +53,11 @@ export async function loader({params, context}: Route.LoaderArgs) {
   // Get fulfillment status from first fulfillment node
   const fulfillmentStatus = order.fulfillments.nodes[0]?.status ?? 'N/A';
 
+  // parcel tracking: every fulfillment with a number or a link (FoxPost)
+  const tracking = order.fulfillments.nodes
+    .flatMap((f) => f.trackingInformation)
+    .filter((t) => t.number || t.url);
+
   // Get first discount value with proper type checking
   const firstDiscount = discountApplications[0]?.value;
 
@@ -82,6 +87,7 @@ export async function loader({params, context}: Route.LoaderArgs) {
     discountValue,
     discountPercentage,
     fulfillmentStatus,
+    tracking,
   };
 }
 
@@ -99,6 +105,7 @@ export default function OrderRoute() {
     discountValue,
     discountPercentage,
     fulfillmentStatus,
+    tracking,
   } = useLoaderData<typeof loader>();
 
   return (
@@ -197,6 +204,22 @@ export default function OrderRoute() {
         <div className="order-detail-section">
           <h3>Állapot</h3>
           <p>{FULFILLMENT_LABELS[fulfillmentStatus] ?? fulfillmentStatus}</p>
+          {tracking.map((t, i) => (
+            // eslint-disable-next-line react/no-array-index-key
+            <p key={i} className="order-tracking">
+              {t.url && (
+                <a href={t.url} target="_blank" rel="noopener noreferrer">
+                  Csomag követése →
+                </a>
+              )}
+              {t.number && (
+                <span className="order-tracking-number">
+                  {' '}
+                  Csomagszám: {t.number}
+                </span>
+              )}
+            </p>
+          ))}
         </div>
       </div>
 

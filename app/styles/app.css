@@ -4759,6 +4759,19 @@ button.reset {
   text-decoration: underline;
 }
 
+.order-tracking {
+  margin-top: 0.5rem;
+}
+
+.order-tracking a {
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.order-tracking-number {
+  color: var(--color-text-muted);
+}
+
 @media (max-width: 560px) {
   .order-detail-table thead {
     display: none;
