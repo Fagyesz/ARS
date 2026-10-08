@@ -17,7 +17,7 @@
   "prettier": "@shopify/prettier-config",
   "dependencies": {
     "@shopify/hydrogen": "^2026.4.7",
-    "graphql": "^16.10.0",
+    "graphql": "^17.0.2",
     "graphql-tag": "^2.12.7",
     "isbot": "^5.2.2",
     "react": "18.3.1",
