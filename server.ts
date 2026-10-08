@@ -52,6 +52,16 @@ export default {
         response.headers.set('X-Robots-Tag', 'noindex, nofollow');
       }
 
+      // Baseline security headers (the Content-Security-Policy comes from
+      // entry.server.tsx). No other site may frame the shop; the camera,
+      // microphone and location APIs are never used.
+      response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+      response.headers.set('X-Frame-Options', 'SAMEORIGIN');
+      response.headers.set(
+        'Permissions-Policy',
+        'camera=(), microphone=(), geolocation=()',
+      );
+
       if (hydrogenContext.session.isPending) {
         response.headers.set(
           'Set-Cookie',
