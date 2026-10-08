@@ -16,6 +16,10 @@ Updated 2026-10-06. Scope for this repo is DevOps only.
 1. Owner updates the product list in Shopify.
 2. End-to-end test on production while it is private: browse, filter, product, cart, coupon, kosR checkout,
    FoxPost, `/koszonjuk`, newsletter, contact form, account login.
+   Invoicing (kosR → e-invoice, set up 2026-10-08 for B2C): invoice on "paid", e-mailed, AAM on the 0% lines
+   (correct only if the tax number’s 9th digit is 1), auto storno on cancel, no 0 Ft invoices, payment due 0 days,
+   company purchases off for now. Test: one order → invoice e-mail with order number, AAM and the FoxPost line;
+   cancel → storno invoice + tag.
 3. react-router security upgrade (item 2 below), on a branch, verified on its preview.
 4. Switch production to Public.
 
