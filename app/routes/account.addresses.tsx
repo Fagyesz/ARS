@@ -80,7 +80,7 @@ export const meta: Route.MetaFunction = ({location}) =>
   seoMeta({title: 'Címek', path: location.pathname, noindex: true});
 
 export async function loader({context}: Route.LoaderArgs) {
-  context.customerAccount.handleAuthStatus();
+  await context.customerAccount.handleAuthStatus();
 
   return {};
 }

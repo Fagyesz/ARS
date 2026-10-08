@@ -25,6 +25,7 @@ export default [
   {
     ignores: [
       '**/node_modules/',
+      '.claude/',
       '**/build/',
       '**/dist/',
       '**/*.graphql.d.ts',
