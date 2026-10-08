@@ -3,7 +3,7 @@ import type {Route} from './+types/artists._index';
 import {ARTISTS, artistPortrait} from '~/lib/artists';
 import {seoMeta} from '~/lib/seo';
 import type {RootLoader} from '~/root';
-import {BackgroundCanvas} from '~/components/BackgroundCanvas';
+import {Backdrop} from '~/components/Backdrop';
 
 export const meta: Route.MetaFunction = ({location}) =>
   seoMeta({
@@ -17,9 +17,9 @@ export default function ArtistsIndex() {
   const artists = useRouteLoaderData<RootLoader>('root')?.content?.artists ?? ARTISTS;
   return (
     <div className="artists-index-page">
+      <Backdrop />
       {/* Editorial dark header */}
-      <div className="artists-index-hero">
-        <BackgroundCanvas scene="beetles" />
+      <div className="artists-index-hero" data-motif="artists-line" data-motif-bg="#231F20">
         <div className="container">
           <span className="artists-index-eyebrow">Ars Mosoris</span>
           <h1 className="artists-index-title">Alkotóink</h1>
@@ -30,7 +30,7 @@ export default function ArtistsIndex() {
         </div>
       </div>
 
-      <div className="container">
+      <div className="container" data-motif="calm">
         <div className="artists-page-grid">
           {artists.map((artist, index) => {
             const portrait = artistPortrait(artist);
