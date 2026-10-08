@@ -32,6 +32,8 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "@graphql-codegen/*"
         update-types: ["version-update:semver-major"]
+      - dependency-name: "graphql"
+        update-types: ["version-update:semver-major"]
       - dependency-name: "@shopify/cli"
         update-types: ["version-update:semver-major"]
     groups:
