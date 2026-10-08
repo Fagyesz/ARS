@@ -15,7 +15,7 @@ import {ProductItem} from '~/components/ProductItem';
 import {seoMeta} from '~/lib/seo';
 import {CAMPAIGN_PATH, untilHu} from '~/lib/campaigns';
 import type {RootLoader} from '~/root';
-import {BackgroundCanvas} from '~/components/BackgroundCanvas';
+import {Backdrop} from '~/components/Backdrop';
 
 // The hero watermark is the largest paint on the home page; let the browser
 // fetch it before it discovers the CSS background rule.
@@ -196,6 +196,7 @@ export default function Homepage() {
   const data = useLoaderData<typeof loader>();
   return (
     <div className="home">
+      <Backdrop />
       <HeroSection />
       <FeaturedProducts products={data.recommendedProducts} />
       <CollectionsSection collections={data.collections} />
@@ -210,9 +211,8 @@ function HeroSection() {
   const campaign = rootData?.campaigns?.[0];
   const until = campaign ? untilHu(campaign.endsAt) : '';
   return (
-    <section className="hero">
+    <section className="hero" data-motif="line" data-motif-bg="#30331C">
       <div className="hero-background" />
-      <BackgroundCanvas scene="halftone" />
       <div className="hero-overlay" />
       <div className="hero-content">
         {campaign && (
@@ -268,7 +268,7 @@ function FeaturedProducts({
   products: Promise<RecommendedProductsQuery | null>;
 }) {
   return (
-    <section className="section">
+    <section className="section" data-motif="calm">
       <div className="container">
         <div className="text-center mb-8">
           <h2>Kiemelt termékek</h2>
@@ -329,7 +329,7 @@ function CollectionsSection({
           );
           if (!nodes.length) return null;
           return (
-            <section className="collections-drops-section">
+            <section className="collections-drops-section" data-motif="print">
               <div className="container">
                 <div className="collections-drops-header">
                   <span className="collections-drops-label">Kollekciók</span>
@@ -382,7 +382,7 @@ function CollectionsSection({
 function ArtistsPreview() {
   const artists = useRouteLoaderData<RootLoader>('root')?.content?.artists ?? ARTISTS;
   return (
-    <section className="section section-alt">
+    <section className="section section-alt" data-motif="artists">
       <div className="container">
         <div className="text-center mb-8">
           <h2>Alkotóink</h2>
@@ -437,7 +437,7 @@ function NewsletterSection() {
 
   if (actionData?.success) {
     return (
-      <section className="newsletter" id="newsletter">
+      <section className="newsletter" id="newsletter" data-motif="stack" data-motif-bg="#C43F27">
         <h2 className="newsletter-title">Köszönjük!</h2>
         <p className="newsletter-subtitle">
           Feliratkoztál a hírlevelünkre. Az új darabokról és az akciókról elsőként értesítünk.
@@ -447,7 +447,7 @@ function NewsletterSection() {
   }
 
   return (
-    <section className="newsletter" id="newsletter">
+    <section className="newsletter" id="newsletter" data-motif="stack" data-motif-bg="#C43F27">
       <h2 className="newsletter-title">Első kézből az új darabokról</h2>
       <p className="newsletter-subtitle">
         Új kollekciók, események és akciók, havonta legfeljebb egyszer. Nincs spam.
