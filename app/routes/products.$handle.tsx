@@ -37,6 +37,7 @@ import {useRecentlyViewed, type RecentProduct} from '~/hooks/useRecentlyViewed';
 import {ImageSlider} from '~/components/ImageSlider';
 import {ARTISTS, artistForVendor, type Artist} from '~/lib/artists';
 import {isSizeOption} from '~/lib/sizes';
+import {useToast} from '~/components/Toast';
 import {ablative} from '~/lib/hungarian';
 import {deliveryEstimate, parseDayRange} from '~/lib/delivery-estimate';
 
@@ -357,7 +358,10 @@ export default function Product() {
                   {vendor}
                 </Link>
               )}
-              <h1>{title}</h1>
+              <div className="product-title-row">
+                <h1>{title}</h1>
+                <ShareButton title={title} url={canonicalUrl} />
+              </div>
               <ProductPrice
                 price={selectedVariant?.price}
                 compareAtPrice={selectedVariant?.compareAtPrice}
@@ -758,6 +762,50 @@ const TRUST_ICONS = {
     </svg>
   ),
 };
+
+/** Native share sheet where there is one (phones: Messenger, Instagram), else copies the link */
+function ShareButton({title, url}: {title: string; url: string}) {
+  const {addToast} = useToast();
+
+  const share = async () => {
+    if (typeof navigator.share === 'function') {
+      try {
+        await navigator.share({title, url});
+      } catch {
+        // dismissed sheet (AbortError) or a failed share: nothing to report
+      }
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      addToast('Link másolva', 'success');
+    } catch {
+      addToast('A link másolása nem sikerült', 'error');
+    }
+  };
+
+  return (
+    <button type="button" className="share-btn" onClick={() => void share()} aria-label="Megosztás">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <circle cx="18" cy="5" r="3" />
+        <circle cx="6" cy="12" r="3" />
+        <circle cx="18" cy="19" r="3" />
+        <path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98" />
+      </svg>
+    </button>
+  );
+}
 
 /**
  * "Ha ma megrendeled, várható átvétel: okt. 9–10." Worked out on the client after
