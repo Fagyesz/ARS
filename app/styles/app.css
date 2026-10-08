@@ -4870,6 +4870,154 @@ button.reset {
   margin-bottom: 1rem;
 }
 
+/* Login: brand panel (ink lines) + e-mail form that skips Shopify's e-mail step */
+.login-shell {
+  width: 100%;
+  max-width: 880px;
+  display: grid;
+  grid-template-columns: 1fr;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-ars-cream);
+}
+@media (min-width: 768px) {
+  .login-shell {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.login-shell .login-card {
+  max-width: none;
+  border: 0;
+  text-align: left;
+  padding: 2.5rem 2rem;
+}
+@media (min-width: 768px) {
+  .login-shell .login-card {
+    padding: 3.25rem 2.75rem;
+  }
+}
+.login-brand-panel {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-ars-dark);
+  color: var(--color-ars-cream);
+  padding: 2rem;
+  display: flex;
+  align-items: flex-end;
+  min-height: 180px;
+}
+@media (min-width: 768px) {
+  .login-brand-panel {
+    padding: 2.75rem;
+    min-height: 420px;
+  }
+}
+.login-brand-panel::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--color-ars-red);
+}
+.login-brand-inner {
+  position: relative;
+  z-index: 1;
+}
+.login-eyebrow {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-ars-sage);
+  margin-bottom: 0.75rem;
+}
+.login-hello {
+  font-family: var(--font-heading, inherit);
+  font-size: clamp(1.6rem, 3.2vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1.15;
+  margin: 0 0 1.25rem;
+}
+.login-perks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+  font-size: 0.9375rem;
+}
+.login-perks li {
+  display: flex;
+  gap: 0.6rem;
+  align-items: baseline;
+}
+.login-perks li::before {
+  content: '';
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--color-ars-red);
+  transform: translateY(-0.05rem);
+}
+@media (max-width: 767px) {
+  .login-perks {
+    display: none;
+  }
+}
+.login-shell .login-heading {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+.login-shell .login-sub {
+  margin-bottom: 1.5rem;
+}
+.login-form {
+  display: grid;
+  gap: 0.5rem;
+}
+.login-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-ars-dark);
+}
+.login-input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0.75rem 0.875rem;
+  border: 1.5px solid var(--color-border);
+  background: #fff;
+  font-size: 1rem;
+  color: var(--color-ars-dark);
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+.login-input:focus-visible {
+  border-color: var(--color-primary);
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+.login-form .login-btn {
+  margin-top: 0.75rem;
+  min-height: 48px;
+}
+.login-shell .login-note {
+  margin-top: 1.25rem;
+}
+.login-alt {
+  display: inline-block;
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--color-ars-dark);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.login-alt:hover {
+  color: var(--color-primary);
+}
+
 /* ============================================================
    POLICY PAGES
    ============================================================ */
