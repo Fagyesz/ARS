@@ -37,7 +37,9 @@ import {useRecentlyViewed, type RecentProduct} from '~/hooks/useRecentlyViewed';
 import {ImageSlider} from '~/components/ImageSlider';
 import {ARTISTS, artistForVendor, type Artist} from '~/lib/artists';
 import {isSizeOption} from '~/lib/sizes';
+import {useToast} from '~/components/Toast';
 import {ablative} from '~/lib/hungarian';
+import {deliveryEstimate, parseDayRange} from '~/lib/delivery-estimate';
 
 export const meta: Route.MetaFunction = ({data, location, matches}) => {
   const product = data?.product;
@@ -356,7 +358,10 @@ export default function Product() {
                   {vendor}
                 </Link>
               )}
-              <h1>{title}</h1>
+              <div className="product-title-row">
+                <h1>{title}</h1>
+                <ShareButton title={title} url={canonicalUrl} />
+              </div>
               <ProductPrice
                 price={selectedVariant?.price}
                 compareAtPrice={selectedVariant?.compareAtPrice}
@@ -379,6 +384,9 @@ export default function Product() {
                   available={selectedVariant?.availableForSale ?? false}
                   quantity={selectedVariant?.quantityAvailable ?? null}
                 />
+                {selectedVariant?.availableForSale && (
+                  <DeliveryEstimate shipping={settings.shipping} />
+                )}
                 {!selectedVariant?.availableForSale && (
                   <BackInStockForm
                     // a fresh form (and success message) for every sold-out size
@@ -493,13 +501,6 @@ export default function Product() {
       />
     </>
   );
-}
-
-/** "1–2 munkanap" → {min: 1, max: 2}; free text without a number gives null */
-function dayRange(text: string) {
-  const numbers = text.match(/\d+/g)?.map(Number) ?? [];
-  if (!numbers.length) return null;
-  return {min: Math.min(...numbers), max: Math.max(...numbers)};
 }
 
 function daysValue(range: {min: number; max: number}) {
@@ -640,8 +641,8 @@ function offerJsonLd({
   const low = Number(priceRange.minVariantPrice.amount);
   const high = Number(priceRange.maxVariantPrice.amount);
   const currency = priceRange.minVariantPrice.currencyCode;
-  const handling = dayRange(shipping.handlingDays);
-  const transit = dayRange(shipping.transitDays);
+  const handling = parseDayRange(shipping.handlingDays);
+  const transit = parseDayRange(shipping.transitDays);
   const freeShipping = shipping.freeOverFt > 0 && low >= shipping.freeOverFt;
 
   const common = {
@@ -761,6 +762,72 @@ const TRUST_ICONS = {
     </svg>
   ),
 };
+
+/** Native share sheet where there is one (phones: Messenger, Instagram), else copies the link */
+function ShareButton({title, url}: {title: string; url: string}) {
+  const {addToast} = useToast();
+
+  const share = async () => {
+    if (typeof navigator.share === 'function') {
+      try {
+        await navigator.share({title, url});
+      } catch {
+        // dismissed sheet (AbortError) or a failed share: nothing to report
+      }
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      addToast('Link másolva', 'success');
+    } catch {
+      addToast('A link másolása nem sikerült', 'error');
+    }
+  };
+
+  return (
+    <button type="button" className="share-btn" onClick={() => void share()} aria-label="Megosztás">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <circle cx="18" cy="5" r="3" />
+        <circle cx="6" cy="12" r="3" />
+        <circle cx="18" cy="19" r="3" />
+        <path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98" />
+      </svg>
+    </button>
+  );
+}
+
+/**
+ * "Ha ma megrendeled, várható átvétel: okt. 9–10." Worked out on the client after
+ * mount (the date depends on the visitor's "today"), so the server renders nothing.
+ */
+function DeliveryEstimate({shipping}: {shipping: SiteSettings['shipping']}) {
+  const [estimate, setEstimate] = useState<string | null>(null);
+  const {handlingDays, transitDays} = shipping;
+
+  useEffect(() => {
+    const handling = parseDayRange(handlingDays);
+    const transit = parseDayRange(transitDays);
+    setEstimate(handling && transit ? deliveryEstimate(new Date(), handling, transit) : null);
+  }, [handlingDays, transitDays]);
+
+  if (!estimate) return null;
+  return (
+    <p className="delivery-estimate">
+      Ha ma megrendeled, várható átvétel: <strong>{estimate}</strong>
+    </p>
+  );
+}
 
 /** The four things a buyer asks before adding to cart; facts come from the shop_settings metaobject */
 function TrustStrip({settings}: {settings: SiteSettings}) {
