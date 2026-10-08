@@ -1,0 +1,13 @@
+{
+  "name": "Ars Mosoris",
+  "short_name": "Ars Mosoris",
+  "lang": "hu",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F7EAD7",
+  "theme_color": "#231F20",
+  "icons": [
+    {"src": "/logo-144.png", "sizes": "144x144", "type": "image/png"},
+    {"src": "/logo-512.png", "sizes": "512x512", "type": "image/png"}
+  ]
+}
