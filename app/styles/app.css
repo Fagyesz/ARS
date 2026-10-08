@@ -7095,6 +7095,16 @@ body:has(.cookie-banner--visible) .sticky-cart-bar {
   color: var(--color-ars-red-dark);
 }
 
+.delivery-estimate {
+  margin: 0.75rem 0 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.delivery-estimate strong {
+  color: var(--color-text);
+}
+
 .trust-strip {
   list-style: none;
   margin: 1.75rem 0 0;
