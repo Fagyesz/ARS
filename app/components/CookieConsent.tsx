@@ -39,7 +39,7 @@ function applyConsent(choice: ConsentChoice, attempt = 0) {
     return;
   }
   const granted = choice === 'accepted';
-  privacy.setTrackingConsent(
+  privacy.setTrackingConsent?.(
     {
       analytics: granted,
       marketing: granted,
