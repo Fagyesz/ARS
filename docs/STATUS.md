@@ -17,13 +17,15 @@ Updated 2026-10-06. Scope for this repo is DevOps only.
    (black M: digital 7 500 Ft x2, lino 7 000 Ft x1, like Dongó); Cápali szatyor added (Emi, 3 000 Ft x3, 2 photos).
    Sheet clean-ups left to the owner: "Visons", "zöd", size spellings, artist column labels; rows 116–117 say
    Linóleum but their text says digital print.
-2. End-to-end test on production while it is private: browse, filter, product, cart, coupon, kosR checkout,
+2. End-to-end test on production while it is private, following `docs/LAUNCH-TEST.md`: browse, filter, product, cart, coupon, kosR checkout,
    FoxPost, `/koszonjuk`, newsletter, contact form, account login.
    Invoicing (kosR → e-invoice, set up 2026-10-08 for B2C): invoice on "paid", e-mailed, AAM on the 0% lines
    (correct only if the tax number’s 9th digit is 1), auto storno on cancel, no 0 Ft invoices, payment due 0 days,
    company purchases off for now. Test: one order → invoice e-mail with order number, AAM and the FoxPost line;
    cancel → storno invoice + tag.
-3. react-router security upgrade (item 2 below), on a branch, verified on its preview.
+3. ~~react-router security upgrade~~ done 2026-10-08 (PR #21): Hydrogen 2026.4.7, react-router 7.18.4 pinned by an
+   npm override, `handleAuthStatus()` awaited; `npm audit --omit=dev` 0 vulnerabilities. Shopper QoL batch done
+   (PR #27): parcel tracking link, delivery estimate, share button, web app manifest.
 4. Switch production to Public.
 
 ## Health check 2026-10-06
@@ -31,7 +33,7 @@ Updated 2026-10-06. Scope for this repo is DevOps only.
 1. **The site is private on purpose** (owner, 2026-10-06): every URL redirects to a Shopify account login
    until the product list is updated and the whole purchase flow is tested. To launch: Shopify admin →
    Hydrogen → Ars Mosoris → Environments → Production → URL privacy: **Public**.
-2. **react-router 7.13.0 in production** has high-severity advisories, including unauthenticated RCE
+2. **Fixed (PR #21).** react-router 7.13.0 had high-severity advisories, including unauthenticated RCE
    through turbo-stream deserialisation (GHSA-49rj-9fvp-4h2h, GHSA-337j-9hxr-rhxg) and open redirects.
    Fixed in 7.18.2+. Hydrogen 2026.4.7 (latest) declares `react-router ~7.16.0`, so the fix means running
    7.18.x with an npm override ahead of Hydrogen's range. Build it on a branch and smoke-test the preview.
