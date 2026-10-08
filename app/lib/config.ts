@@ -28,6 +28,7 @@ export const COLLECTION_TYPES = [
   {label: 'Pulóverek', value: 'pulover'},
   {label: 'Nadrágok', value: 'nadrag'},
   {label: 'Kabátok', value: 'kabat'},
+  {label: 'Táskák', value: 'taska'},
 ];
 
 // Categories, promotions and shop facts are not configured here:
