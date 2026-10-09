@@ -113,8 +113,8 @@ export function CartLineItem({
             />
             {(line.discountAllocations ?? [])
               .filter((a) => parseFloat(a.discountedAmount.amount) > 0)
-              .map((a, i) => (
-                <span className="cart-line-discount" key={i}>
+              .map((a) => (
+                <span className="cart-line-discount" key={discountLabel(a)}>
                   {discountLabel(a)} · −
                   {formatMoney(a.discountedAmount.amount, a.discountedAmount.currencyCode)}
                 </span>

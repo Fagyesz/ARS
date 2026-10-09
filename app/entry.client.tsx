@@ -24,6 +24,7 @@ if (!window.location.origin.includes('webcache.googleusercontent.com')) {
           // was client-rendered instead. Output is identical; keep the console clean.
           const message = error instanceof Error ? error.message : String(error);
           if (message.includes('#421') || message.includes('before it finished hydrating')) {
+            // eslint-disable-next-line no-console -- deliberately quiet: debug level only
             console.debug('[hydration] boundary client-rendered after early update', error);
             return;
           }

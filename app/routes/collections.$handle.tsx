@@ -115,6 +115,8 @@ function ProductGridSkeleton() {
   return (
     <div className="products-grid">
       {Array.from({length: 12}).map((_, i) => (
+        // identical placeholders: the position is the identity
+        // eslint-disable-next-line react/no-array-index-key
         <div key={i} className="product-card skeleton-card">
           <div className="skeleton-image" />
           <div className="product-card-info">

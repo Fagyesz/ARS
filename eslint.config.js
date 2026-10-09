@@ -232,11 +232,23 @@ export default [
     plugins: {
       jest,
     },
+    // the tests run on vitest, which shares jest's API; jest itself is not installed,
+    // so its version cannot be detected
+    settings: {
+      jest: {version: 29},
+    },
     languageOptions: {
       globals: {
         ...globals.node,
         ...globals.jest,
       },
+    },
+  },
+  {
+    // command-line scripts report to the terminal
+    files: ['scripts/**'],
+    rules: {
+      'no-console': 'off',
     },
   },
   {

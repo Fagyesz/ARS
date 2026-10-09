@@ -10,6 +10,7 @@
     "preview": "shopify hydrogen preview --build",
     "lint": "eslint --no-error-on-unmatched-pattern .",
     "typecheck": "node -e \"require('fs').rmSync('.react-router/types',{recursive:true,force:true})\" && react-router typegen && tsc --noEmit",
+    "test": "vitest run",
     "codegen": "shopify hydrogen codegen && react-router typegen",
     "format": "prettier --write --end-of-line auto .",
     "format:check": "prettier --check --end-of-line auto ."
@@ -61,7 +62,8 @@
     "tailwindcss": "^4.3.3",
     "typescript": "^5.9.2",
     "vite": "^6.4.3",
-    "vite-tsconfig-paths": "^6.1.1"
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^4.1.11"
   },
   "engines": {
     "node": ">=20.10.0"
