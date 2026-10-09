@@ -41,7 +41,7 @@ Updated 2026-10-06. Scope for this repo is DevOps only.
    cleared by the minor/patch Dependabot group and a later Hydrogen upgrade.
 4. **Fixed (PR #29).** Referrer-Policy, X-Frame-Options and Permissions-Policy are now sent from `server.ts`.
 5. SEO and shopper QoL gaps: see `docs/audits/2026-10-06-seo-qol-gaps.md`.
-6. Lint: 19 `no-console` warnings. Use `console.warn`/`error` or remove the calls.
+6. **Done (PR #31).** Lint has no warnings; `npm test` runs 41 vitest unit tests for the pure helpers in CI.
 7. Still open from the audit: payment logos, hero product visual, `app.css` size (133 KB render-blocking).
 
 ## Owner actions still open
