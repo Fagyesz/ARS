@@ -119,7 +119,7 @@ export function ImageSlider({slides}: ImageSliderProps) {
       <div className="slider-stage">
         <div ref={trackRef} className="slider-track">
           {slides.map((slide, i) => (
-            <div key={i} className="slider-slide">
+            <div key={slide.url} className="slider-slide">
               <img
                 src={shopifyUrl(slide.url, 1200)}
                 srcSet={shopifySrcSet(slide.url, SLIDE_WIDTHS)}
@@ -181,7 +181,7 @@ export function ImageSlider({slides}: ImageSliderProps) {
       <div className="slider-thumbs" role="tablist" aria-label="Képválasztó">
         {slides.map((slide, i) => (
           <button
-            key={i}
+            key={slide.url}
             role="tab"
             aria-selected={i === current}
             className={`slider-thumb ${i === current ? 'active' : ''}`}

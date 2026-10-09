@@ -72,7 +72,8 @@ export function untilHu(endsAt: string | null): string {
   const month = Number(parts.find((p) => p.type === 'month')?.value);
   const day = Number(parts.find((p) => p.type === 'day')?.value);
   if (!month || !day) return '';
-  return `${MONTHS_HU[month - 1]} ${day === 1 ? '1-jé' : day}-ig`;
+  // "szeptember 30-ig", but the 1st takes its possessive form: "október 1-jéig"
+  return `${MONTHS_HU[month - 1]} ${day === 1 ? '1-jéig' : `${day}-ig`}`;
 }
 
 function listHu(titles: string[]): string {

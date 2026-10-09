@@ -917,6 +917,8 @@ function SizeGuide({guide, sizes}: {guide: SizeGuideData | null; sizes: string[]
               {rows.map((cells) => (
                 <tr key={cells[0]}>
                   {cells.map((cell, i) => (
+                    // a cell is identified by its column
+                    // eslint-disable-next-line react/no-array-index-key
                     <td key={i}>{cell}</td>
                   ))}
                 </tr>
