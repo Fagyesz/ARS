@@ -26,7 +26,13 @@ Updated 2026-10-06. Scope for this repo is DevOps only.
 3. ~~react-router security upgrade~~ done 2026-10-08 (PR #21): Hydrogen 2026.4.7, react-router 7.18.4 pinned by an
    npm override, `handleAuthStatus()` awaited; `npm audit --omit=dev` 0 vulnerabilities. Shopper QoL batch done
    (PR #27): parcel tracking link, delivery estimate, share button, web app manifest.
-4. Switch production to Public.
+4. Launch is **2026-11-01** (Sunday, All Saints' Day: first parcels go out Monday 2 Nov).
+   2026-10-26: product data check over the Admin API: all 43 active, published, priced, SKU'd, in stock;
+   85 variants had no weight and got their type's weight (póló 200 g, kapucnis 500 g, környakú 450 g,
+   táska 150 g). Test product `teszt-termek` (1 Ft, SKU `TESZT-1`) made for the Google Pay / Billingo /
+   FoxPost / cancel test. **Delete it before launch.** The custom app has no `read_orders` scope, so order
+   results come from the admin by hand.
+5. Switch production to Public.
 
 ## Health check 2026-10-06
 

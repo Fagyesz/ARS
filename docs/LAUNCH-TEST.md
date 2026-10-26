@@ -8,7 +8,8 @@ to the bottom with what you saw.
 - [ ] kosR return URL is set to `https://arsmosoris.art/koszonjuk` (needed for section 6)
 - [ ] Tax status checked: the 9th digit of the tax number is 1 (alanyi adómentes). Otherwise stop: the
       invoices would carry the wrong VAT code (AAM)
-- [ ] One real card (or kosR's test mode) for a cheap order, e.g. the Cápali szatyor (3 000 Ft)
+- [ ] One real card or Google Pay for a cheap order: use `/products/teszt-termek` ("TESZT termék", 1 Ft,
+      200 g, 10 in stock, SKU `TESZT-1`, made 2026-10-26). The total is 1 Ft + 1 300 Ft FoxPost shipping.
 
 ## 1. Home and browsing
 - [ ] Home: hero clothesline animation starts after the first mouse move or scroll; text stays readable
@@ -59,6 +60,18 @@ to the bottom with what you saw.
 - [ ] If a FoxPost label was made: delete the parcel in the FoxPost portal (or kosR) before drop-off,
       and check it is not on the next weekly FoxPost bill
 
+### Test order results
+| Step | Result | Notes (order number, invoice number, FoxPost parcel ID) |
+|---|---|---|
+| Google Pay payment | | |
+| `/koszonjuk` + confirmation e-mail | | |
+| Billingo invoice (AAM, shipping line, order number) | | |
+| FoxPost parcel created (automatically or by hand) | | |
+| Cancel + refund in Shopify | | |
+| Billingo storno invoice | | |
+| FoxPost parcel gone / not billed | | |
+| Refund arrived on the card | | |
+
 ## 8. Account
 - [ ] "Bejelentkezés": type the e-mail, "Kódot kérek" lands directly on Shopify's 6-digit code screen
 - [ ] After the code you are back on the site, logged in (account icon leads to the account page)
@@ -85,6 +98,7 @@ to the bottom with what you saw.
 - [ ] Policy pages (shipping, returns, privacy, terms) show FoxPost / 1 300 Ft and the right e-mail
 
 ## At launch
+- [ ] Delete the `teszt-termek` product (or set it to Draft)
 - [ ] Shopify admin → Hydrogen → Production → URL privacy: **Public**
 - [ ] Search Console: verify `arsmosoris.art`, submit `https://arsmosoris.art/sitemap.xml`
 - [ ] Google & YouTube channel in Shopify for free Shopping listings
