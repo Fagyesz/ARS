@@ -63,11 +63,11 @@ to the bottom with what you saw.
 ### Test order results
 | Step | Result | Notes (order number, invoice number, FoxPost parcel ID) |
 |---|---|---|
-| Google Pay payment | | |
+| Google Pay payment | OK (2026-10-26) | #1001, confirmation NV5AIGL5J |
 | `/koszonjuk` + confirmation e-mail | | |
 | Billingo invoice (AAM, shipping line, order number) | | |
-| FoxPost parcel created (automatically or by hand) | | |
-| Cancel + refund in Shopify | | |
+| FoxPost parcel created (automatically or by hand) | OK, automatically | CLFOX17930184638715 |
+| Cancel + refund in Shopify | Done; refund pending | Account pages showed 0 Ft, no shipping, "SUCCESS": fixed in PR #34 |
 | Billingo storno invoice | | |
 | FoxPost parcel gone / not billed | | |
 | Refund arrived on the card | | |
