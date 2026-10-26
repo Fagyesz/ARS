@@ -1,7 +1,9 @@
 import {redirect, useLoaderData} from 'react-router';
 import type {Route} from './+types/account.orders.$id';
 import {seoMeta} from '~/lib/seo';
-import {Money, Image} from '@shopify/hydrogen';
+import {Image} from '@shopify/hydrogen';
+import {formatMoney} from '~/lib/money';
+import {orderStatus, refundSummary} from '~/lib/order-status';
 import type {
   OrderLineItemFullFragment,
   OrderQuery,
@@ -44,69 +46,45 @@ export async function loader({params, context}: Route.LoaderArgs) {
 
   const {order} = data;
 
-  // Extract line items directly from nodes array
   const lineItems = order.lineItems.nodes;
+  const amount = (m?: {amount: string} | null) => Number(m?.amount ?? 0);
 
-  // Extract discount applications directly from nodes array
-  const discountApplications = order.discountApplications.nodes;
+  // amounts as sold: after a refund Shopify lowers totalPrice and the current line totals
+  const subtotal = lineItems.reduce(
+    (sum, l) => sum + (l.soldTotalPrice ? amount(l.soldTotalPrice) : amount(l.price) * l.quantity),
+    0,
+  );
+  const discount = lineItems.reduce(
+    (sum, l) =>
+      sum + (l.soldTotalPrice && l.soldDiscountedTotalPrice
+        ? amount(l.soldTotalPrice) - amount(l.soldDiscountedTotalPrice)
+        : amount(l.totalDiscount)),
+    0,
+  );
+  const shipping =
+    amount(order.shippingLine?.originalPrice) -
+    order.shippingDiscountAllocations.reduce((sum, a) => sum + amount(a.allocatedAmount), 0);
+  const refund = refundSummary(order.transactions);
 
-  // Get fulfillment status from first fulfillment node
-  const fulfillmentStatus = order.fulfillments.nodes[0]?.status ?? 'N/A';
-
-  // parcel tracking: every fulfillment with a number or a link (FoxPost)
-  const tracking = order.fulfillments.nodes
-    .flatMap((f) => f.trackingInformation)
-    .filter((t) => t.number || t.url);
-
-  // Get first discount value with proper type checking
-  const firstDiscount = discountApplications[0]?.value;
-
-  // Type guard for MoneyV2 discount
-  const discountValue =
-    firstDiscount?.__typename === 'MoneyV2'
-      ? (firstDiscount as Extract<
-          typeof firstDiscount,
-          {__typename: 'MoneyV2'}
-        >)
-      : null;
-
-  // Type guard for percentage discount
-  const discountPercentage =
-    firstDiscount?.__typename === 'PricingPercentageValue'
-      ? (
-          firstDiscount as Extract<
-            typeof firstDiscount,
-            {__typename: 'PricingPercentageValue'}
-          >
-        ).percentage
-      : null;
+  // parcel tracking: every fulfillment with a number or a link (FoxPost); none once cancelled
+  const tracking = order.cancelledAt
+    ? []
+    : order.fulfillments.nodes
+        .flatMap((f) => f.trackingInformation)
+        .filter((t) => t.number || t.url);
 
   return {
     order,
     lineItems,
-    discountValue,
-    discountPercentage,
-    fulfillmentStatus,
+    totals: {subtotal, discount, shipping, total: subtotal - discount + shipping, refund},
+    status: orderStatus(order),
     tracking,
   };
 }
-
-const FULFILLMENT_LABELS: Record<string, string> = {
-  FULFILLED: 'Teljesítve',
-  UNFULFILLED: 'Feldolgozás alatt',
-  PARTIALLY_FULFILLED: 'Részben teljesítve',
-  'N/A': 'Nincs adat',
-};
-
 export default function OrderRoute() {
-  const {
-    order,
-    lineItems,
-    discountValue,
-    discountPercentage,
-    fulfillmentStatus,
-    tracking,
-  } = useLoaderData<typeof loader>();
+  const {order, lineItems, totals, status, tracking} = useLoaderData<typeof loader>();
+  const currency = order.totalPrice.currencyCode;
+  const money = (value: number) => formatMoney(value, currency);
 
   return (
     <div className="account-order">
@@ -142,45 +120,42 @@ export default function OrderRoute() {
           ))}
         </tbody>
         <tfoot>
-          {((discountValue && discountValue.amount) ||
-            discountPercentage) && (
-            <tr>
-              <th scope="row" colSpan={3}>
-                Kedvezmény
-              </th>
-              <td>
-                {discountPercentage ? (
-                  <span>-{discountPercentage}%</span>
-                ) : (
-                  discountValue && <Money data={discountValue!} />
-                )}
-              </td>
-            </tr>
-          )}
           <tr>
             <th scope="row" colSpan={3}>
               Részösszeg
             </th>
-            <td>
-              <Money data={order.subtotal!} />
-            </td>
+            <td>{money(totals.subtotal)}</td>
           </tr>
-          <tr>
-            <th scope="row" colSpan={3}>
-              ÁFA
-            </th>
-            <td>
-              <Money data={order.totalTax!} />
-            </td>
-          </tr>
+          {totals.discount > 0 && (
+            <tr>
+              <th scope="row" colSpan={3}>
+                Kedvezmény
+              </th>
+              <td>{money(-totals.discount)}</td>
+            </tr>
+          )}
+          {order.shippingLine && (
+            <tr>
+              <th scope="row" colSpan={3}>
+                Szállítás ({order.shippingLine.title})
+              </th>
+              <td>{totals.shipping > 0 ? money(totals.shipping) : 'Ingyenes'}</td>
+            </tr>
+          )}
           <tr>
             <th scope="row" colSpan={3}>
               Végösszeg
             </th>
-            <td>
-              <Money data={order.totalPrice!} />
-            </td>
+            <td>{money(totals.total)}</td>
           </tr>
+          {totals.refund.amount > 0 && (
+            <tr className="order-refund-row">
+              <th scope="row" colSpan={3}>
+                {totals.refund.pending ? 'Visszatérítés folyamatban' : 'Visszatérítve'}
+              </th>
+              <td>{money(-totals.refund.amount)}</td>
+            </tr>
+          )}
         </tfoot>
       </table>
 
@@ -189,13 +164,9 @@ export default function OrderRoute() {
           <h3>Szállítási cím</h3>
           {order?.shippingAddress ? (
             <address>
-              <p>{order.shippingAddress.name}</p>
-              {order.shippingAddress.formatted && (
-                <p>{order.shippingAddress.formatted}</p>
-              )}
-              {order.shippingAddress.formattedArea && (
-                <p>{order.shippingAddress.formattedArea}</p>
-              )}
+              {order.shippingAddress.formatted.map((line) => (
+                <p key={line}>{line}</p>
+              ))}
             </address>
           ) : (
             <p>Nincs megadva szállítási cím</p>
@@ -203,7 +174,9 @@ export default function OrderRoute() {
         </div>
         <div className="order-detail-section">
           <h3>Állapot</h3>
-          <p>{FULFILLMENT_LABELS[fulfillmentStatus] ?? fulfillmentStatus}</p>
+          <p>
+            <span className={`order-status-badge ${status.tone}`}>{status.label}</span>
+          </p>
           {tracking.map((t, i) => (
             // eslint-disable-next-line react/no-array-index-key
             <p key={i} className="order-tracking">
@@ -253,12 +226,14 @@ function OrderLineRow({lineItem}: {lineItem: OrderLineItemFullFragment}) {
           </div>
         </div>
       </td>
-      <td>
-        <Money data={lineItem.price!} />
-      </td>
+      <td>{lineItem.price && formatMoney(lineItem.price.amount, lineItem.price.currencyCode)}</td>
       <td>{lineItem.quantity}</td>
       <td>
-        <Money data={lineItem.totalDiscount!} />
+        {formatMoney(
+          lineItem.soldTotalPrice?.amount ??
+            Number(lineItem.price?.amount ?? 0) * lineItem.quantity,
+          lineItem.price?.currencyCode,
+        )}
       </td>
     </tr>
   );

@@ -1,8 +1,8 @@
 import {Link, useLoaderData, useOutletContext} from 'react-router';
 import type {Route} from './+types/account._index';
 import {seoMeta} from '~/lib/seo';
-import {Money} from '@shopify/hydrogen';
-import type {CurrencyCode} from '@shopify/hydrogen/storefront-api-types';
+import {formatMoney} from '~/lib/money';
+import {displayTotal, orderStatus, type OrderTransactionLike} from '~/lib/order-status';
 import type {CustomerFragment} from 'customer-accountapi.generated';
 import {DASHBOARD_ORDERS_QUERY} from '~/graphql/customer-account/CustomerDashboardQuery';
 
@@ -11,8 +11,10 @@ type DashboardOrder = {
   number: number;
   processedAt: string;
   financialStatus: string | null;
-  fulfillments: {nodes: Array<{status: string}>};
-  totalPrice: {amount: string; currencyCode: CurrencyCode};
+  fulfillmentStatus: string;
+  cancelledAt: string | null;
+  transactions: OrderTransactionLike[];
+  totalPrice: {amount: string; currencyCode: string};
   lineItems: {
     nodes: Array<{
       title: string;
@@ -42,24 +44,6 @@ export async function loader({context}: Route.LoaderArgs) {
     email: data.customer.emailAddress?.emailAddress ?? null,
   };
 }
-
-const FINANCIAL_STATUS: Record<string, {label: string; color: string}> = {
-  PAID: {label: 'Fizetve', color: 'paid'},
-  PENDING: {label: 'Függőben', color: 'pending'},
-  REFUNDED: {label: 'Visszatérítve', color: 'refunded'},
-  PARTIALLY_REFUNDED: {label: 'Részben visszatérítve', color: 'refunded'},
-  VOIDED: {label: 'Érvénytelenítve', color: 'pending'},
-};
-
-const FULFILLMENT_STATUS: Record<string, {label: string; step: number}> = {
-  UNFULFILLED: {label: 'Feldolgozás alatt', step: 1},
-  IN_PROGRESS: {label: 'Folyamatban', step: 2},
-  ON_HOLD: {label: 'Várakoztatva', step: 2},
-  PARTIALLY_FULFILLED: {label: 'Részben teljesítve', step: 3},
-  FULFILLED: {label: 'Kiszállítva', step: 4},
-  RETURNED: {label: 'Visszaküldve', step: 4},
-  RESTOCKED: {label: 'Visszatárolt', step: 4},
-};
 
 export default function AccountDashboard() {
   const {recentOrders, email} = useLoaderData<typeof loader>();
@@ -95,13 +79,7 @@ export default function AccountDashboard() {
         ) : (
           <div className="dashboard-orders">
             {recentOrders.map((order) => {
-              const fulfillmentStatus =
-                order.fulfillments.nodes[0]?.status ?? 'UNFULFILLED';
-              const statusInfo = FULFILLMENT_STATUS[fulfillmentStatus] ?? {
-                label: fulfillmentStatus,
-                step: 1,
-              };
-              const financialInfo = FINANCIAL_STATUS[order.financialStatus ?? ''];
+              const status = orderStatus(order);
               const firstImage = order.lineItems.nodes[0]?.image;
               const itemCount = order.lineItems.nodes.reduce(
                 (sum, item) => sum + item.quantity,
@@ -151,21 +129,19 @@ export default function AccountDashboard() {
                     </p>
 
                     <div className="dashboard-order-status-row">
-                      {financialInfo && (
-                        <span className={`order-status-badge ${financialInfo.color}`}>
-                          {financialInfo.label}
-                        </span>
-                      )}
-                      <span className="order-status-badge fulfillment">
-                        {statusInfo.label}
+                      <span className={`order-status-badge ${status.tone}`}>
+                        {status.label}
                       </span>
                     </div>
 
-                    <OrderProgressBar step={statusInfo.step} />
+                    {status.step > 0 && <OrderProgressBar step={status.step} />}
                   </div>
 
                   <div className="dashboard-order-price">
-                    <Money data={order.totalPrice} />
+                    {formatMoney(
+                      displayTotal(order.totalPrice, order.transactions),
+                      order.totalPrice.currencyCode,
+                    )}
                   </div>
                 </Link>
               );

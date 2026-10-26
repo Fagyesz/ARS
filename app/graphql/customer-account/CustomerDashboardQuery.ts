@@ -11,9 +11,16 @@ export const DASHBOARD_ORDERS_QUERY = `#graphql
           number
           processedAt
           financialStatus
-          fulfillments(first: 1) {
-            nodes {
-              status
+          fulfillmentStatus
+          cancelledAt
+          transactions {
+            kind
+            status
+            transactionAmount {
+              presentmentMoney {
+                amount
+                currencyCode
+              }
             }
           }
           totalPrice {

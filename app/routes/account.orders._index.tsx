@@ -7,11 +7,9 @@ import {
 import type {Route} from './+types/account.orders._index';
 import {seoMeta} from '~/lib/seo';
 import {useRef} from 'react';
-import {
-  Money,
-  getPaginationVariables,
-  flattenConnection,
-} from '@shopify/hydrogen';
+import {getPaginationVariables} from '@shopify/hydrogen';
+import {formatMoney} from '~/lib/money';
+import {displayTotal, orderStatus} from '~/lib/order-status';
 import {
   buildOrderSearchQuery,
   parseOrderFilters,
@@ -57,16 +55,6 @@ export async function loader({request, context}: Route.LoaderArgs) {
 
   return {customer: data.customer, filters};
 }
-
-const STATUS_LABELS: Record<string, string> = {
-  PAID: 'Fizetve',
-  PENDING: 'Függőben',
-  REFUNDED: 'Visszatérítve',
-  PARTIALLY_REFUNDED: 'Részben visszatérítve',
-  FULFILLED: 'Teljesítve',
-  UNFULFILLED: 'Feldolgozás alatt',
-  PARTIALLY_FULFILLED: 'Részben teljesítve',
-};
 
 export default function Orders() {
   const {customer, filters} = useLoaderData<OrdersLoaderData>();
@@ -209,7 +197,7 @@ function OrderSearchForm({
 }
 
 function OrderItem({order}: {order: OrderItemFragment}) {
-  const fulfillmentStatus = flattenConnection(order.fulfillments)[0]?.status;
+  const status = orderStatus(order);
 
   return (
     <div className="order-card">
@@ -227,21 +215,15 @@ function OrderItem({order}: {order: OrderItemFragment}) {
           </span>
         </div>
         <div className="order-card-statuses">
-          {order.financialStatus && (
-            <span className={`order-status-badge ${order.financialStatus.toLowerCase()}`}>
-              {STATUS_LABELS[order.financialStatus] ?? order.financialStatus}
-            </span>
-          )}
-          {fulfillmentStatus && (
-            <span className={`order-status-badge ${fulfillmentStatus.toLowerCase()}`}>
-              {STATUS_LABELS[fulfillmentStatus] ?? fulfillmentStatus}
-            </span>
-          )}
+          <span className={`order-status-badge ${status.tone}`}>{status.label}</span>
         </div>
       </div>
       <div className="order-card-right">
         <div className="order-card-price">
-          <Money data={order.totalPrice} />
+          {formatMoney(
+            displayTotal(order.totalPrice, order.transactions),
+            order.totalPrice.currencyCode,
+          )}
         </div>
         <Link to={`/account/orders/${btoa(order.id)}`} className="order-card-link">
           Részletek →
