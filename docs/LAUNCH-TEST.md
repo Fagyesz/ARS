@@ -100,6 +100,7 @@ to the bottom with what you saw.
 ## At launch
 - [ ] Delete the `teszt-termek` product (or set it to Draft)
 - [ ] Shopify admin → Hydrogen → Production → URL privacy: **Public**
+- [ ] Online Store → Preferences → Password protection: off (kosR checkout runs through the Online Store)
 - [ ] Search Console: verify `arsmosoris.art`, submit `https://arsmosoris.art/sitemap.xml`
 - [ ] Google & YouTube channel in Shopify for free Shopping listings
 - [ ] Rich Results Test on one tee and one one-off piece (Product / ProductGroup, breadcrumbs)
