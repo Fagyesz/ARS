@@ -4621,6 +4621,27 @@ button.reset {
   color: #1e40af;
 }
 
+.order-status-badge.shipped {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.order-status-badge.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.order-status-badge.refunded,
+.order-status-badge.cancelled {
+  background: #f3e8e4;
+  color: #8a2d1c;
+}
+
+.order-refund-row th,
+.order-refund-row td {
+  color: var(--color-text-muted);
+}
+
 .order-card-right {
   text-align: right;
 }

@@ -33,6 +33,12 @@ export const CUSTOMER_ORDER_QUERY = `#graphql
     totalDiscount {
       ...OrderMoney
     }
+    soldTotalPrice {
+      ...OrderMoney
+    }
+    soldDiscountedTotalPrice {
+      ...OrderMoney
+    }
     image {
       altText
       height
@@ -48,7 +54,30 @@ export const CUSTOMER_ORDER_QUERY = `#graphql
     confirmationNumber
     statusPageUrl
     fulfillmentStatus
+    financialStatus
+    cancelledAt
     processedAt
+    transactions {
+      kind
+      status
+      transactionAmount {
+        presentmentMoney {
+          amount
+          currencyCode
+        }
+      }
+    }
+    shippingLine {
+      title
+      originalPrice {
+        ...OrderMoney
+      }
+    }
+    shippingDiscountAllocations {
+      allocatedAmount {
+        ...OrderMoney
+      }
+    }
     fulfillments(first: 10) {
       nodes {
         status
@@ -69,9 +98,7 @@ export const CUSTOMER_ORDER_QUERY = `#graphql
       ...OrderMoney
     }
     shippingAddress {
-      name
       formatted(withName: true)
-      formattedArea
     }
     discountApplications(first: 100) {
       nodes {
