@@ -92,8 +92,7 @@ export default function ShippingPolicy() {
 
           <h2>Csomagolás</h2>
           <p>
-            Minden terméket gondosan csomagolunk, hogy sérülés nélkül érjen hozzád. Igyekszünk
-            környezetbarát csomagolóanyagokat használni, összhangban értékeinkkel.
+            Minden terméket gondosan csomagolunk, hogy sérülés nélkül érjen hozzád.
           </p>
 
           <h2>Mit tegyél, ha a csomag sérült vagy hiányos?</h2>

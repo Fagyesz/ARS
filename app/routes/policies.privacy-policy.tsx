@@ -29,7 +29,7 @@ export default function PrivacyPolicy() {
         <div className="policy-header">
           <p className="policy-tag">Jogi feltételek</p>
           <h1>Adatvédelmi tájékoztató</h1>
-          <p className="policy-meta">Utolsó módosítás: 2026. szeptember 29.</p>
+          <p className="policy-meta">Utolsó módosítás: 2026. november 1.</p>
         </div>
 
         <div className="policy-body">
@@ -60,6 +60,19 @@ export default function PrivacyPolicy() {
             <li>
               <strong>Kapcsolatfelvételi adatok</strong> (neve, e-mail, üzenet): az üzeneted
               megválaszolása
+            </li>
+            <li>
+              <strong>Egyedi rendelési adatok</strong> (név, e-mail, a ruhadarab és az elképzelés
+              leírása, az e-mailben küldött fotók): az ajánlatkérés megválaszolása és a munka
+              elvégzése
+            </li>
+            <li>
+              <strong>Elállási adatok</strong> (név, e-mail, rendelésszám, érintett termékek): az
+              elállás intézése, a rendelés adataival való egyeztetése és a visszaigazolás
+            </li>
+            <li>
+              <strong>Hírlevél- és készletértesítési adatok</strong> (e-mail): értesítés küldése a
+              leiratkozásig
             </li>
             <li>
               <strong>Technikai adatok</strong> (IP-cím, böngésző típusa, sütik): a webshop
@@ -106,6 +119,12 @@ export default function PrivacyPolicy() {
             </li>
           </ul>
 
+          <p>
+            A felsorolt partnerek egy része az Európai Unión kívül (például az Egyesült Államokban)
+            is kezelhet adatot. Ilyenkor az adattovábbítás az Európai Bizottság megfelelőségi
+            határozatán vagy általános szerződési feltételein alapul.
+          </p>
+
           <h2>Adatmegőrzési idő</h2>
           <p>
             A rendelési és számlázási adatokat a jogszabályi előírásoknak megfelelően{' '}
@@ -134,6 +153,13 @@ export default function PrivacyPolicy() {
               <strong>Tiltakozás:</strong> tiltakozhatsz a jogos érdeken alapuló adatkezelés
               ellen
             </li>
+            <li>
+              <strong>Korlátozás:</strong> kérheted az adatkezelés korlátozását
+            </li>
+            <li>
+              <strong>A hozzájárulás visszavonása:</strong> a hozzájárulásodat bármikor
+              visszavonhatod, ez nem érinti a korábbi adatkezelés jogszerűségét
+            </li>
           </ul>
           <p>
             Kéréseidet a <a href={`mailto:${contactEmail}`}>{contactEmail}</a>{' '}
@@ -151,7 +177,8 @@ export default function PrivacyPolicy() {
           <p>
             Ha úgy érzed, hogy adataid kezelése sérti a GDPR-t, panaszt tehetsz a{' '}
             <strong>Nemzeti Adatvédelmi és Információszabadság Hatóságnál</strong>{' '}
-            (NAIH, <a href="https://www.naih.hu" target="_blank" rel="noopener noreferrer">www.naih.hu</a>).
+            (NAIH, <a href="https://www.naih.hu" target="_blank" rel="noopener noreferrer">www.naih.hu</a>),
+            és bírósághoz is fordulhatsz.
           </p>
         </div>
 

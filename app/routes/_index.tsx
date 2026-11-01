@@ -164,6 +164,8 @@ export async function action({request, context}: Route.ActionArgs) {
             '',
             'Üdvözlet,',
             'Ars Mosoris',
+            '',
+            `Leiratkozás: válaszolj erre a levélre, vagy írj a ${contactEmail} címre.`,
           ].join('\n'),
         }),
         sendEmail({

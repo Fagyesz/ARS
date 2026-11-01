@@ -52,13 +52,9 @@ const SETTINGS = {
   transit_time: '2–3 munkanap',
   return_days: '14',
   payment_methods: 'Biztonságos online fizetés',
-  usp_title: 'Kézzel készül Budapesten',
+  usp_title: 'Budapesten készül',
   usp_text: 'kis szériás, egyedi grafika',
-  company_name: '',
-  company_address: 'Budapest, Magyarország',
-  tax_number: '',
-  company_phone: '',
-  company_email: '',
+  // the company_* and tax_number fields are the owner's: a re-seed must not overwrite them
 };
 
 const SIZE_GUIDES = [
@@ -102,8 +98,10 @@ const DEFINITIONS = [
     T('payment_methods', 'Fizetési módok (szöveg)', 'single_line_text_field'),
     T('usp_title', 'Érv a termékoldalon (cím)', 'single_line_text_field'),
     T('usp_text', 'Érv a termékoldalon (szöveg)', 'single_line_text_field'),
-    T('company_name', 'Cégnév', 'single_line_text_field'),
-    T('company_address', 'Székhely / cím', 'single_line_text_field'),
+    T('company_name', 'Név a nyilvántartás szerint (e.v. megjelöléssel)', 'single_line_text_field'),
+    T('company_address', 'Székhely, teljes postai cím', 'single_line_text_field'),
+    T('company_registration_number', 'Nyilvántartási szám', 'single_line_text_field'),
+    T('company_registry', 'Nyilvántartásba vevő szerv', 'single_line_text_field'),
     T('tax_number', 'Adószám', 'single_line_text_field'),
     T('company_phone', 'Telefonszám (jogi oldalak)', 'single_line_text_field'),
     T('company_email', 'E-mail (jogi oldalak, üresen a kapcsolati e-mail)', 'single_line_text_field'),
@@ -231,6 +229,15 @@ async function ensureMenu(handle, title, items) {
     if (r.metafieldDefinitionCreate.userErrors.length) throw new Error('metafield def: ' + JSON.stringify(r.metafieldDefinitionCreate.userErrors));
     console.log('  product metafield custom.size_guide created');
   } else console.log('  product metafield custom.size_guide exists');
+
+  // product metafield "Anyagösszetétel", shown on the product page
+  const fibre = (await gql('{ metafieldDefinitions(first: 1, ownerType: PRODUCT, namespace: "custom", key: "fibre_composition") { nodes { id } } }')).metafieldDefinitions.nodes[0];
+  if (!fibre) {
+    const r = await gql('mutation($d: MetafieldDefinitionInput!) { metafieldDefinitionCreate(definition: $d) { userErrors { field message } } }',
+      {d: {name: 'Anyagösszetétel', namespace: 'custom', key: 'fibre_composition', ownerType: 'PRODUCT', type: 'single_line_text_field', access: {storefront: 'PUBLIC_READ'}}});
+    if (r.metafieldDefinitionCreate.userErrors.length) throw new Error('metafield def: ' + JSON.stringify(r.metafieldDefinitionCreate.userErrors));
+    console.log('  product metafield custom.fibre_composition created');
+  } else console.log('  product metafield custom.fibre_composition exists');
 
   console.log('\nentries');
   await upsert('shop_settings', 'default', SETTINGS);

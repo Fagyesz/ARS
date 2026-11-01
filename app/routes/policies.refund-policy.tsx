@@ -13,8 +13,8 @@ export const meta: Route.MetaFunction = ({location}) =>
   });
 
 export default function RefundPolicy() {
-  // the contact address comes from the shop_settings metaobject, like the other policy pages
-  const {contactEmail} =
+  // the contact details come from the shop_settings metaobject, like the other policy pages
+  const {contactEmail, company} =
     useRouteLoaderData<RootLoader>('root')?.content?.settings ?? FALLBACK_SETTINGS;
   return (
     <div className="policy-page">
@@ -26,74 +26,95 @@ export default function RefundPolicy() {
         <div className="policy-header">
           <p className="policy-tag">Jogi feltételek</p>
           <h1>Visszaküldési feltételek</h1>
-          <p className="policy-meta">Utolsó módosítás: 2025. január 1.</p>
+          <p className="policy-meta">Utolsó módosítás: 2026. november 1.</p>
         </div>
 
         <div className="policy-body">
           <h2>Elállási jog</h2>
           <p>
-            Az Európai Unió fogyasztóvédelmi jogszabályai alapján, mint vásárló,{' '}
-            <strong>14 napon belül indoklás nélkül elállhatsz</strong> a vásárlástól, és
-            visszaküldheted a megvásárolt terméket. Az elállási határidő a termék kézhezvételétől
-            számított 14. nap elteltével jár le.
+            A 45/2014. (II. 26.) Korm. rendelet alapján a termék átvételétől számított{' '}
+            <strong>14 napon belül indoklás nélkül elállhatsz</strong> a vásárlástól. Ez a kész,
+            készletről rendelt darabokra is vonatkozik, a kézzel készült és egyedi darabokat is
+            beleértve. A határidő betartásához elég, ha a nyilatkozatot a 14. nap végéig elküldöd.
           </p>
           <p>
-            Kézzel festett, egyedi, vagy személyre szabott termékek esetén az elállási jog{' '}
-            <strong>nem alkalmazható</strong>, kivéve, ha a termék hibás.
+            <strong>Nem állhatsz el</strong> attól a nem előre gyártott terméktől, amelyet az
+            utasításod alapján vagy kifejezett kérésedre készítettünk. A saját ruhadarabra kért
+            munkára az <Link to="/policies/terms-of-service">ÁSZF</Link> 13. pontja vonatkozik.
           </p>
 
-          <h2>Visszaküldés folyamata</h2>
-          <ol>
-            <li>
-              Küldj e-mailt a{' '}
-              <a href={`mailto:${contactEmail}`}>{contactEmail}</a>{' '}
-              címre a megrendelésed számával és a visszaküldeni kívánt termék(ek) megjelölésével.
-            </li>
-            <li>
-              Csapatunk 1–2 munkanapon belül visszajelez, és elküldi a visszaküldési utasításokat.
-            </li>
-            <li>
-              Csomagold be a terméket az eredeti (vagy azzal egyenértékű) csomagolásban, és küldd
-              vissza a megadott címre.
-            </li>
-            <li>
-              A visszaküldés postaköltségét <strong>a vásárló viseli</strong>, kivéve, ha a termék
-              hibás vagy helytelen terméket kaptál.
-            </li>
-          </ol>
-
-          <h2>A visszaküldött termék állapota</h2>
-          <p>A visszaküldött terméknek az alábbi feltételeknek kell megfelelnie:</p>
+          <h2>Így állhatsz el</h2>
           <ul>
-            <li>Viseletlenül, eredeti állapotában, mosatlanul</li>
-            <li>A címkék és eredeti csomagolás megőrzésével</li>
-            <li>A vásárlástól számított 14 napon belül postázva</li>
+            <li>
+              az <Link to="/elallas">Elállás a szerződéstől</Link> oldalon,
+            </li>
+            <li>
+              e-mailben a <a href={`mailto:${contactEmail}`}>{contactEmail}</a> címen, vagy
+              bármilyen más egyértelmű nyilatkozattal,
+            </li>
+            <li>az alábbi nyilatkozatminta kitöltésével.</li>
           </ul>
+
+          <h2>A termék visszaküldése</h2>
           <p>
-            Ha a termék nem felel meg ezeknek a feltételeknek, fenntartjuk a jogot a visszaküldés
-            elutasítására vagy az értékcsökkenés levonására.
+            A terméket az elállás közlésétől számított <strong>14 napon belül</strong> kell
+            visszaküldened{company.address ? ` a következő címre: ${company.address}` : ''}. A
+            határidő betartásához elég, ha a csomagot a 14. nap végéig feladod. A visszaküldés
+            közvetlen költségét <strong>te viseled</strong>, kivéve, ha a termék hibás, vagy nem azt
+            kaptad, amit rendeltél.
+          </p>
+          <p>
+            A termék kipróbálható, mint egy üzletben. Csak az olyan értékcsökkenésért felelsz, amely
+            a termék jellegének, tulajdonságainak és működésének megállapításához szükséges
+            használatot meghaladó használatból ered.
           </p>
 
           <h2>Visszatérítés</h2>
           <p>
-            A visszaküldött termék kézhezvétele és ellenőrzése után{' '}
-            <strong>14 napon belül</strong> térítjük vissza a vételárat az eredeti fizetési módra.
-            Banki átutalás esetén a jóváírás ideje a banktól függően változhat.
+            A kifizetett összeget, a szokásos szállítási díjat is beleértve, haladéktalanul, de
+            legkésőbb az elállásról való tudomásszerzésünktől számított{' '}
+            <strong>14 napon belül</strong> visszatérítjük, az eredeti fizetési móddal megegyező
+            módon. A visszatérítést addig visszatarthatjuk, amíg a termék vissza nem érkezik, vagy
+            nem igazolod, hogy feladtad.
           </p>
 
           <h2>Hibás termék</h2>
           <p>
             Ha hibás vagy sérült terméket kaptál, kérjük, fotókkal együtt jelezd nekünk a{' '}
-            <a href={`mailto:${contactEmail}`}>{contactEmail}</a>{' '}
-            e-mail-címen. Ilyenkor ingyenes cserét vagy teljes visszatérítést biztosítunk, és a
-            postaköltséget is mi álljuk.
+            <a href={`mailto:${contactEmail}`}>{contactEmail}</a> e-mail-címen. A szavatossági
+            jogaidat az <Link to="/policies/terms-of-service">ÁSZF</Link> 8. pontja ismerteti, a
+            hibás termék visszaküldésének költségét mi álljuk.
           </p>
 
           <h2>Csere</h2>
           <p>
-            Ha más méretet vagy terméket szeretnél, a legegyszerűbb megoldás az eredeti termék
-            visszaküldése (visszatérítéssel) és egy új rendelés leadása. Cserére vonatkozó
-            egyedi igényeket esetileg mérlegelünk – kérjük, vedd fel velünk a kapcsolatot.
+            Ha más méretet vagy terméket szeretnél, a legegyszerűbb megoldás az elállás és egy új
+            rendelés leadása. Cserére vonatkozó egyedi igényeket esetileg mérlegelünk, kérjük, vedd
+            fel velünk a kapcsolatot.
+          </p>
+
+          <h2>Elállási nyilatkozatminta</h2>
+          <p>
+            Címzett: {[company.name || 'Ars Mosoris', company.address, company.email || contactEmail]
+              .filter(Boolean)
+              .join(', ')}
+          </p>
+          <p>
+            Alulírott kijelentem, hogy gyakorlom elállási jogomat az alábbi termék(ek) adásvételére
+            vagy az alábbi szolgáltatás nyújtására irányuló szerződés tekintetében:
+          </p>
+          <p>
+            ............................................
+            <br />
+            Szerződéskötés időpontja / átvétel időpontja: ....................
+            <br />
+            A fogyasztó neve: ....................
+            <br />
+            A fogyasztó címe: ....................
+            <br />
+            A fogyasztó aláírása (kizárólag papíron tett nyilatkozat esetén): ....................
+            <br />
+            Kelt: ....................
           </p>
         </div>
 

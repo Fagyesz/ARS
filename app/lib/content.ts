@@ -33,6 +33,8 @@ export type SiteSettings = {
   company: {
     name: string;
     address: string;
+    registrationNumber: string;
+    registry: string;
     taxNumber: string;
     phone: string;
     /** falls back to contactEmail */
@@ -74,10 +76,12 @@ export const FALLBACK_SETTINGS: SiteSettings = {
     returnDays: SHIPPING.returnDays,
   },
   paymentMethods: 'Biztonságos online fizetés',
-  usp: {title: 'Kézzel készül Budapesten', text: 'kis szériás, egyedi grafika'},
+  usp: {title: 'Budapesten készül', text: 'kis szériás, egyedi grafika'},
   company: {
     name: '',
-    address: 'Budapest, Magyarország',
+    address: '',
+    registrationNumber: '',
+    registry: '',
     taxNumber: '',
     phone: '',
     email: EMAIL,
@@ -184,6 +188,8 @@ export function toSettings(node: {fields: Field[]} | null | undefined): SiteSett
     company: {
       name: f.company_name ?? d.company.name,
       address: f.company_address ?? d.company.address,
+      registrationNumber: f.company_registration_number ?? d.company.registrationNumber,
+      registry: f.company_registry ?? d.company.registry,
       taxNumber: f.tax_number ?? d.company.taxNumber,
       phone: f.company_phone ?? d.company.phone,
       email: f.company_email ?? contactEmail,

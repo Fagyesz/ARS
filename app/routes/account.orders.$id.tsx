@@ -1,4 +1,4 @@
-import {redirect, useLoaderData} from 'react-router';
+import {Link, redirect, useLoaderData} from 'react-router';
 import type {Route} from './+types/account.orders.$id';
 import {seoMeta} from '~/lib/seo';
 import {Image} from '@shopify/hydrogen';
@@ -204,6 +204,9 @@ export default function OrderRoute() {
       >
         Rendelés állapota megtekintése →
       </a>
+      <p>
+        <Link to="/elallas">Elállás a szerződéstől</Link>
+      </p>
     </div>
   );
 }

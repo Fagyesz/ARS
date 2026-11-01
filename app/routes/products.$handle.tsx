@@ -402,7 +402,13 @@ export default function Product() {
                   <div dangerouslySetInnerHTML={{__html: descriptionHtml}} />
                 </div>
               )}
+              {product.fibreComposition?.value && (
+                <p className="product-fibre">
+                  <strong>Anyagösszetétel:</strong> {product.fibreComposition.value}
+                </p>
+              )}
               <SizeGuide guide={sizeGuide} sizes={sizeValues} />
+              <ProductSafety company={settings.company} />
             </div>
           </div>
         </div>
@@ -829,6 +835,18 @@ function DeliveryEstimate({shipping}: {shipping: SiteSettings['shipping']}) {
   );
 }
 
+/** Manufacturer details every listing must show (GPSR Art. 19); facts come from the shop_settings metaobject */
+function ProductSafety({company}: {company: SiteSettings['company']}) {
+  return (
+    <details className="size-guide">
+      <summary>Gyártói információk</summary>
+      <p>
+        {[company.name || 'Ars Mosoris', company.address, company.email].filter(Boolean).join(', ')}
+      </p>
+    </details>
+  );
+}
+
 /** The four things a buyer asks before adding to cart; facts come from the shop_settings metaobject */
 function TrustStrip({settings}: {settings: SiteSettings}) {
   const {shipping, usp} = settings;
@@ -1161,6 +1179,9 @@ const PRODUCT_FRAGMENT = `#graphql
     seo {
       description
       title
+    }
+    fibreComposition: metafield(namespace: "custom", key: "fibre_composition") {
+      value
     }
     sizeGuide: metafield(namespace: "custom", key: "size_guide") {
       reference {
