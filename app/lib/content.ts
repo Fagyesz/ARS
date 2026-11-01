@@ -75,7 +75,7 @@ export const FALLBACK_SETTINGS: SiteSettings = {
     transitDays: SHIPPING.transitDays,
     returnDays: SHIPPING.returnDays,
   },
-  paymentMethods: 'Biztonságos online fizetés',
+  paymentMethods: 'Bankkártya vagy Google Pay',
   usp: {title: 'Budapesten készül', text: 'kis szériás, egyedi grafika'},
   company: {
     name: '',

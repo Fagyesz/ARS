@@ -38,8 +38,8 @@ Updated 2026-10-06. Scope for this repo is DevOps only.
    and `/egyedi-rendeles` are on production (PR #36, `90f79c7`, 2026-11-01). Seller details are set in `shop_settings` (2026-11-01). **Hold until**
    these blockers from the legal review are closed: the sole-trader registration number is added; the official Hungarian
    legal-guarantee notice (Reg. 2025/1960 Annex I, 45/2014. 11. § (1a) a)) is on product pages and checkout; kosR's order
-   button says „Megrendelés fizetési kötelezettséggel" (15. § (2)) and the ÁSZF wording matches; `payment_methods` names
-   real methods; fibre composition is filled in (the definition comes from the seed, whose `--apply` resets non-company
+   button says „Megrendelés fizetési kötelezettséggel" (15. § (2)) and the ÁSZF wording matches;
+   fibre composition is filled in (the definition comes from the seed, whose `--apply` resets non-company
    settings); `npm run check:legal` passes; both forms have been tested live. Custom-order garment liability and IP terms
    still need a lawyer.
 
