@@ -49,8 +49,9 @@ export function Footer({
       <Await resolve={footerPromise}>
         {(footer) => {
           // "hydrogen-footer" menu: top-level items are columns, children the links
+          // "Információ" is built in below, so the menu cannot drop the legal links
           const columns = (footer?.menu?.items as MenuItem[] | undefined)?.filter(
-            (item) => item.items && item.items.length > 0,
+            (item) => item.items && item.items.length > 0 && item.title !== 'Információ',
           );
           return (
             <footer className="footer">
@@ -126,7 +127,6 @@ export function Footer({
                               {collection.title}
                             </NavLink>
                           ))}
-                          <NavLink to="/egyedi-rendeles">Egyedi rendelés</NavLink>
                           <NavLink to="/wishlist">Kívánságlista</NavLink>
                           <NavLink to="/account">Fiókom</NavLink>
                         </nav>
@@ -139,19 +139,25 @@ export function Footer({
                           <NavLink to="/about">Rólunk</NavLink>
                         </nav>
                       </div>
-                      <div>
-                        <h2 className="footer-heading">Információ</h2>
-                        <nav className="footer-links">
-                          <NavLink to="/contact">Kapcsolat</NavLink>
-                          <NavLink to="/policies/shipping-policy">Szállítás</NavLink>
-                          <NavLink to="/policies/refund-policy">Visszaküldés</NavLink>
-                          <NavLink to="/policies/privacy-policy">Adatvédelem</NavLink>
-                          <NavLink to="/policies/terms-of-service">ÁSZF</NavLink>
-                          <NavLink to="/policies">Minden tájékoztató</NavLink>
-                        </nav>
-                      </div>
                     </>
                   )}
+                  <div>
+                    <h2 className="footer-heading">Információ</h2>
+                    <nav className="footer-links">
+                      <NavLink to="/contact">Kapcsolat</NavLink>
+                      <NavLink to="/egyedi-rendeles">Egyedi rendelés</NavLink>
+                      <NavLink to="/policies/shipping-policy">Szállítás</NavLink>
+                      <NavLink to="/policies/refund-policy">Visszaküldés</NavLink>
+                      <NavLink to="/elallas">Elállás a szerződéstől</NavLink>
+                      <NavLink to="/policies/terms-of-service">ÁSZF</NavLink>
+                      <NavLink to="/policies/privacy-policy">Adatvédelem</NavLink>
+                      <NavLink to="/impresszum">Impresszum</NavLink>
+                      <NavLink to="/policies">Minden tájékoztató</NavLink>
+                      <button type="button" className="footer-cookie-btn" onClick={openCookieSettings}>
+                        Süti beállítások
+                      </button>
+                    </nav>
+                  </div>
                 </div>
 
                 <p className="footer-shipping">
@@ -163,26 +169,11 @@ export function Footer({
                 </p>
                 <div className="footer-bottom">
                   <p suppressHydrationWarning>
-                    &copy; {new Date().getFullYear()} {settings.company.name || 'Ars Mosoris'}. Minden jog fenntartva.
+                    {/* the name may end in "e.v.": no second full stop */}
+                    &copy; {new Date().getFullYear()} {(settings.company.name || 'Ars Mosoris').replace(/\.$/, '')}. Minden jog fenntartva.
                     {settings.company.taxNumber ? ` · Adószám: ${settings.company.taxNumber}` : ''}
-                  </p>
-                  <p>
+                    {' · '}
                     <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
-                    {/* outside the menu columns: the owner's footer menu must not be able to drop these */}
-                    {' · '}
-                    <NavLink to="/egyedi-rendeles">Egyedi rendelés</NavLink>
-                    {' · '}
-                    <NavLink to="/impresszum">Impresszum</NavLink>
-                    {' · '}
-                    <NavLink to="/policies/terms-of-service">ÁSZF</NavLink>
-                    {' · '}
-                    <NavLink to="/policies/privacy-policy">Adatvédelem</NavLink>
-                    {' · '}
-                    <NavLink to="/elallas">Elállás a szerződéstől</NavLink>
-                    {' · '}
-                    <button type="button" className="footer-cookie-btn" onClick={openCookieSettings}>
-                      Süti beállítások
-                    </button>
                   </p>
                 </div>
               </div>
