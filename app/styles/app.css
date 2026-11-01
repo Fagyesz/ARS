@@ -668,9 +668,9 @@ aside header .close:hover {
   border: 0;
   background: none;
   font: inherit;
-  color: rgba(247, 234, 215, 0.72);
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  font-size: 0.875rem;
+  text-align: left;
+  color: rgba(247, 234, 215, 0.65);
   cursor: pointer;
   transition: color 0.2s;
 }
