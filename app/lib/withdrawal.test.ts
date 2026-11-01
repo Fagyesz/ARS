@@ -24,11 +24,16 @@ describe('withdrawalError', () => {
     expect(withdrawalError(valid)).toBeNull();
   });
 
+  it('accepts an order reference that is not a Shopify number', () => {
+    expect(withdrawalError({...valid, orderNumber: 'egyedi rendelés, május'})).toBeNull();
+  });
+
   it.each([
     [{...valid, name: ''}, 'neved'],
     [{...valid, email: 'nem-email'}, 'e-mail'],
     [{...valid, orderNumber: ''}, 'rendelés'],
-    [{...valid, orderNumber: 'Nyerj most egy iPhone-t'}, 'rendelés'],
+    [{...valid, orderNumber: 'Nyerj itt: evil.com'}, 'rendelés'],
+    [{...valid, orderNumber: 'a'.repeat(61)}, 'rendelés'],
     [{...valid, name: 'Anna https://evil.example'}, 'neved'],
     [{...valid, name: 'a'.repeat(101)}, 'neved'],
     [{...valid, items: 'Katt ide: www.evil.example'}, 'link'],
@@ -43,6 +48,7 @@ describe('orderName', () => {
   it.each([
     ['1001', '#1001'],
     ['#1001', '#1001'],
+    ['egyedi rendelés', null],
   ])('turns %s into the Shopify name', (input, expected) => {
     expect(orderName(input)).toBe(expected);
   });
@@ -59,11 +65,11 @@ describe('isOrderEmail', () => {
 });
 
 describe('ownerNotice', () => {
-  it('keeps the receipt and says whether the customer got the e-mail', () => {
+  it('keeps the receipt and says whether the sender matches the order', () => {
     expect(ownerNotice('RECEIPT', true)).toContain('RECEIPT');
-    expect(ownerNotice('RECEIPT', true)).toContain('elküldtük');
+    expect(ownerNotice('RECEIPT', true)).toContain('egyezik');
     expect(ownerNotice('RECEIPT', false)).toContain('RECEIPT');
-    expect(ownerNotice('RECEIPT', false)).toContain('NEM kapott');
+    expect(ownerNotice('RECEIPT', false)).toContain('nem egyeztethető');
   });
 });
 

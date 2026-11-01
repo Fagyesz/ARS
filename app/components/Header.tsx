@@ -121,9 +121,29 @@ export function HeaderMenu({
           </NavLink>
         );
       })}
+      {viewport === 'mobile' &&
+        MOBILE_EXTRA_LINKS.map(({to, title}) => (
+          <NavLink
+            key={to}
+            onClick={close}
+            prefetch="intent"
+            className="header-menu-item"
+            to={to}
+          >
+            {title}
+          </NavLink>
+        ))}
     </nav>
   );
 }
+
+// in the header icons on desktop only, or in the footer: a phone menu lists them too
+const MOBILE_EXTRA_LINKS = [
+  {to: '/account', title: 'Fiókom'},
+  {to: '/wishlist', title: 'Kívánságlista'},
+  {to: '/policies/shipping-policy', title: 'Szállítás'},
+  {to: '/policies', title: 'Vásárlási információk'},
+];
 
 function HeaderCtas({
   isLoggedIn,
@@ -293,6 +313,15 @@ const FALLBACK_HEADER_MENU = {
       title: 'Alkotók',
       type: 'HTTP',
       url: '/artists',
+      items: [],
+    },
+    {
+      id: 'gid://shopify/MenuItem/461609566263',
+      resourceId: null,
+      tags: [],
+      title: 'Egyedi rendelés',
+      type: 'HTTP',
+      url: '/egyedi-rendeles',
       items: [],
     },
     {

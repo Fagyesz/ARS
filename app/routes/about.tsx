@@ -107,6 +107,12 @@ export default function About() {
           <p>Négy tehetséges képzőművész, négy egyedi látásmód.</p>
           <Link to="/artists" className="btn btn-primary">
             Alkotóink
+          </Link>{' '}
+          <Link to="/egyedi-rendeles" className="btn btn-primary">
+            Egyedi rendelés
+          </Link>{' '}
+          <Link to="/contact" className="btn btn-primary">
+            Kapcsolat
           </Link>
         </div>
       </section>

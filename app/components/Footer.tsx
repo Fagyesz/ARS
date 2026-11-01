@@ -120,12 +120,15 @@ export function Footer({
                         <h2 className="footer-heading">Bolt</h2>
                         <nav className="footer-links">
                           <NavLink to="/collections/all">Minden termék</NavLink>
+                          <NavLink to="/collections">Kollekciók</NavLink>
                           {collections.map((collection) => (
                             <NavLink key={collection.handle} to={`/collections/${collection.handle}`}>
                               {collection.title}
                             </NavLink>
                           ))}
+                          <NavLink to="/egyedi-rendeles">Egyedi rendelés</NavLink>
                           <NavLink to="/wishlist">Kívánságlista</NavLink>
+                          <NavLink to="/account">Fiókom</NavLink>
                         </nav>
                       </div>
                       <div>
@@ -144,6 +147,7 @@ export function Footer({
                           <NavLink to="/policies/refund-policy">Visszaküldés</NavLink>
                           <NavLink to="/policies/privacy-policy">Adatvédelem</NavLink>
                           <NavLink to="/policies/terms-of-service">ÁSZF</NavLink>
+                          <NavLink to="/policies">Minden tájékoztató</NavLink>
                         </nav>
                       </div>
                     </>
@@ -164,12 +168,15 @@ export function Footer({
                   </p>
                   <p>
                     <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
-                    {settings.company.address ? ` · ${settings.company.address}` : ''}
                     {/* outside the menu columns: the owner's footer menu must not be able to drop these */}
                     {' · '}
                     <NavLink to="/egyedi-rendeles">Egyedi rendelés</NavLink>
                     {' · '}
                     <NavLink to="/impresszum">Impresszum</NavLink>
+                    {' · '}
+                    <NavLink to="/policies/terms-of-service">ÁSZF</NavLink>
+                    {' · '}
+                    <NavLink to="/policies/privacy-policy">Adatvédelem</NavLink>
                     {' · '}
                     <NavLink to="/elallas">Elállás a szerződéstől</NavLink>
                     {' · '}

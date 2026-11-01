@@ -370,6 +370,12 @@ function CollectionsSection({
                     className="btn btn-outline btn-outline-on-dark"
                   >
                     Összes kollekció
+                  </Link>{' '}
+                  <Link
+                    to="/egyedi-rendeles"
+                    className="btn btn-outline btn-outline-on-dark"
+                  >
+                    Egyedi rendelés
                   </Link>
                 </div>
               </div>

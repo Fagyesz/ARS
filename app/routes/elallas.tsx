@@ -7,6 +7,7 @@ import {
   orderName,
   ownerNotice,
   parseWithdrawal,
+  receiptFailedNotice,
   withdrawalError,
   withdrawalReceipt,
 } from '~/lib/withdrawal';
@@ -45,10 +46,11 @@ export async function action({request, context}: Route.ActionArgs) {
       body: JSON.stringify({from, ...payload}),
     }).then((response) => response.ok);
 
-  // a failed lookup must not block the withdrawal: it only means no receipt e-mail
+  // only informs the owners: a failed lookup or a mismatch never stops the receipt
   const creds = adminCreds(context.env);
-  const orderEmail = creds
-    ? await findOrderEmail(creds, orderName(input.orderNumber)).catch((lookupError) => {
+  const name = orderName(input.orderNumber);
+  const orderEmail = creds && name
+    ? await findOrderEmail(creds, name).catch((lookupError) => {
         console.error('[elallas] order lookup failed:', lookupError);
         return null;
       })
@@ -65,15 +67,21 @@ export async function action({request, context}: Route.ActionArgs) {
     });
     if (!delivered) return {success: false as const, error: SEND_ERROR};
 
-    if (verified) {
+    // 22. § (1a) d): the customer names where the receipt goes, matching the order or not
+    const receiptSent = await send({
+      to: [input.email],
+      subject: 'Elállási nyilatkozatodat megkaptuk – Ars Mosoris',
+      text: receipt,
+    }).catch(() => false);
+    if (!receiptSent) {
       await send({
-        to: [input.email],
-        subject: 'Elállási nyilatkozatodat megkaptuk – Ars Mosoris',
-        text: receipt,
+        to: [owner],
+        replyTo: input.email,
+        subject: `[Elállás – nincs visszaigazolás] ${input.orderNumber} – ${input.name}`,
+        text: receiptFailedNotice(receipt),
       }).catch(() => false);
     }
-    // the same answer either way, so the form cannot test which e-mail owns an order
-    return {success: true as const, receipt};
+    return {success: true as const, receipt, receiptSent};
   } catch {
     return {success: false as const, error: SEND_ERROR};
   }
@@ -99,8 +107,9 @@ export default function Withdrawal() {
             <div role="status">
               <h2>Megkaptuk a nyilatkozatodat</h2>
               <p>
-                Ha ez az e-mail cím szerepel a rendelésen, a visszaigazolást oda is elküldtük.
-                Mindenképp mentsd el az alábbi szöveget.
+                {actionData.receiptSent
+                  ? 'A visszaigazolást elküldtük a megadott e-mail címre.'
+                  : 'A visszaigazoló e-mailt nem sikerült elküldeni, ezért mentsd el az alábbi szöveget. Hamarosan e-mailben is megkapod.'}
               </p>
               <p style={{whiteSpace: 'pre-line'}}>{actionData.receipt}</p>
             </div>

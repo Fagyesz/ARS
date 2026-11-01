@@ -31,12 +31,17 @@ Updated 2026-10-06. Scope for this repo is DevOps only.
    85 variants had no weight and got their type's weight (póló 200 g, kapucnis 500 g, környakú 450 g,
    táska 150 g). Test product `teszt-termek` (1 Ft, SKU `TESZT-1`) made for the Google Pay / Billingo /
    FoxPost / cancel test. **Delete it before launch.** The custom app has had `read_orders` since 2026-11-01 (version after `api-6`;
-   covers the last 60 days). `/elallas` uses it: the receipt e-mail goes only to the address on the order; otherwise
-   the owners are told and the customer sees the receipt on screen.
+   covers the last 60 days). `/elallas` uses it only to tell the owners whether the sender matches the order. The
+   receipt always goes to the address the customer enters (22. § (1a) d)), so the open form can still mail any address;
+   add Turnstile or rate limiting if it gets abused.
 5. Switch production to Public. Legal fixes from `docs/audits/2026-11-01-legal-analysis.md`, `/elallas`, `/impresszum`
-   and `/egyedi-rendeles` are on production (PR #36, `90f79c7`, 2026-11-01). **Hold until** the seed has added the new
-   Shopify fields (not run yet: `--apply` resets the non-company settings), the owners have filled them,
-   `npm run check:legal` passes, and both forms have been tested live.
+   and `/egyedi-rendeles` are on production (PR #36, `90f79c7`, 2026-11-01). Seller details are set in `shop_settings` (2026-11-01). **Hold until**
+   these blockers from the legal review are closed: the sole-trader registration number is added; the official Hungarian
+   legal-guarantee notice (Reg. 2025/1960 Annex I, 45/2014. 11. § (1a) a)) is on product pages and checkout; kosR's order
+   button says „Megrendelés fizetési kötelezettséggel" (15. § (2)) and the ÁSZF wording matches; `payment_methods` names
+   real methods; fibre composition is filled in (the definition comes from the seed, whose `--apply` resets non-company
+   settings); `npm run check:legal` passes; both forms have been tested live. Custom-order garment liability and IP terms
+   still need a lawyer.
 
 ## Health check 2026-10-06
 

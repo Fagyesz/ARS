@@ -111,7 +111,7 @@ export default function PrivacyPolicy() {
             </li>
             <li>
               <strong>Resend</strong> – e-mailek küldése (hírlevél-feliratkozás visszaigazolása,
-              a kapcsolatfelvételi űrlap üzenetei)
+              a kapcsolatfelvételi űrlap, az egyedi rendelés és az elállási nyilatkozat üzenetei)
             </li>
             <li>
               <strong>Discord</strong> – belső értesítés a kapcsolatfelvételi űrlapon érkezett
