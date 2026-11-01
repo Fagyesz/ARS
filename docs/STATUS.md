@@ -33,9 +33,10 @@ Updated 2026-10-06. Scope for this repo is DevOps only.
    FoxPost / cancel test. **Delete it before launch.** The custom app has had `read_orders` since 2026-11-01 (version after `api-6`;
    covers the last 60 days). `/elallas` uses it: the receipt e-mail goes only to the address on the order; otherwise
    the owners are told and the customer sees the receipt on screen.
-5. Switch production to Public. **Hold until** branch `fix/legal-compliance` is merged and deployed (legal fixes from
-   `docs/audits/2026-11-01-legal-analysis.md`, `/elallas`, `/impresszum`, `/egyedi-rendeles`), the seed has added the
-   new Shopify fields, the owners have filled them, `npm run check:legal` passes, and both forms have been tested live.
+5. Switch production to Public. Legal fixes from `docs/audits/2026-11-01-legal-analysis.md`, `/elallas`, `/impresszum`
+   and `/egyedi-rendeles` are on production (PR #36, `90f79c7`, 2026-11-01). **Hold until** the seed has added the new
+   Shopify fields (not run yet: `--apply` resets the non-company settings), the owners have filled them,
+   `npm run check:legal` passes, and both forms have been tested live.
 
 ## Health check 2026-10-06
 
