@@ -270,7 +270,7 @@ a:hover {
   margin-left: 3rem;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1200px) {
   .header-menu-desktop {
     display: flex;
   }
@@ -284,6 +284,7 @@ a:hover {
   color: rgba(247, 234, 215, 0.65);
   transition: color 0.2s ease;
   padding: 0.35rem 1rem;
+  white-space: nowrap;
   position: relative;
   text-decoration: none;
   user-select: none;
@@ -373,14 +374,14 @@ a:hover {
 }
 
 /* Hide hamburger on mobile — bottom nav handles navigation there */
-/* Phones have the bottom navigation; tablets (768–1023px) need the hamburger */
+/* Phones have the bottom navigation; 768–1199px needs the hamburger (seven menu items do not fit) */
 @media (max-width: 767px) {
   .header-menu-mobile-toggle {
     display: none;
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1200px) {
   .header-menu-mobile-toggle {
     display: none;
   }
@@ -389,8 +390,8 @@ a:hover {
   }
 }
 
-/* On mobile, wishlist is in bottom nav — hide from header */
-@media (max-width: 1023px) {
+/* Below the desktop menu, wishlist is in the bottom nav or the menu — hide from header */
+@media (max-width: 1199px) {
   .header-wishlist-icon {
     display: none;
   }

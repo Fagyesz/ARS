@@ -207,13 +207,13 @@ function MobileBottomNavInner({cart: originalCart}: {cart: CartApiQueryFragment 
 
   return (
     <nav className="mobile-bottom-nav" aria-label="Mobil navigáció">
-      <NavLink to="/" end className={({isActive}) => `mobile-nav-item${isActive ? ' active' : ''}`}>
+      {/* phones have no header hamburger: this is their way to every page; the logo goes home */}
+      <button className="mobile-nav-item" onClick={() => open('mobile')} aria-label="Menü">
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-          <polyline points="9 22 9 12 15 12 15 22"/>
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
         </svg>
-        <span>Főoldal</span>
-      </NavLink>
+        <span>Menü</span>
+      </button>
       <NavLink to="/collections/all" className={({isActive}) => `mobile-nav-item${isActive ? ' active' : ''}`}>
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <rect x="2" y="3" width="7" height="7"/><rect x="15" y="3" width="7" height="7"/>

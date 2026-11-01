@@ -30,9 +30,10 @@ export function withdrawalError(input: WithdrawalInput): string | null {
     return 'Adj meg egy érvényes e-mail címet, ide küldjük a visszaigazolást.';
   }
   if (!input.orderNumber) return 'Add meg a rendelés számát.';
-  // The form is open to anyone and these values reach the owners and the
-  // receipt, so they must not be able to carry a message: short plain values, no links.
-  if (!/^#?[\p{L}\d-]{1,30}$/u.test(input.orderNumber)) {
+  // The form is open to anyone and the receipt goes to the address it names, so
+  // the values must not be able to carry a message: short and plain, no links.
+  // Free text, as a custom order has no Shopify number.
+  if (input.orderNumber.length > 60 || LINK.test(input.orderNumber)) {
     return 'A rendelés számát a visszaigazoló e-mailben találod, például #1001.';
   }
   if (input.name.length > 100 || LINK.test(input.name)) return 'Csak a neved add meg.';
@@ -42,15 +43,15 @@ export function withdrawalError(input: WithdrawalInput): string | null {
   return null;
 }
 
-/** The order number as Shopify names it: "1001" and "#1001" are the same order. */
-export function orderName(orderNumber: string): string {
-  return `#${orderNumber.replace(/^#/, '')}`;
+/**
+ * The order number as Shopify names it ("1001" and "#1001" are the same order),
+ * or null when it cannot be a Shopify order number, such as a custom order.
+ */
+export function orderName(orderNumber: string): string | null {
+  return /^#?[\p{L}\d-]{1,30}$/u.test(orderNumber) ? `#${orderNumber.replace(/^#/, '')}` : null;
 }
 
-/**
- * The receipt is e-mailed only to the address on the order, so the form cannot
- * send mail to a stranger. A mismatch never rejects the withdrawal itself.
- */
+/** Whether the sender is the address on the order: information for the owners, never a condition. */
 export function isOrderEmail(orderEmail: string | null, email: string): boolean {
   return orderEmail?.trim().toLowerCase() === email.trim().toLowerCase();
 }
@@ -58,9 +59,14 @@ export function isOrderEmail(orderEmail: string | null, email: string): boolean 
 /** The owners' copy: the receipt, and whether the sender could be tied to the order. */
 export function ownerNotice(receipt: string, verified: boolean): string {
   const status = verified
-    ? 'Ellenőrzés: a rendelésszám és az e-mail cím egyezik, a visszaigazolást elküldtük a vásárlónak.'
-    : 'Ellenőrzés: a rendelésszám és az e-mail cím nem egyeztethető (elírás, 60 napnál régebbi rendelés vagy más cím). A vásárló NEM kapott e-mailt, csak a képernyőn látta a visszaigazolást. A nyilatkozat ettől még érvényes lehet, ellenőrizd a rendelést, és válaszolj neki.';
+    ? 'Ellenőrzés: a rendelésszám és az e-mail cím egyezik.'
+    : 'Ellenőrzés: a rendelésszám és az e-mail cím nem egyeztethető (elírás, 60 napnál régebbi vagy egyedi rendelés, más cím). A nyilatkozat ettől még érvényes lehet, ellenőrizd a rendelést.';
   return `${status}\n\n${receipt}`;
+}
+
+/** Tells the owners that the customer has no receipt, which the law requires them to get. */
+export function receiptFailedNotice(receipt: string): string {
+  return `A visszaigazolást NEM sikerült elküldeni a vásárlónak. Küldd el neki kézzel!\n\n${receipt}`;
 }
 
 /** Date and time of receipt in Hungarian time, as the receipt must state it. */
