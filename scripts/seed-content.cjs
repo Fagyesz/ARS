@@ -51,7 +51,7 @@ const SETTINGS = {
   handling_time: '1–2 munkanap',
   transit_time: '2–3 munkanap',
   return_days: '14',
-  payment_methods: 'Biztonságos online fizetés',
+  payment_methods: 'Bankkártya vagy Google Pay',
   usp_title: 'Budapesten készül',
   usp_text: 'kis szériás, egyedi grafika',
   // the company_* and tax_number fields are the owner's: a re-seed must not overwrite them
