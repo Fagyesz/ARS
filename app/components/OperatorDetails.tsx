@@ -3,10 +3,10 @@ import type {SiteSettings} from '~/lib/content';
 /**
  * "Üzemeltető adatai" for the legal pages. Every value comes from the
  * shop_settings metaobject (entered by the owner in the Shopify admin);
- * empty fields are left out.
+ * empty fields are left out, and `npm run check:legal` reports them.
  */
 export function OperatorDetails({company}: {company: SiteSettings['company']}) {
-  const {name, address, taxNumber, email, phone} = company;
+  const {name, address, registrationNumber, registry, taxNumber, email, phone} = company;
   return (
     <p>
       <strong>{name || 'Ars Mosoris'}</strong>
@@ -14,6 +14,18 @@ export function OperatorDetails({company}: {company: SiteSettings['company']}) {
         <>
           <br />
           Székhely: {address}
+        </>
+      ) : null}
+      {registrationNumber ? (
+        <>
+          <br />
+          Nyilvántartási szám: {registrationNumber}
+        </>
+      ) : null}
+      {registry ? (
+        <>
+          <br />
+          Nyilvántartásba vevő szerv: {registry}
         </>
       ) : null}
       {taxNumber ? (

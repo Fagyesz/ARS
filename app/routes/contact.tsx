@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {Form, useActionData, useNavigation, useLoaderData} from 'react-router';
+import {Form, Link, useActionData, useNavigation, useLoaderData} from 'react-router';
 import type {Route} from './+types/contact';
 import {EMAIL, SOCIAL_LINKS} from '~/lib/config';
 import {seoMeta} from '~/lib/seo';
@@ -289,7 +289,11 @@ export default function Contact() {
             </div>
             <div className="faq-item">
               <h3>Van lehetőség visszaküldésre?</h3>
-              <p>Igen, a kézhezvételtől számított 14 napon belül visszaküldheted a terméket.</p>
+              <p>
+                Igen, a kézhezvételtől számított 14 napon belül indoklás nélkül elállhatsz a
+                vásárlástól. A részleteket az <Link to="/elallas">Elállás a szerződéstől</Link>{' '}
+                oldalon találod.
+              </p>
             </div>
             <div className="faq-item">
               <h3>Hogyan ápoljam a ruháimat?</h3>
@@ -297,7 +301,10 @@ export default function Contact() {
             </div>
             <div className="faq-item">
               <h3>Lehet egyedi rendelést leadni?</h3>
-              <p>Egyedi megrendelésekről és együttműködésekről szívesen egyeztetünk. Írj nekünk!</p>
+              <p>
+                Igen! A saját ruhádat is újragondoljuk, az{' '}
+                <Link to="/egyedi-rendeles">Egyedi rendelés</Link> oldalon írhatod meg az ötleted.
+              </p>
             </div>
           </div>
         </div>

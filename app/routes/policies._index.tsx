@@ -56,6 +56,14 @@ export default function Policies() {
               <p>{policy.description}</p>
             </Link>
           ))}
+          <Link to="/elallas" className="policy-index-card">
+            <strong>Elállás a szerződéstől →</strong>
+            <p>Online elállási nyilatkozat.</p>
+          </Link>
+          <Link to="/impresszum" className="policy-index-card">
+            <strong>Impresszum →</strong>
+            <p>Az üzemeltető és a tárhelyszolgáltató adatai.</p>
+          </Link>
         </div>
       </div>
     </div>

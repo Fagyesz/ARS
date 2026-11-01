@@ -165,6 +165,13 @@ export function Footer({
                   <p>
                     <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
                     {settings.company.address ? ` · ${settings.company.address}` : ''}
+                    {/* outside the menu columns: the owner's footer menu must not be able to drop these */}
+                    {' · '}
+                    <NavLink to="/egyedi-rendeles">Egyedi rendelés</NavLink>
+                    {' · '}
+                    <NavLink to="/impresszum">Impresszum</NavLink>
+                    {' · '}
+                    <NavLink to="/elallas">Elállás a szerződéstől</NavLink>
                     {' · '}
                     <button type="button" className="footer-cookie-btn" onClick={openCookieSettings}>
                       Süti beállítások

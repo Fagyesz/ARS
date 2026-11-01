@@ -30,9 +30,12 @@ Updated 2026-10-06. Scope for this repo is DevOps only.
    2026-10-26: product data check over the Admin API: all 43 active, published, priced, SKU'd, in stock;
    85 variants had no weight and got their type's weight (póló 200 g, kapucnis 500 g, környakú 450 g,
    táska 150 g). Test product `teszt-termek` (1 Ft, SKU `TESZT-1`) made for the Google Pay / Billingo /
-   FoxPost / cancel test. **Delete it before launch.** The custom app has no `read_orders` scope, so order
-   results come from the admin by hand.
-5. Switch production to Public.
+   FoxPost / cancel test. **Delete it before launch.** The custom app has had `read_orders` since 2026-11-01 (version after `api-6`;
+   covers the last 60 days). `/elallas` uses it: the receipt e-mail goes only to the address on the order; otherwise
+   the owners are told and the customer sees the receipt on screen.
+5. Switch production to Public. **Hold until** branch `fix/legal-compliance` is merged and deployed (legal fixes from
+   `docs/audits/2026-11-01-legal-analysis.md`, `/elallas`, `/impresszum`, `/egyedi-rendeles`), the seed has added the
+   new Shopify fields, the owners have filled them, `npm run check:legal` passes, and both forms have been tested live.
 
 ## Health check 2026-10-06
 

@@ -8,6 +8,13 @@ export const EMAIL = 'arsmosoris@gmail.com'; // fallback only
 // never follow the request Host (preview hosts, old subdomains) — update on domain changes.
 export const SITE_URL = 'https://arsmosoris.art';
 
+// Hosting provider shown on /impresszum (Ektv. 4. §). Source: shopify.com/legal/terms, 2026-11-01.
+export const HOSTING_PROVIDER = {
+  name: 'Shopify International Limited',
+  address: 'The Sidings, 4th Floor, Grand Canal Quay, Dublin D02 E7K8, Írország',
+  contactUrl: 'https://help.shopify.com',
+};
+
 // Hungarian checkout via the kosR app (parcel points, utánvét, Billingo invoicing).
 // Its page is an Online Store app proxy on PUBLIC_CHECKOUT_DOMAIN; the /penztar route
 // rebuilds the cart there. Set to false to fall back to Shopify's native checkout.
