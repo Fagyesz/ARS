@@ -16,7 +16,9 @@ Updated 2026-11-08. Scope for this repo is DevOps only.
 **2026-11-08 go-live check.** Site still private. Done: test product deleted; real orders #1001 (Google Pay, refunded) and
 #1002 (11 000 Ft, owner bought a farmer: payment, FoxPost and e-mails worked, Billingo tag "Számlázva"). Blocking:
 `check:legal` fails on 40 items: the sole-trader registration number in `shop_settings` and fibre composition on all
-39 active products (`custom.fibre_composition`). Also open: kosR order-button wording, both forms tested live.
+39 active products (`custom.fibre_composition`). Also open: both forms tested live. Payments: kosR passes the order to the **Shopify checkout with Shopify Payments**
+(enabled for FoxPost csomagpont, screenshot 2026-11-08), so payouts are under Shopify admin → Settings → Payments → Payouts,
+and the final button is Shopify's Hungarian "Fizetés most" (accepted as an unambiguous wording under 2011/83/EU Art. 8(2)).
 `check:legal` reads `ARS/.env`; with the shared `PersonalClaude/.env` it needs a copy or a path override.
 
 
