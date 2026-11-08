@@ -7575,3 +7575,12 @@ html.ars-backdrop-on .newsletter::after {
 html.ars-backdrop-on .artists-index-hero::before {
   background: var(--color-ars-dark);
 }
+
+/* EU legal guarantee notice: the official image, shown at its own proportions */
+.guarantee-notice img {
+  display: block;
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  margin-top: 0.75rem;
+}
