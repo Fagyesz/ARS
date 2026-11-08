@@ -1,5 +1,6 @@
 import type {CartApiQueryFragment} from 'storefrontapi.generated';
 import type {CartLayout} from '~/components/CartMain';
+import {GuaranteeNotice} from '~/components/GuaranteeNotice';
 import {CartForm, type OptimisticCart} from '@shopify/hydrogen';
 import {Link, useRouteLoaderData} from 'react-router';
 import {KOSR_CHECKOUT_ENABLED} from '~/lib/config';
@@ -187,6 +188,7 @@ function CartCheckoutActions({
         {settings.paymentMethods} · {settings.shipping.carrier} {deliveryModes(settings.shipping)} ·{' '}
         {settings.shipping.returnDays} napos elállás
       </p>
+      <GuaranteeNotice />
     </div>
   );
 }

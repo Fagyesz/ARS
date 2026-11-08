@@ -1,3 +1,4 @@
+import {GuaranteeNotice} from '~/components/GuaranteeNotice';
 import {Await, useLoaderData, useRouteLoaderData, Link, useFetcher} from 'react-router';
 import type {RootLoader} from '~/root';
 import {CAMPAIGN_PATH, eligibleCampaign} from '~/lib/campaigns';
@@ -409,6 +410,7 @@ export default function Product() {
               )}
               <SizeGuide guide={sizeGuide} sizes={sizeValues} />
               <ProductSafety company={settings.company} />
+              <GuaranteeNotice />
             </div>
           </div>
         </div>
