@@ -7670,3 +7670,17 @@ html.ars-backdrop-on .artists-index-hero::before {
 .product-card-wrapper::after {
   display: none;
 }
+
+/* Desktop: a mouse can't see the filter bar scrolls sideways, so the last size chips
+   (often the active one) were cut off; wrap to a second row instead of overflowing */
+@media (min-width: 768px) {
+  .catalog-filters-inner {
+    flex-wrap: wrap;
+    height: auto;
+    overflow-x: visible;
+  }
+
+  .catalog-filter-section {
+    height: 56px;
+  }
+}
