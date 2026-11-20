@@ -103,31 +103,41 @@ export default function Withdrawal() {
         </div>
 
         <div className="policy-body">
+          <div className="contact-form-wrapper withdrawal-card">
           {actionData?.success ? (
-            <div role="status">
+            <div role="status" className="contact-success">
+              <div className="contact-success-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                  <polyline points="22 4 12 14.01 9 11.01" />
+                </svg>
+              </div>
               <h2>Megkaptuk a nyilatkozatodat</h2>
               <p>
                 {actionData.receiptSent
                   ? 'A visszaigazolást elküldtük a megadott e-mail címre.'
                   : 'A visszaigazoló e-mailt nem sikerült elküldeni, ezért mentsd el az alábbi szöveget. Hamarosan e-mailben is megkapod.'}
               </p>
-              <p style={{whiteSpace: 'pre-line'}}>{actionData.receipt}</p>
+              <pre className="withdrawal-receipt">{actionData.receipt}</pre>
             </div>
           ) : (
             <Form method="post" className="contact-form">
+              <h2>Elállási nyilatkozat</h2>
               {actionData?.error && <div className="form-error">{actionData.error}</div>}
 
-              <div className="form-group">
-                <label htmlFor="name">Neved *</label>
-                <input type="text" id="name" name="name" autoComplete="name" required />
-              </div>
-              <div className="form-group">
-                <label htmlFor="email">E-mail cím a visszaigazoláshoz *</label>
-                <input type="email" id="email" name="email" autoComplete="email" required />
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="name">Neved *</label>
+                  <input type="text" id="name" name="name" autoComplete="name" required />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="email">E-mail cím a visszaigazoláshoz *</label>
+                  <input type="email" id="email" name="email" autoComplete="email" required />
+                </div>
               </div>
               <div className="form-group">
                 <label htmlFor="orderNumber">Rendelés száma *</label>
-                <input type="text" id="orderNumber" name="orderNumber" required />
+                <input type="text" id="orderNumber" name="orderNumber" placeholder="pl. #1002" required />
               </div>
               <div className="form-group">
                 <label htmlFor="items">Érintett termékek (ha nem a teljes rendelés)</label>
@@ -143,16 +153,17 @@ export default function Withdrawal() {
                 style={{display: 'none'}}
               />
 
-              <p>
+              <p className="withdrawal-consent">
                 A gomb megnyomásával kijelentem, hogy elállok a fenti szerződéstől. Az adatok
                 kezeléséről az <Link to="/policies/privacy-policy">adatvédelmi tájékoztatóban</Link>{' '}
                 olvashatsz.
               </p>
-              <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+              <button type="submit" className="btn btn-primary contact-submit" disabled={isSubmitting}>
                 {isSubmitting ? 'Küldés...' : 'Elállás megerősítése'}
               </button>
             </Form>
           )}
+          </div>
 
           <p>
             A részletes szabályokat és a nyilatkozatmintát a{' '}

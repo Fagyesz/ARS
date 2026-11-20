@@ -3592,6 +3592,8 @@ aside .cart-empty {
 .form-row {
   display: grid;
   gap: 1rem;
+  /* the groups inside drop their margin; keep the same gap to the next field */
+  margin-bottom: 1.5rem;
 }
 
 @media (min-width: 600px) {
@@ -7583,4 +7585,27 @@ html.ars-backdrop-on .artists-index-hero::before {
   max-width: 420px;
   height: auto;
   margin-top: 0.75rem;
+}
+
+/* /elallas: the withdrawal form as a card, like the contact form */
+.withdrawal-card {
+  max-width: 720px;
+  margin-bottom: 2rem;
+}
+
+.withdrawal-consent {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin: 0.5rem 0 1.5rem;
+}
+
+.withdrawal-receipt {
+  white-space: pre-wrap;
+  font-family: inherit;
+  font-size: 0.875rem;
+  text-align: left;
+  background: var(--color-ars-cream);
+  border: 1px solid var(--color-border, rgba(0, 0, 0, 0.12));
+  padding: 1rem 1.25rem;
+  margin-top: 1.5rem;
 }
