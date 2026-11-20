@@ -34,7 +34,10 @@ export async function action({request, context}: Route.ActionArgs) {
       headers: {Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json'},
       body: JSON.stringify({from, to: [owner], replyTo: input.email, ...customOrderEmail(input)}),
     });
-    if (!response.ok) return {success: false as const, error: SEND_ERROR};
+    if (!response.ok) {
+      console.error(`[egyedi-rendeles] Resend ${response.status}: ${await response.text()}`);
+      return {success: false as const, error: SEND_ERROR};
+    }
     return {success: true as const};
   } catch {
     return {success: false as const, error: SEND_ERROR};

@@ -44,7 +44,10 @@ export async function action({request, context}: Route.ActionArgs) {
       method: 'POST',
       headers: {Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json'},
       body: JSON.stringify({from, ...payload}),
-    }).then((response) => response.ok);
+    }).then(async (response) => {
+      if (!response.ok) console.error(`[elallas] Resend ${response.status}: ${await response.text()}`);
+      return response.ok;
+    });
 
   // only informs the owners: a failed lookup or a mismatch never stops the receipt
   const creds = adminCreds(context.env);

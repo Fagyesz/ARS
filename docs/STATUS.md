@@ -18,7 +18,10 @@ URLs answer 200 (`/account` → login, `/pages/contact` → `/contact` as intend
 product pages carry ProductGroup/Offer/Breadcrumb JSON-LD, fibre composition and the guarantee notice; the checkout domain
 is open. Launch-day fixes: `/elallas` as a card (PR #45), brand favicon and no doubled "| Ars Mosoris" title (PR #46),
 manifest served as `manifest.json` because Oxygen 404s `.webmanifest` (PR #47).
-Still to do: live test of `/elallas` and `/egyedi-rendeles`; Search Console + sitemap; Google & YouTube channel;
+E-mail fixed the same day: Resend domain `arsmosoris.art` verified (DKIM at GoDaddy); `FROM_EMAIL` lacked its closing `>`
+(422 on every send) and is now `Ars Mosoris <rendeles@arsmosoris.art>`. Contact, custom-order and withdrawal forms tested live,
+all delivered. The three forms now log Resend errors like the newsletter does.
+Still to do: Search Console + sitemap; Google & YouTube channel;
 fibre composition for the 3 parked products; Dependabot PRs #44, #33 after a quiet day.
 
 **2026-11-20, go-live day.** Niddhog kabát, Cicanaci nadrág (sold out) and Bogaras póló parked as Draft until Zorka
