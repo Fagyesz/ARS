@@ -62,6 +62,7 @@ export async function action({request, context}: Route.ActionArgs) {
     });
 
     if (!emailResponse.ok) {
+      console.error(`[contact] Resend ${emailResponse.status}: ${await emailResponse.text()}`);
       return {success: false, error: 'Az üzenet küldése sikertelen volt. Próbáld újra.'};
     }
 
