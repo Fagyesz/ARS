@@ -12,7 +12,6 @@ import {
   useRouteLoaderData,
 } from 'react-router';
 import type {Route} from './+types/root';
-import favicon from '~/assets/favicon.svg';
 import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
 import {SITE_URL, SOCIAL_LINKS} from '~/lib/config';
 import {jsonLd, seoMeta} from '~/lib/seo';
@@ -96,7 +95,9 @@ export function links() {
       href: '/fonts/grandstander-latin-ext.woff2',
       crossOrigin: 'anonymous',
     },
-    {rel: 'icon', type: 'image/svg+xml', href: favicon},
+    // brand logo on cream: readable in light and dark tabs; Google wants a multiple of 48 px
+    {rel: 'icon', type: 'image/png', sizes: '48x48', href: '/favicon-48.png'},
+    {rel: 'icon', type: 'image/png', sizes: '96x96', href: '/favicon-96.png'},
     {rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png'},
     {rel: 'manifest', href: '/manifest.webmanifest'},
   ];

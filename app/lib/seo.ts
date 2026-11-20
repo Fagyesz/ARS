@@ -4,6 +4,7 @@ import {SITE_URL} from './config';
 export const SITE_NAME = 'Ars Mosoris';
 export const DEFAULT_DESCRIPTION =
   'Négy képzőművész által alapított márka, ahol a mindennapi viselet és a kortárs művészet találkozik. Kézzel nyomott pólók, pulóverek és egyedi darabok.';
+const SITE_SUFFIX = /\s*[|–-]\s*Ars Mosoris\s*$/i;
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/og-default.png`;
 
 type SeoInput = {
@@ -58,7 +59,9 @@ export function seoMeta({
   noindex = false,
   rawTitle = false,
 }: SeoInput): MetaDescriptor[] {
-  const fullTitle = rawTitle ? title : `${title} | ${SITE_NAME}`;
+  // SEO titles typed in Shopify often already end in "| Ars Mosoris"; never show it twice
+  const base = title.replace(SITE_SUFFIX, '');
+  const fullTitle = rawTitle ? title : `${base} | ${SITE_NAME}`;
   const url = absoluteUrl(path.split('?')[0]);
   const desc = truncate(description || DEFAULT_DESCRIPTION);
   const ogImage = absoluteUrl(image || '/og-default.png');

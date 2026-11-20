@@ -37,6 +37,13 @@ describe('seoMeta', () => {
     });
   });
 
+  it('does not repeat the site name when the Shopify SEO title already has it', () => {
+    expect(seoMeta({title: 'Baseline póló | Ars Mosoris', path: '/products/baseline-polo'})).toContainEqual({
+      title: 'Baseline póló | Ars Mosoris',
+    });
+    expect(seoMeta({title: 'Bika póló – Ars Mosoris', path: '/p'})).toContainEqual({title: 'Bika póló | Ars Mosoris'});
+  });
+
   it('gives utility pages noindex and no canonical', () => {
     const tags = seoMeta({title: 'Kosár', path: '/cart', noindex: true});
     expect(tags).toContainEqual({name: 'robots', content: 'noindex'});
