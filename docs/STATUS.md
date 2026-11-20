@@ -4,7 +4,7 @@ Updated 2026-11-08. Scope for this repo is DevOps only.
 
 ## Where things stand
 
-- **Production** (`main`, Oxygen, https://arsmosoris.art, **private until launch**): PR #2 merged 2026-10-06
+- **Production** (`main`, Oxygen, https://arsmosoris.art, **public since 2026-11-20**): PR #2 merged 2026-10-06
   (`0504dd7`). It holds audit batches 1–3, Shopify-driven campaigns and content, the size filter, and the
   2026-09-29 fixes (a11y, SEO, cart, pagination). CI runs lint, a codegen drift check, typecheck and build
   on every push and PR. Dependabot checks npm and Actions weekly.
@@ -12,6 +12,14 @@ Updated 2026-11-08. Scope for this repo is DevOps only.
 - All other branches and worktrees have been removed. GitHub CLI token has the `workflow` scope.
 
 ## Next (before launch)
+
+**LIVE 2026-11-20 (~10:30).** Hydrogen production and the Online Store are public. Outside check: all 76 sitemap and home-page
+URLs answer 200 (`/account` → login, `/pages/contact` → `/contact` as intended); robots.txt and the sitemap index serve;
+product pages carry ProductGroup/Offer/Breadcrumb JSON-LD, fibre composition and the guarantee notice; the checkout domain
+is open. Launch-day fixes: `/elallas` as a card (PR #45), brand favicon and no doubled "| Ars Mosoris" title (PR #46),
+manifest served as `manifest.json` because Oxygen 404s `.webmanifest` (PR #47).
+Still to do: live test of `/elallas` and `/egyedi-rendeles`; Search Console + sitemap; Google & YouTube channel;
+fibre composition for the 3 parked products; Dependabot PRs #44, #33 after a quiet day.
 
 **2026-11-20, go-live day.** Niddhog kabát, Cicanaci nadrág (sold out) and Bogaras póló parked as Draft until Zorka
 sends their fibre composition; `check:legal` passes. 35 active products, all in stock, photographed, weighed and priced;
