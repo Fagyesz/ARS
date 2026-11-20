@@ -23,7 +23,7 @@ E-mail fixed the same day: Resend domain `arsmosoris.art` verified (DKIM at GoDa
 all delivered. The three forms now log Resend errors like the newsletter does.
 A full real order (Cicanaci nadrág, Flórián) went through start to finish; the NAV PDFs in `downloads/` are deleted.
 Phone proportions tightened (PR #49: 60 px header, compact promo bar and catalogue head, price under the card title,
-card counter that hid under the heart removed) so products show on the first screen.
+card counter that hid under the heart removed) so products show on the first screen. Desktop catalogue filter bar wraps instead of clipping the size chips (PR #50).
 Still to do: Search Console + sitemap; Google & YouTube channel;
 fibre composition for the 3 parked products; Dependabot PRs #44, #33 after a quiet day.
 
