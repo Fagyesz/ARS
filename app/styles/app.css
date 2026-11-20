@@ -7609,3 +7609,64 @@ html.ars-backdrop-on .artists-index-hero::before {
   padding: 1rem 1.25rem;
   margin-top: 1.5rem;
 }
+
+/* ============================================
+   Phone proportions: the first products show on the first screen
+   ============================================ */
+@media (max-width: 767px) {
+  :root {
+    --header-height: 60px;
+  }
+
+  .header-logo-img {
+    height: 30px;
+  }
+
+  /* the badge repeats the banner text; one block of copy instead of four rows */
+  .announcement-bar {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.6875rem;
+  }
+
+  .announcement-bar-badge {
+    display: none;
+  }
+
+  .announcement-bar-text {
+    display: block;
+    line-height: 1.35;
+  }
+
+  .catalog-header {
+    padding: 1.5rem 0 1rem;
+  }
+
+  .catalog-header h1 {
+    margin-bottom: 0.35rem;
+  }
+
+  .catalog-header-sub {
+    font-size: 0.5625rem;
+    letter-spacing: 0.16em;
+  }
+
+  .catalog-filters-inner {
+    height: 46px;
+  }
+
+  .catalog-meta {
+    padding: 0.625rem 0 0.875rem;
+  }
+
+  /* price under the title, so long names don't wrap to three lines */
+  .product-card-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+  }
+}
+
+/* the decorative card number sat under the wishlist heart (and badges hold the other corner) */
+.product-card-wrapper::after {
+  display: none;
+}

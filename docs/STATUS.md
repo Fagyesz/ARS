@@ -22,6 +22,8 @@ E-mail fixed the same day: Resend domain `arsmosoris.art` verified (DKIM at GoDa
 (422 on every send) and is now `Ars Mosoris <rendeles@arsmosoris.art>`. Contact, custom-order and withdrawal forms tested live,
 all delivered. The three forms now log Resend errors like the newsletter does.
 A full real order (Cicanaci nadrág, Flórián) went through start to finish; the NAV PDFs in `downloads/` are deleted.
+Phone proportions tightened (PR #49: 60 px header, compact promo bar and catalogue head, price under the card title,
+card counter that hid under the heart removed) so products show on the first screen.
 Still to do: Search Console + sitemap; Google & YouTube channel;
 fibre composition for the 3 parked products; Dependabot PRs #44, #33 after a quiet day.
 
