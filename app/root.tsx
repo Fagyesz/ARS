@@ -99,7 +99,8 @@ export function links() {
     {rel: 'icon', type: 'image/png', sizes: '48x48', href: '/favicon-48.png'},
     {rel: 'icon', type: 'image/png', sizes: '96x96', href: '/favicon-96.png'},
     {rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png'},
-    {rel: 'manifest', href: '/manifest.webmanifest'},
+    // Oxygen does not serve the .webmanifest extension
+    {rel: 'manifest', href: '/manifest.json'},
   ];
 }
 
