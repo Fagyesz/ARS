@@ -13,6 +13,10 @@ Updated 2026-11-08. Scope for this repo is DevOps only.
 
 ## Next (before launch)
 
+**2026-11-20, go-live day.** Niddhog kabát, Cicanaci nadrág (sold out) and Bogaras póló parked as Draft until Zorka
+sends their fibre composition; `check:legal` passes. 35 active products, all in stock, photographed, weighed and priced;
+test product gone; main CI green. Dependabot PRs #44 and #33 held until after launch (no dependency changes on launch day).
+
 **2026-11-20.** From Zorka's NAV notices: registration number 61809327, seat 1221 Budapest, Ják utca 8. (moved from 1222
 on 2026-02-06), registry NAV; set in `shop_settings`. The `custom.fibre_composition` definition did not exist in the shop
 (created, storefront read) and 36 products got her values (tees 100% pamut 183 g/m², hoodies and crewneck 80/20 285 g/m²,
