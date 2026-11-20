@@ -13,6 +13,12 @@ Updated 2026-11-08. Scope for this repo is DevOps only.
 
 ## Next (before launch)
 
+**2026-11-20.** From Zorka's NAV notices: registration number 61809327, seat 1221 Budapest, Ják utca 8. (moved from 1222
+on 2026-02-06), registry NAV; set in `shop_settings`. The `custom.fibre_composition` definition did not exist in the shop
+(created, storefront read) and 36 products got her values (tees 100% pamut 183 g/m², hoodies and crewneck 80/20 285 g/m²,
+tote 100 g/m², one-offs one by one). `check:legal` now misses only 3: Cicanaci nadrág, Bogaras póló (one-off, maybe not the
+standard tee) and Niddhog kabát (her list has a "Bugatti kabát", 88% poliamid 12% elasztán, bélés 100% poliészter: probably this one).
+
 **2026-11-08 go-live check.** Site still private. Done: test product deleted; real orders #1001 (Google Pay, refunded) and
 #1002 (11 000 Ft, owner bought a farmer: payment, FoxPost and e-mails worked, Billingo tag "Számlázva"). Blocking:
 `check:legal` fails on 40 items: the sole-trader registration number in `shop_settings` and fibre composition on all
